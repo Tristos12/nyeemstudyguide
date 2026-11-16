@@ -1,0 +1,106 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nyeem · Grade 7 Mathematics</title><style>
+body{margin:0;background:#f3f7fd;color:#1b3855;font:16px/1.5 system-ui,Arial,sans-serif}header{background:#174877;color:white;padding:24px max(16px,calc((100vw - 1000px)/2))}header a{color:white}h1{margin:0}main{max-width:1000px;margin:auto;padding:15px}.card{background:white;border:1px solid #d4e1ef;border-radius:14px;padding:18px;margin:14px 0}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}button{cursor:pointer;font:inherit;border:1px solid #9bb5ce;padding:9px 14px;border-radius:8px;background:white;color:#174877}.active,.primary{background:#174877;color:white}.question{border:1px solid #d4e1ef;border-radius:10px;padding:13px;margin:12px 0}.options{display:grid;gap:6px}.options label{border:1px solid #d4e1ef;border-radius:8px;padding:8px}.options label:has(input:checked){background:#e8f3ff}.feedback{background:#e7f5ed;padding:10px;border-radius:9px;margin:12px 0}.wrong{background:#fff0ea}.muted{color:#567089}summary{font-weight:700;cursor:pointer}textarea{width:100%;min-height:120px;padding:10px;font:inherit}.track{background:#deebf7;height:10px;border-radius:7px;overflow:hidden}.track div{background:#269779;height:100%}
+</style></head><body><header><a href="./">← All subjects</a><h1>🔢 Nyeem's Grade 7 Mathematics</h1><p>Sets · Number Systems · Algebra · Geometry · Introductory Trigonometry</p></header><main><section class="card"><h2>Four-day examination preparation</h2><p>Days 1–3: 12 questions in each of five sections, for 60 per day. Day 4: a 75-question untimed test and a 60-question test timed for 1 hour 15 minutes. Mastery requires at least 90% on each test.</p><p class="muted">The first four sections include essential Grade 7 skills. Basic right-triangle trigonometry is offered as an introductory extension, not as a claim about the official school examination.</p><strong id="progress"></strong><div class="track"><div id="bar"></div></div></section><nav id="tabs" class="tabs"></nav><div id="view"></div><footer class="muted">Independent revision resource · Saved in this browser · No sign-in</footer></main><script>
+const topics=["Sets","Number Systems","Algebra","Geometry","Trigonometry"];
+const guides=[
+"Members and notation: ∈ means belongs to; ∉ does not belong; ∩ means intersection; ∪ means union; n(A) counts distinct elements. Union: n(A)+n(B)−n(A∩B).",
+"Types of numbers, factors, multiples, HCF, LCM, integers, fractions, decimals, squares and order of operations.",
+"Expressions, like terms, substitution, simple equations, distributive rule and number patterns.",
+"Angles on a straight line total 180°, angles around a point 360°, triangle angles 180°. Area and perimeter require correct units.",
+"Introductory extension: right triangles, Pythagoras, opposite/adjacent/hypotenuse and simple sine, cosine and tangent ratios."
+];
+function gcd(a,b){while(b){let x=a%b;a=b;b=x}return a}
+function make(t,d,k){let a=2+(k+3*d)%7,b=3+(k*2+d)%8,c=1+(k+d)%5,v=(k+d*5)%12;let p,ans,wrong=[],why="";
+if(t===0){let A=[a,a+2,a+4],B=[a+2,a+4,a+6];let cases=[
+["A={"+A+"}. Find n(A).",3,[2,4,5],"Count distinct elements."],
+["A={"+A+"} and B={"+B+"}. Find n(A∩B).",2,[1,3,4],"Two elements belong to both sets."],
+["A={"+A+"} and B={"+B+"}. Find n(A∪B).",4,[2,3,5],"Count every different element once."],
+["Which statement shows "+a+" is a member of A={"+A+"}?",a+" ∈ A",[a+" ∉ A","A ∈ "+a,"A = "+a],"∈ means is an element of."],
+["Which statement shows "+(a+1)+" is not a member of A={"+A+"}?",(a+1)+" ∉ A",[(a+1)+" ∈ A","A = "+(a+1),a+" ∉ A"],"∉ means is not an element of."],
+["U={1,2,3,4,5,6}, A={2,4,6}. Find A′.","{1,3,5}",["{2,4,6}","{1,2,3}","{}"],"A′ contains members of U outside A."],
+["A has "+(a+6)+" members, B has "+(b+6)+", "+c+" are in both. Find n(A∪B).",a+b+12-c,[a+b+12,a+b+12+c,a+b+11-c],"Add memberships then subtract those counted twice."],
+["Which set is a subset of {"+A+"}?","{"+a+","+(a+2)+"}",["{"+a+","+(a+1)+"}","{"+(a+1)+"}","{"+(a+6)+"}"],"All subset members must appear in A."],
+["A={"+A+"}, B={"+(a+6)+","+(a+8)+"}. Find n(A∩B).",0,[1,2,3],"The sets do not overlap."],
+[(a+12)+" students like football, "+(b+11)+" like cricket, "+c+" like both. How many like at least one?",a+b+23-c,[a+b+23,a+b+23+c,a+b+22-c],"Union = first + second − both."],
+["How many different elements are in {"+a+","+a+","+(a+2)+","+(a+4)+"}?",3,[2,4,5],"Repeated elements count once."],
+["How many elements are in the empty set ∅?",0,[1,2,3],"The empty set has no members."]];[p,ans,wrong,why]=cases[v]}
+if(t===1){let cases=[
+["Evaluate "+a+" × ("+b+" + "+c+").",a*(b+c),[a*b+c,(a+b)*c,a*b+c+1],"Evaluate brackets first."],
+["Evaluate "+a+"² + "+b+".",a*a+b,[2*a+b,a*a-b,a*a+b+2],"Square before addition."],
+["Find −"+a+" + "+(a+b)+".",b,[-b,a,a+b],"The opposite quantities cancel."],
+["Find HCF of "+(6*a)+" and "+(9*a)+".",3*a,[2*a,6*a,a],"Find the greatest shared factor."],
+["Find LCM of "+(2*a)+" and "+(3*a)+".",6*a,[3*a,5*a,9*a],"Find the least common multiple."],
+["Simplify "+a+"/"+(2*a)+".","1/2",["1/3","2/3","2/5"],"Divide top and bottom by "+a+"."],
+["Calculate "+a+" + "+b+" × "+c+".",a+b*c,[(a+b)*c,a*b+c,a+b+c],"Multiply before addition."],
+["Which of these is an integer?","−"+a,["1/2","√2","0.3"],"Integers have no fractional part."],
+["Calculate "+(a*12)+" + "+(b*7)+".",a*12+b*7,[a*12+b*7+2,a*12+b*7-3,a*12+b*7+9],"Add the two amounts."],
+["Calculate "+(a*13+20)+" − "+(b+5)+".",a*13+15-b,[a*13+25+b,a*13+16-b,a*13+14-b],"Subtract carefully."],
+["Write "+(a*5)+"% as a decimal.",String(a*0.05),[String(a*0.5),String(a/5),String(a*5)],"Divide percent by 100."],
+["Calculate "+a+" × "+b+" − "+c+".",a*b-c,[a*(b-c),a*b+c,a+b-c],"Multiply before subtracting."]];[p,ans,wrong,why]=cases[v]}
+if(t===2){let cases=[
+["Simplify "+a+"x + "+b+"x.",(a+b)+"x",[(a*b)+"x",a+"x²",b+"x"],"Add coefficients of like terms."],
+["Solve x + "+a+" = "+(a+b)+".",b,[a,a+b,a*b],"Subtract "+a+"."],
+["Solve "+a+"x = "+(a*b)+".",b,[a,a+b,a*b],"Divide by "+a+"."],
+["Expand "+a+"(x + "+b+").",a+"x + "+a*b,[a+"x + "+b,a+"x + "+(a+b),a+"x² + "+b],"Multiply each term."],
+["Evaluate "+a+"x + "+b+" for x="+c+".",a*c+b,[a+b+c,a*c-b,a+b*c],"Substitute and calculate."],
+["Find the next term: "+a+", "+(a+b)+", "+(a+2*b)+", ...",a+3*b,[a+4*b,a+2*b+1,a+b*b],"The sequence increases by "+b+"."],
+["Solve x − "+a+" = "+b+".",a+b,[b-a,a*b,b],"Add "+a+"."],
+["Factorise "+a+"x + "+a*b+".",a+"(x + "+b+")",[a+"(x + "+a+")",b+"(x + "+a+")",a+"(x − "+b+")"],"Factor out "+a+"."],
+["Solve "+a+"x + "+b+" = "+(a*c+b)+".",c,[a,b,c+1],"Subtract "+b+", then divide by "+a+"."],
+["Simplify "+a+"y + "+b+" − "+c+"y.",(a-c)+"y + "+b,[(a+c)+"y + "+b,(a+b-c)+"y",(a-c)+"y − "+b],"Collect the y terms."],
+["Solve 2x > "+(2*a)+".","x > "+a,["x < "+a,"x ≥ "+a,"x = "+a],"Divide both sides by positive 2."],
+["If y="+a+"x and x="+b+", find y.",a*b,[a+b,b-a,a*b+1],"Multiply a by x."]];[p,ans,wrong,why]=cases[v]}
+if(t===3){let cases=[
+["A straight-line angle is "+a*10+"°. Find the adjacent angle.",180-a*10,[a*10,360-a*10,90-a*10],"Straight line total =180°."],
+["Angles around a point include "+a*25+"°. Find the remainder.",360-a*25,[180-a*25,360+a*25,a*25],"Full turn =360°."],
+["Two angles of a triangle are "+a*5+"° and "+b*4+"°. Find the third.",180-a*5-b*4,[90-a*5-b*4,180-a*5+b*4,a*5+b*4],"Triangle total =180°."],
+["Perimeter of rectangle "+(a+4)+" cm by "+b+" cm?",2*(a+4+b)+" cm",[(a+4)*b+" cm",(a+4+b)+" cm",2*(a+4)*b+" cm"],"Perimeter=2(length+width)."],
+["Area of rectangle "+a+" cm by "+b+" cm?",a*b+" cm²",[2*(a+b)+" cm²",(a+b)+" cm²",a*b+" cm"],"Area=length×width."],
+["Area of triangle base "+2*a+" cm, height "+b+" cm?",a*b+" cm²",[2*a*b+" cm²",(a+b)+" cm²",a*b+" cm"],"Area=½×base×height."],
+["Right triangle legs: 3 cm and 4 cm. Find hypotenuse.","5 cm",["7 cm","6 cm","12 cm"],"√(3²+4²)=5."],
+["Sum of interior angles of a "+(a+3)+"-sided polygon?",(a+1)*180+"°",[(a+3)*180+"°",(a+2)*180+"°",a*180+"°"],"Use (n−2)×180°."],
+["Interior angle of a regular hexagon?","120°",["60°","90°","135°"],"720° divided by 6."],
+["An acute angle measures ...","Less than 90°",["Exactly 90°","Between 90° and 180°","Exactly 180°"],"Acute angles are smaller than a right angle."],
+["Perimeter of square side "+a+" cm?",4*a+" cm",[a*a+" cm",2*a+" cm",3*a+" cm"],"Four equal sides."],
+["Fourth angle of quadrilateral with angles 80°,90°,110°?","80°",["90°","100°","70°"],"Quadrilateral total=360°."]];[p,ans,wrong,why]=cases[v]}
+if(t===4){const cases=[
+["Right triangle opposite 3, hypotenuse 5: sin θ?","3/5",["4/5","3/4","5/3"],"sin=opposite/hypotenuse."],
+["Right triangle adjacent 4, hypotenuse 5: cos θ?","4/5",["3/5","4/3","5/4"],"cos=adjacent/hypotenuse."],
+["Right triangle opposite 3, adjacent 4: tan θ?","3/4",["4/3","3/5","4/5"],"tan=opposite/adjacent."],
+["Which ratio equals opposite/hypotenuse?","sine",["cosine","tangent","none"],"SOH means sine=opposite/hypotenuse."],
+["Which ratio equals adjacent/hypotenuse?","cosine",["sine","tangent","none"],"CAH means cosine=adjacent/hypotenuse."],
+["What is sin 30°?","1/2",["1","√3/2","0"],"sin 30°=½."],
+["What is cos 60°?","1/2",["1","√3/2","0"],"cos 60°=½."],
+["What is tan 45°?","1",["0","1/2","2"],"The two shorter sides are equal."],
+["Right triangle legs 5 cm and 12 cm: hypotenuse?","13 cm",["17 cm","11 cm","10 cm"],"√(25+144)=13."],
+["The hypotenuse lies ...","Opposite the right angle",["Opposite the smallest angle","On the bottom only","On the left only"],"It is opposite 90°."],
+["sin θ=0.6, hypotenuse=10 cm. Find opposite.","6 cm",["4 cm","16 cm","10.6 cm"],"0.6×10=6."],
+["tan θ=0.75, adjacent=8 cm. Find opposite.","6 cm",["8.75 cm","10 cm","4 cm"],"0.75×8=6."]];[p,ans,wrong,why]=cases[v]}
+const options=[String(ans),...wrong.map(String)];if(new Set(options).size!==4){throw Error("Duplicate answers: "+p+" "+JSON.stringify(options))}const shift=(k*3+d*5+t)%4;return{prompt:p,options:options.slice(shift).concat(options.slice(0,shift)),answer:(4-shift)%4,why,topic:t}}
+const daily=[0,1,2].map(d=>topics.map((_,t)=>Array.from({length:12},(_,k)=>make(t,d,k))));
+const pool=topics.map((_,t)=>Array.from({length:90},(_,k)=>make(t,4+Math.floor(k/12),k)));
+const specs=[{id:"a",n:75,seconds:0,label:"75 questions · Untimed"},{id:"b",n:60,seconds:4500,label:"60 questions · 75 minutes"}];
+let data={daily:{},tests:{},written:{}};try{data=Object.assign(data,JSON.parse(localStorage.getItem("nyeem_grade7_math_v1")||"{}"))}catch(e){}
+function save(){try{localStorage.setItem("nyeem_grade7_math_v1",JSON.stringify(data))}catch(e){}}
+const tabs=document.getElementById("tabs"),view=document.getElementById("view");let day=0,finalTab=0;
+function el(t,cls,content){const x=document.createElement(t);if(cls)x.className=cls;if(content!==undefined)x.textContent=content;return x}
+function progress(){const n=Object.keys(data.daily).length;document.getElementById("progress").textContent=n+"/180 questions answered";document.getElementById("bar").style.width=(n/180*100)+"%"}
+function question(item,key,record,showExplanation){const article=el("article","question");article.append(el("h3","",item.prompt));const choices=el("div","options"),feedback=el("p");item.options.forEach((choice,j)=>{const label=el("label"),radio=document.createElement("input");radio.type="radio";radio.name=key;radio.checked=record[key]===j;radio.onchange=()=>{record[key]=j;save();if(showExplanation){feedback.className="feedback"+(j===item.answer?"":" wrong");feedback.textContent=(j===item.answer?"Correct. ":"Try again. ")+item.why;progress()}};label.append(radio,document.createTextNode(" "+String.fromCharCode(65+j)+". "+choice));choices.append(label)});article.append(choices);if(showExplanation){const val=record[key];if(val!==undefined){feedback.className="feedback"+(val===item.answer?"":" wrong");feedback.textContent=(val===item.answer?"Correct. ":"Try again. ")+item.why}article.append(feedback)}return article}
+function render(){tabs.innerHTML="";[0,1,2,3].forEach(d=>{const b=el("button",day===d?"active":"",d===3?"Day 4 · Exams":"Day "+(d+1));b.onclick=()=>{day=d;finalTab=0;render()};tabs.append(b)});view.innerHTML="";if(day===3){renderFinal();return}
+const intro=el("section","card");intro.append(el("h2","","Day "+(day+1)+" · Five mathematics sections"),el("p","","Each section has 12 questions with immediate feedback and explanations. Open one topic at a time."));view.append(intro);
+daily[day].forEach((qs,t)=>{const card=el("section","card"),details=document.createElement("details"),correct=qs.filter((q,i)=>data.daily[day+"-"+t+"-"+i]===q.answer).length;details.append(el("summary","",topics[t]+" · "+correct+"/12 correct"),el("p","muted",guides[t]));qs.forEach((q,i)=>details.append(question(q,day+"-"+t+"-"+i,data.daily,true)));card.append(details);view.append(card)});
+const working=el("section","card");working.append(el("h2","","Show your working"),el("p","","Choose two difficult problems and explain the steps you took."));const area=document.createElement("textarea");area.value=data.written[day]||"";area.oninput=()=>{data.written[day]=area.value;save()};working.append(area);view.append(working);progress()}
+function get(spec){return data.tests[spec.id]||{attempt:0,started:null,answers:{},result:null}}
+function set(spec,x){data.tests[spec.id]=x;save()}
+function questions(spec,attempt){let out=[];const per=spec.n/5;for(let t=0;t<5;t++)for(let j=0;j<per;j++)out.push(pool[t][(attempt*23+j*7+t*13)%90]);return out}
+function score(spec,x,expired){const qs=questions(spec,x.attempt),correct=qs.filter((q,i)=>x.answers[i]===q.answer).length;x.result={correct,pct:Math.round(correct/spec.n*1000)/10,expired};set(spec,x)}
+function renderFinal(){view.innerHTML="";const box=el("section","card");box.append(el("h2","","Day 4 · Mathematics examinations"),el("p","","Complete both examinations. Aim for 90% or higher on each. The timed examination clock continues after a refresh."));const first=get(specs[0]).result,second=get(specs[1]).result;box.append(el("p","feedback"+(first&&second&&first.pct>=90&&second.pct>=90?"":" wrong"),"Untimed: "+(first?first.pct+"%":"Not taken")+" | Timed: "+(second?second.pct+"%":"Not taken")+(first&&second&&first.pct>=90&&second.pct>=90?" | Both mastery targets met!":" | Mastery in progress")));view.append(box);
+const chooser=el("nav","tabs");specs.forEach((sp,i)=>{const b=el("button",finalTab===i?"active":"",sp.label);b.onclick=()=>{finalTab=i;renderFinal()};chooser.append(b)});view.append(chooser);
+const sp=specs[finalTab],x=get(sp),panel=el("section","card");panel.append(el("h2","",sp.label));view.append(panel);
+if(sp.seconds&&x.started&&!x.result&&Date.now()-x.started>=sp.seconds*1000){score(sp,x,true);renderFinal();return}
+if(x.result){panel.append(el("p","feedback"+(x.result.pct>=90?"":" wrong"),"Attempt "+(x.attempt+1)+": "+x.result.correct+"/"+sp.n+" = "+x.result.pct+"%."+(x.result.expired?" Time expired.":"")));const review=document.createElement("details");review.append(el("summary","","Review answers and worked explanations"));questions(sp,x.attempt).forEach((q,i)=>review.append(el("p","",q.prompt+" Your answer: "+(x.answers[i]===undefined?"Unanswered":q.options[x.answers[i]])+". Correct: "+q.options[q.answer]+". "+q.why)));panel.append(review);const repeat=el("button","primary",x.result.pct>=90?"Optional new test":"Try another test");repeat.onclick=()=>{set(sp,{attempt:x.attempt+1,started:null,answers:{},result:null});renderFinal()};panel.append(repeat);return}
+if(sp.seconds&&!x.started){panel.append(el("p","","The 75-minute clock starts when you press Start and cannot be paused. Unanswered questions count as incorrect after time expires."));const start=el("button","primary","Start timed examination");start.onclick=()=>{x.started=Date.now();set(sp,x);renderFinal()};panel.append(start);return}
+const clock=el("p","feedback");panel.append(clock);let interval;function tick(){if(!sp.seconds){clock.textContent="Untimed | "+Object.keys(x.answers).length+"/"+sp.n+" answered";return}const remaining=Math.max(0,sp.seconds-Math.floor((Date.now()-x.started)/1000));clock.textContent="Time left: "+Math.floor(remaining/60)+":"+String(remaining%60).padStart(2,"0")+" | "+Object.keys(x.answers).length+"/"+sp.n+" answered";if(remaining===0&&!x.result){clearInterval(interval);score(sp,x,true);renderFinal()}}tick();if(sp.seconds)interval=setInterval(()=>{if(!panel.isConnected){clearInterval(interval);return}tick()},1000);
+questions(sp,x.attempt).forEach((q,i)=>{const item=question(q,"exam-"+sp.id+"-"+i,{[ "exam-"+sp.id+"-"+i ]:x.answers[i]},false);item.querySelector("h3").textContent=(i+1)+". "+q.prompt;item.querySelectorAll("input").forEach((radio,j)=>{radio.onchange=()=>{if(sp.seconds&&Date.now()-x.started>=sp.seconds*1000){score(sp,x,true);renderFinal();return}x.answers[i]=j;set(sp,x);tick()}});panel.append(item)});const submit=el("button","primary","Submit examination");submit.onclick=()=>{if(sp.seconds&&Date.now()-x.started>=sp.seconds*1000)score(sp,x,true);else{if(Object.keys(x.answers).length<sp.n&&!confirm("Some questions are unanswered and will count as incorrect. Submit?"))return;score(sp,x,false)}renderFinal()};panel.append(submit)}
+render();
+</script></body></html>
