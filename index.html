@@ -218,6 +218,20 @@ const timeText=el("p","feedback");panel.append(timeText);let interval=null;funct
 finalQuestions(kind,state.attempt).forEach((q,i)=>{const block=el("article","question");block.append(el("h3","",(i+1)+". "+q.question));const choices=el("div","options");q.options.forEach((choice,j)=>{const label=el("label","option"),input=document.createElement("input");input.type="radio";input.name="final-"+kind.id+"-"+i;input.checked=state.answers[i]===j;input.onchange=()=>{state.answers[i]=j;setFinal(kind,state);updateTimer()};label.append(input,document.createTextNode(" "+String.fromCharCode(65+j)+". "+choice));choices.append(label)});block.append(choices);panel.append(block)});
 const submit=el("button","btn primary","Submit for grading");submit.onclick=()=>{if(kind.seconds&&Date.now()-state.started>=kind.seconds*1000){gradeFinal(kind,state,true)}else{if(Object.keys(state.answers).length<kind.n&&!confirm("Some questions are unanswered and will count as incorrect. Submit anyway?"))return;gradeFinal(kind,state,false)}renderFinalV4();document.getElementById("study").scrollIntoView()};panel.append(submit);view.append(panel)}
 function renderFinalStoryV4(){const p=storyPrompts[(finalState(finalKinds[0]).attempt+finalState(finalKinds[1]).attempt)%storyPrompts.length];const section=el("section","card");section.append(el("h2","","Creative writing · 20 marks"),el("h3","",p.title),el("p","",p.prompt),el("p","muted","Write 180–220 words. Plan a beginning, believable complication, turning point, resolution and meaningful ending. The story is compulsory, but grading requires an adult or teacher."));const key="day4-final-story",ta=document.createElement("textarea");ta.style.minHeight="300px";ta.value=drafts[key]||"";ta.placeholder="Write your story here...";const counter=el("p","muted");function update(){drafts[key]=ta.value;counter.textContent=(ta.value.trim()?ta.value.trim().split(/\s+/).length:0)+" words";finalSave()}ta.oninput=update;section.append(ta,counter);update();const guide=document.createElement("details");guide.append(el("summary","","20-mark writing rubric"));[["Ideas and believable conflict",5],["Character and decisions",4],["Sequence, resolution and theme",4],["Description and vocabulary",3],["Grammar and paragraphs",4]].forEach(x=>guide.append(el("p","lesson",x[0]+" · "+x[1]+" marks")));section.append(guide);const score=el("p","", "A teacher or adult should award the mark out of 20.");const input=document.createElement("input");input.type="number";input.min="0";input.max="20";input.step="1";input.placeholder="Mark 0–20";input.style.cssText="max-width:145px;padding:10px;border:1px solid #94abc9;border-radius:8px";input.value=finalV4.storyScore??"";const record=el("button","btn primary","Record story score");record.onclick=()=>{const value=Number(input.value),words=(drafts[key]||"").trim().split(/\s+/).filter(Boolean).length;if(words<180||words>220){alert("Story must be between 180 and 220 words before marking.");return}if(input.value.trim()===""||!Number.isInteger(value)||value<0||value>20){alert("Enter a whole-number score from 0 to 20.");return}finalV4.storyScore=value;finalSave();renderFinalV4()};section.append(score,input,document.createTextNode(" "),record);if(Number.isInteger(finalV4.storyScore))section.append(el("div","feedback"+(finalV4.storyScore<18?" wrong":""),"Story: "+finalV4.storyScore+"/20. "+(finalV4.storyScore>=18?"Story mastery achieved.":"Revise the story with feedback and try again.")));view.append(section)}
-render();
-
+(function(){
+const active=!!window.bssStudent;
+document.getElementById("learnerAccess").hidden=active;
+document.getElementById("learnerBanner").hidden=!active;
+document.getElementById("subjectChoices").hidden=!active;
+document.getElementById("study").hidden=!active;
+if(active){
+document.getElementById("learnerGreeting").textContent="Welcome, "+window.bssStudent.name+"!";
+document.getElementById("learnerDetails").textContent="Form 1 · "+window.bssStudent.room+" · Your answers are saved separately in this browser.";
+}
+document.getElementById("learnerForm").onsubmit=function(event){
+event.preventDefault();
+if(!window.bssChooseStudent(document.getElementById("learnerName").value,document.getElementById("learnerRoom").value,document.getElementById("learnerCode").value)){alert("Please enter a name, class and four-digit code.")}
+};
+})();
+if(window.bssStudent)render();
 </script></body></html>
