@@ -27,9 +27,9 @@ window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the cu
 <main><section id="learnerAccess" class="card" aria-label="Choose your learner profile"><h2>Start learning</h2><p>Enter your first name or nickname, class and your own four-digit learner code. Use the same details when returning to this browser to see your saved work.</p><form id="learnerForm"><label for="learnerName">First name or nickname</label><input id="learnerName" required minlength="2" maxlength="40" autocomplete="off" placeholder="e.g. Jayden" style="display:block;width:100%;max-width:360px;padding:11px;margin:5px 0 12px;border:1px solid #aac1de;border-radius:8px"><label for="learnerRoom">Class / room</label><input id="learnerRoom" required maxlength="25" autocomplete="off" placeholder="e.g. 1R11" style="display:block;width:100%;max-width:360px;padding:11px;margin:5px 0 12px;border:1px solid #aac1de;border-radius:8px"><label for="learnerCode">Your four-digit learner code</label><input id="learnerCode" required pattern="[0-9]{4}" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="4 digits" type="password" style="display:block;width:100%;max-width:200px;padding:11px;margin:5px 0 12px;border:1px solid #aac1de;border-radius:8px"><button type="submit" class="btn primary">Enter learning hub</button></form><p class="muted">No full name, email address or account required. Your code separates local progress; it is not a secure password. On shared devices, switch learners before starting. Work does not sync to other devices.</p></section><section class="card" id="learnerBanner" hidden><h2 id="learnerGreeting"></h2><p id="learnerDetails"></p><button type="button" class="btn" onclick="bssSwitchStudent()">Switch learner</button></section>
 <section class="card"><small>FORM 1 · INDEPENDENT LEARNING</small><h2>Welcome to Form 1! 👋</h2><p>Choose a subject, practise new questions and build your confidence before your examinations.</p><strong>ELA progress <span id="progress">0 / 30</span></strong><div class="track"><div id="bar" style="width:0%"></div></div></section>
 <section class="subjects" id="subjectChoices"><button class="subject" onclick="document.getElementById('study').scrollIntoView({behavior:'smooth'})"><span>📖</span><b>English Language Arts</b><small>Open now · 4 days</small></button><button class="subject" onclick="window.location.href='./math.html'"><span>🔢</span><b>Mathematics</b><small>Open now · Grade 7 · 4 days</small></button><button class="subject" disabled><span>🔬</span><b>Science</b><small>Coming soon</small></button><button class="subject" onclick="window.location.href='./social-studies.html'"><span>🌎</span><b>Social Studies</b><small>Open now · Grade 7 Term 1</small></button><button class="subject" disabled><span>🎨</span><b>Other Subjects</b><small>Add later</small></button></section>
-<section id="study"><nav class="tabs" id="tabs" aria-label="Revision days"></nav><div id="view"></div></section>
+<section id="reportTools" class="card" hidden><h2>My progress report</h2><p>Save a copy of your scores to share with your teacher. The report includes your nickname and class, but not your four-digit learner code or written responses.</p><button type="button" class="btn primary" id="downloadReport">Download my report</button><p class="muted">Your teacher must receive the downloaded file from you. There is no automatic upload or central tracking.</p></section><section id="study"><nav class="tabs" id="tabs" aria-label="Revision days"></nav><div id="view"></div></section>
 <footer>Original revision questions · No sign-in required · Individual answers and writing saved in this browser only; not a secure account</footer>
-</main><script>
+<section class="card" style="margin-top:20px"><h2>Teachers</h2><p>Review downloaded learner progress reports on this device. The dashboard does not automatically collect results.</p><a href="./teacher-reports.html">Open local teacher reports dashboard</a></section></main><script>
 const stories=[
 `On Saturday morning, Amara reached the village library before anyone else. Rain tapped against its windows. A box of donated books stood beside the entrance, but a leak in the roof had soaked the floor nearby. Amara had promised her brother she would attend his football match. She glanced at the clock, then moved the books to a dry table.
 
@@ -224,6 +224,7 @@ document.getElementById("learnerAccess").hidden=active;
 document.getElementById("learnerBanner").hidden=!active;
 document.getElementById("subjectChoices").hidden=!active;
 document.getElementById("study").hidden=!active;
+document.getElementById("reportTools").hidden=!active;
 if(active){
 document.getElementById("learnerGreeting").textContent="Welcome, "+window.bssStudent.name+"!";
 document.getElementById("learnerDetails").textContent="Form 1 · "+window.bssStudent.room+" · Your answers are saved separately in this browser.";
@@ -233,5 +234,29 @@ event.preventDefault();
 if(!window.bssChooseStudent(document.getElementById("learnerName").value,document.getElementById("learnerRoom").value,document.getElementById("learnerCode").value)){alert("Please enter a name, class and four-digit code.")}
 };
 })();
+
+function getJson(key){try{return JSON.parse(bssStorage.getItem(key)||"null")}catch(e){return null}}
+function numeric(n){return Number.isFinite(n)?Number(n):null}
+function testSummary(x){if(!x||typeof x!=="object"||!x.result)return null;return {correct:numeric(x.result.correct),percent:numeric(x.result.percent??x.result.pct),attempt:Number.isInteger(x.attempt)?x.attempt+1:null,expired:!!x.result.expired}}
+function exportLearnerReport(){
+const name=window.bssStudent.name,room=window.bssStudent.room;
+const ela=getJson("nyeem_v4_practice")||{},elaFinal=getJson("nyeem_v4_finals")||{},math=getJson("nyeem_grade7_math_v1")||{},ss=getJson("nyeem_social_studies_v1")||{};
+const elaAnswered=Object.keys(ela).filter(k=>/^[012]-\d+-\d+$/.test(k)).length;
+const elaCorrect=Object.entries(ela).filter(([k,v])=>/^[012]-\d+-\d+$/.test(k)&&v&&v.correct===true).length;
+const mathAnswered=Object.keys(math.daily||{}).filter(k=>/^[012]-[0-4]-\d+$/.test(k)).length;
+const ssAnswered=Object.keys(ss.daily||{}).filter(k=>/^[012]-[0-5]-\d+$/.test(k)).length;
+const elaUntimed=testSummary(elaFinal.untimed),elaTimed=testSummary(elaFinal.timed),mathUntimed=testSummary(math.tests?.a),mathTimed=testSummary(math.tests?.b),ssUntimed=testSummary(ss.tests?.untimed),ssTimed=testSummary(ss.tests?.timed);
+const paper=ss.paper||null;const written=paper?.scores||{},paperA=paper?.submitted?12-(Array.from({length:12}).filter((_,i)=>paper.answers?.[i]===undefined).length):null;
+// School-style paper Section A requires question bank to score; only externally teacher-entered marks are exported.
+const report={schema:"bss-form1-progress-v1",generatedAt:new Date().toISOString(),learner:{name,room},
+ela:{attempted:elaAnswered,correct:elaCorrect,untimed:elaUntimed,timed:elaTimed,storyMark:Number.isInteger(elaFinal.storyScore)?elaFinal.storyScore:null},
+mathematics:{attempted:mathAnswered,untimed:mathUntimed,timed:mathTimed},
+socialStudies:{attempted:ssAnswered,untimed:ssUntimed,timed:ssTimed,schoolPaper:{submitted:!!paper?.submitted,writtenMarks:{B:Number.isInteger(written.B)?written.B:null,C:Number.isInteger(written.C)?written.C:null,D:Number.isInteger(written.D)?written.D:null}}},
+note:"Results are self-reported from this browser and are not verified examination records. No learner code or written responses are included."};
+const text=JSON.stringify(report,null,2),blob=new Blob([text],{type:"application/json"}),url=URL.createObjectURL(blob);
+const link=document.createElement("a");link.href=url;link.download="form1-progress-"+room.replace(/[^A-Z0-9]/gi,"-")+"-"+name.replace(/[^A-Z0-9]/gi,"-")+".json";document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+document.getElementById("downloadReport").onclick=exportLearnerReport;
+
 if(window.bssStudent)render();
 </script></body></html>
