@@ -82,23 +82,45 @@ try{mockAttempt=Number(localStorage.getItem("nyeem_mock_attempt")||0);mockResult
 function bank(){return days.flatMap((d,di)=>d.q.map((q,qi)=>({q,key:di+"-"+qi})))}
 function mockSet(attempt){const all=bank(),length=all.length;let selected=[];let offset=(attempt*43)%length;for(let j=0;j<40;j++)selected.push(all[(offset+j*37)%length]);return selected}
 function persistMock(){try{localStorage.setItem("nyeem_mock_attempt",mockAttempt);localStorage.setItem("nyeem_mock_result",JSON.stringify(mockResult));localStorage.setItem("nyeem_mock_answers",JSON.stringify(mockAnswers))}catch(e){}}
+const storyPrompts=[
+{title:"The Unexpected Choice",prompt:"You are on your way to a school event when you discover that a younger student has lost something important. You have very little time. Write a believable story showing the problem, your decision, what happened next, and a meaningful ending."},
+{title:"The Last Boat Home",prompt:"During a visit to a coastal village, a sudden change in weather delays the last boat. Write a realistic story in which you and another character must make a difficult but responsible decision."},
+{title:"A Promise at the Library",prompt:"You have promised to help with an important school activity, but an unexpected problem threatens your plans. Write an original story about the choice you make and its consequences."},
+{title:"Beyond the Old Gate",prompt:"On the way home you notice an unlocked gate leading to an abandoned playing field. A strange sound makes you stop. Write a story with a believable explanation and a clear ending."}
+];
+function storyKey(){return "day4-story-"+mockAttempt}
+function storyWords(t){return t.trim()?t.trim().split(/\\s+/).length:0}
+function renderStory(section){
+const prompt=storyPrompts[mockAttempt%storyPrompts.length],box=el("section","card");
+box.append(el("h2","","Part B · Creative story writing (20 marks)"),el("h3","",prompt.title),el("p","",prompt.prompt),el("p","muted","Write 180–220 words in 2–4 paragraphs. Include a clear setting, a problem, a meaningful decision, descriptive language and an ending. This story is required for the full mock examination."));
+const plan=document.createElement("details");plan.append(el("summary","","Story planning guide"),el("p","","Beginning: introduce character and setting. Middle: introduce a problem and show actions and feelings. Turning point: make a meaningful choice. Ending: resolve the problem and show a lesson or change."));box.append(plan);
+const area=document.createElement("textarea");area.setAttribute("aria-label","Day 4 story response");area.style.minHeight="270px";area.placeholder="Write your original story here...";area.value=drafts[storyKey()]||"";
+const count=el("p","muted");function update(){drafts[storyKey()]=area.value;count.textContent=storyWords(area.value)+" words / target 180–220";save()}area.oninput=update;box.append(area,count);update();
+const rubric=document.createElement("details");rubric.append(el("summary","","View 20-mark teacher marking rubric"));
+[["Story ideas and believable conflict",5],["Character decisions and development",4],["Sequence, resolution and theme",4],["Description and vocabulary",3],["Grammar, punctuation and paragraphs",4]].forEach(x=>rubric.append(el("p","lesson",x[0]+" · "+x[1]+" marks")));
+box.append(rubric);section.append(box);
+}
 function renderMock(){
 view.innerHTML="";
-const section=el("section","card");section.append(el("h2","","Day 4 · Graded practice examination"),el("p","", "40 original multiple-choice questions. Each is worth 2.5 marks, giving an automatically graded score out of 100. Mastery requires 90% or higher (36 out of 40 correct)."));
-section.append(el("p","muted","This objective mock does not grade written responses. The 12 writing workshops need human feedback using their checklists. No questions or answers from the actual examination are reproduced."));
+const section=el("section","card");section.append(el("h2","","Day 4 · Full practice exam"),el("p","","Part A: 40 questions worth 2 marks each (80 marks). Part B: one original story worth 20 marks, marked by a teacher or adult. Total: 100 marks. Mastery requires at least 90/100 after both parts are assessed."));
+section.append(el("p","muted","This is an original practice assessment, not a copy of the school exam. The story is not automatically evaluated; a teacher or adult must award its mark."));
 const list=mockSet(mockAttempt);
 if(mockResult){
-const passed=mockResult.score>=90;const result=el("div","feedback"+(passed?"":" wrong"),"Attempt "+(mockAttempt+1)+": "+mockResult.correct+"/40 = "+mockResult.score+"%. "+(passed?"Mastery achieved!":"Below the 90% mastery target. Complete another test."));
-section.append(result);
-const review=document.createElement("details");review.append(el("summary","","Review this test and explanations"));
-list.forEach((item,i)=>{const q=item.q,a=mockAnswers[i],block=el("p","lesson",(i+1)+". "+q[0]+" Your answer: "+(a===undefined?"Not answered":q[1][a])+". Correct answer: "+q[1][q[2]]+". "+q[3]);review.append(block)});section.append(review);
-if(!passed){let again=el("button","btn primary","Take a different practice test");again.onclick=()=>{mockAttempt++;mockAnswers={};mockResult=null;persistMock();renderMock()};section.append(again)}
-else{let again=el("button","btn","Optional new practice test");again.onclick=()=>{mockAttempt++;mockAnswers={};mockResult=null;persistMock();renderMock()};section.append(again)}
+const testScore=mockResult.correct*2,hasWriting=Number.isFinite(mockResult.storyScore),total=hasWriting?testScore+mockResult.storyScore:null,passed=total!==null&&total>=90;
+section.append(el("div","feedback"+(total!==null&&!passed?" wrong":""),"Attempt "+(mockAttempt+1)+" · Objective score: "+testScore+"/80. "+(total===null?"Story marking pending. Final mastery cannot yet be determined.":"Story: "+mockResult.storyScore+"/20. Total: "+total+"/100. "+(passed?"Mastery achieved!":"Below the 90% mastery requirement."))));
+const review=document.createElement("details");review.append(el("summary","","Review objective answers and explanations"));
+list.forEach((item,i)=>{const q=item.q,a=mockAnswers[i];review.append(el("p","lesson",(i+1)+". "+q[0]+" Your answer: "+(a===undefined?"Not answered":q[1][a])+". Correct answer: "+q[1][q[2]]+". "+q[3]))});section.append(review);
+renderStory(section);
+const scoreBox=el("div","question");scoreBox.append(el("h3","","Teacher / adult story marking"),el("p","muted","Use the rubric above, then enter the score out of 20. This is a manual assessment, not an AI-generated writing grade."));
+const input=document.createElement("input");input.type="number";input.min="0";input.max="20";input.step="1";input.placeholder="0 to 20";input.value=hasWriting?mockResult.storyScore:"";input.style.cssText="max-width:150px;padding:10px;border:1px solid #94abc9;border-radius:8px";
+const btn=el("button","btn primary","Record writing mark");btn.onclick=()=>{const n=Number(input.value);if(input.value.trim()===""||!Number.isInteger(n)||n<0||n>20){alert("Enter a whole-number story mark from 0 to 20.");return}mockResult.storyScore=n;persistMock();renderMock()};scoreBox.append(input,document.createTextNode(" "),btn);section.append(scoreBox);
+if(total!==null){const again=el("button","btn primary",passed?"Optional new practice examination":"Take another practice examination");again.onclick=()=>{mockAttempt++;mockAnswers={};mockResult=null;persistMock();renderMock()};section.append(again)}
 }else{
-section.append(el("p","muted","Practice examination attempt "+(mockAttempt+1)+". Choose the best answer for every question; results and explanations appear only after submission."));
-const selector=[];
-list.forEach(({q},i)=>{const block=el("article","question");block.append(el("h3","",(i+1)+". "+q[0]));const options=el("div","options");q[1].forEach((choice,j)=>{const label=el("label","option"),radio=document.createElement("input");radio.type="radio";radio.name="mock-"+i;radio.value=j;radio.checked=mockAnswers[i]===j;radio.onchange=()=>{mockAnswers[i]=j;persistMock()};label.append(radio,document.createTextNode(" "+String.fromCharCode(65+j)+". "+choice));options.append(label)});block.append(options);selector.push(block);section.append(block)});
-const submit=el("button","btn primary","Submit graded examination");submit.onclick=()=>{const done=Object.keys(mockAnswers).length;if(done<40){alert("Answer all 40 questions before submitting. "+(40-done)+" remaining.");return}const correct=list.filter((item,i)=>mockAnswers[i]===item.q[2]).length;mockResult={correct,score:correct*2.5};persistMock();renderMock();document.getElementById("study").scrollIntoView()};section.append(submit)}
+section.append(el("h3","","Part A · Reading and language (80 marks)"),el("p","muted","Answer all 40 questions. Results appear only after submission."));
+list.forEach(({q},i)=>{const block=el("article","question");block.append(el("h3","",(i+1)+". "+q[0]));const options=el("div","options");q[1].forEach((choice,j)=>{const label=el("label","option"),radio=document.createElement("input");radio.type="radio";radio.name="mock-"+i;radio.value=j;radio.checked=mockAnswers[i]===j;radio.onchange=()=>{mockAnswers[i]=j;persistMock()};label.append(radio,document.createTextNode(" "+String.fromCharCode(65+j)+". "+choice));options.append(label)});block.append(options);section.append(block)});
+renderStory(section);
+const submit=el("button","btn primary","Submit exam for objective marking");submit.onclick=()=>{const done=Object.keys(mockAnswers).length,words=storyWords(drafts[storyKey()]||"");if(done<40){alert("Answer all 40 objective questions first. "+(40-done)+" remaining.");return}if(words<180){alert("The story needs at least 180 words before submitting. Current length: "+words+".");return}if(words>220){alert("The story should be no more than 220 words. Current length: "+words+".");return}const correct=list.filter((item,i)=>mockAnswers[i]===item.q[2]).length;mockResult={correct,storyScore:null};persistMock();renderMock();document.getElementById("study").scrollIntoView()};section.append(submit)
+}
 view.append(section);save()}
 
 render();
