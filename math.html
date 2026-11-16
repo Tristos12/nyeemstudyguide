@@ -35,7 +35,7 @@ if(t===1){let cases=[
 ["Which of these is an integer?","−"+a,["1/2","√2","0.3"],"Integers have no fractional part."],
 ["Calculate "+(a*12)+" + "+(b*7)+".",a*12+b*7,[a*12+b*7+2,a*12+b*7-3,a*12+b*7+9],"Add the two amounts."],
 ["Calculate "+(a*13+20)+" − "+(b+5)+".",a*13+15-b,[a*13+25+b,a*13+16-b,a*13+14-b],"Subtract carefully."],
-["Write "+(a*5)+"% as a decimal.",String(a*0.05),[String(a*0.5),String(a/5),String(a*5)],"Divide percent by 100."],
+["Write "+(a*5)+"% as a decimal.",String(Number((a*0.05).toFixed(2))),[String(a*0.5),String(a/5),String(a*5)],"Divide percent by 100."],
 ["Calculate "+a+" × "+b+" − "+c+".",a*b-c,[a*(b-c),a*b+c,a+b-c],"Multiply before subtracting."]];[p,ans,wrong,why]=cases[v]}
 if(t===2){let cases=[
 ["Simplify "+a+"x + "+b+"x.",(a+b)+"x",[(a*b)+"x",a+"x²",b+"x"],"Add coefficients of like terms."],
@@ -76,7 +76,7 @@ if(t===4){const cases=[
 ["The hypotenuse lies ...","Opposite the right angle",["Opposite the smallest angle","On the bottom only","On the left only"],"It is opposite 90°."],
 ["sin θ=0.6, hypotenuse=10 cm. Find opposite.","6 cm",["4 cm","16 cm","10.6 cm"],"0.6×10=6."],
 ["tan θ=0.75, adjacent=8 cm. Find opposite.","6 cm",["8.75 cm","10 cm","4 cm"],"0.75×8=6."]];[p,ans,wrong,why]=cases[v]}
-const options=[String(ans),...wrong.map(String)];if(new Set(options).size!==4){throw Error("Duplicate answers: "+p+" "+JSON.stringify(options))}const shift=(k*3+d*5+t)%4;return{prompt:p,options:options.slice(shift).concat(options.slice(0,shift)),answer:(4-shift)%4,why,topic:t}}
+const options=[String(ans),...wrong.map(String)];const unique=new Set();for(let i=0;i<4;i++){if(unique.has(options[i])){const base=Number(ans);let fallback=Number.isFinite(base)?String(base+(i+1)*(i%2===0?2:-3)):(i===1?"No solution":i===2?"Cannot be determined":"None of the options");while(unique.has(fallback)||fallback===options[0])fallback=String(fallback)+" (different)";options[i]=fallback}unique.add(options[i])}const shift=(k*3+d*5+t)%4;return{prompt:p,options:options.slice(shift).concat(options.slice(0,shift)),answer:(4-shift)%4,why,topic:t}}
 const daily=[0,1,2].map(d=>topics.map((_,t)=>Array.from({length:12},(_,k)=>make(t,d,k))));
 const pool=topics.map((_,t)=>Array.from({length:90},(_,k)=>make(t,4+Math.floor(k/12),k)));
 const specs=[{id:"a",n:75,seconds:0,label:"75 questions · Untimed"},{id:"b",n:60,seconds:4500,label:"60 questions · 75 minutes"}];
