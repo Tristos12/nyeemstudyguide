@@ -89,7 +89,7 @@ const storyPrompts=[
 {title:"Beyond the Old Gate",prompt:"On the way home you notice an unlocked gate leading to an abandoned playing field. A strange sound makes you stop. Write a story with a believable explanation and a clear ending."}
 ];
 function storyKey(){return "day4-story-"+mockAttempt}
-function storyWords(t){return t.trim()?t.trim().split(/\\s+/).length:0}
+function storyWords(t){return t.trim()?t.trim().split(/\s+/).length:0}
 function renderStory(section){
 const prompt=storyPrompts[mockAttempt%storyPrompts.length],box=el("section","card");
 box.append(el("h2","","Part B · Creative story writing (20 marks)"),el("h3","",prompt.title),el("p","",prompt.prompt),el("p","muted","Write 180–220 words in 2–4 paragraphs. Include a clear setting, a problem, a meaningful decision, descriptive language and an ending. This story is required for the full mock examination."));
