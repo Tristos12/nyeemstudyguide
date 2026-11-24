@@ -18,6 +18,7 @@
 <button id="rematchButton" type="button">Request rematch</button>
 <p id="rematchStatus" role="status" class="note"></p>
 </section>
+<section class="card" id="safetyPanel" aria-label="Learner safety tools"><h2>🛡️ Safety & respectful play</h2><p class="notice"><strong>Quick Chat is the safer option.</strong> Hide typed messages, report an inappropriate message, or leave a room at any time. Never share personal information. Room reports do not automatically contact a teacher.</p><div class="controls"><button type="button" class="secondary" id="safetyHideChat">Hide typed chat</button><button type="button" class="secondary" id="safetyLeaveRoom">Leave room</button></div><p id="safetyStatus" class="note" role="status">Tell your supervising teacher immediately if anyone makes you uncomfortable.</p><p class="note">For teachers: <a href="../teacher-supervision.html">Supervision and safeguarding guide</a>.</p></section>
 <section class="card" id="quickChat" hidden><h2>💬 Quick Chat</h2><p class="note">Send friendly, ready-made messages to your opponent. No typing required.</p><div class="quick-buttons" id="quickButtons"></div><p id="chatStatus" class="chat-status" role="status"></p><div id="chatMessages" aria-live="polite"></div>
 <hr><div><h3>Type a message</h3><p class="note">150 characters maximum. No personal information, contact details or links. Messages can be reported and hidden from both players; this does not automatically notify a teacher. Tell a trusted adult about serious concerns. Automatic filtering cannot catch everything.</p>
 <form id="typedChatForm" class="typed-form"><label for="typedChatInput">Your message<input id="typedChatInput" type="text" maxlength="150" autocomplete="off" placeholder="Write a friendly message..." required></label><button id="typedSend" type="submit">Send</button></form>
@@ -191,8 +192,18 @@ $('muteTextChat').onclick=()=>{
  typedChatMuted=!typedChatMuted;$('muteTextChat').textContent=typedChatMuted?'Show typed chat':'Hide typed chat';
  $('typedChatInput').disabled=typedChatMuted;$('typedSend').disabled=typedChatMuted;
  renderTypedChat(view?.messages||[],view?.players||[]);
+ $('safetyHideChat').textContent=typedChatMuted?'Show typed chat':'Hide typed chat';
 };
 
+$('safetyHideChat').onclick=()=>{
+ typedChatMuted=!typedChatMuted;
+ $('muteTextChat').textContent=typedChatMuted?'Show typed chat':'Hide typed chat';
+ $('safetyHideChat').textContent=typedChatMuted?'Show typed chat':'Hide typed chat';
+ $('typedChatInput').disabled=typedChatMuted;$('typedSend').disabled=typedChatMuted;
+ $('safetyStatus').textContent=typedChatMuted?'Typed chat hidden on this device. Quick Chat remains available.':'Typed chat visible. Keep messages kind and avoid personal information.';
+ renderTypedChat(view?.messages||[],view?.players||[]);
+};
+$('safetyLeaveRoom').onclick=()=>{if(!session){$('safetyStatus').textContent='You are not in a room.';return}if(confirm('Leave this room and return to the Challenge Centre?')){leaveRoom();location.href='../challenge-centre.html'}};
 $('refreshVersion').onclick=()=>{const link=new URL(location.href);link.searchParams.set('gameVersion','20261124-rematch-1');location.replace(link.toString())};
 $('continue').onclick=()=>{$('feedback').hidden=true;$('continue').hidden=true;shownQuestion=-1;refresh()};
 $('create').onclick=createRoom;$('join').onclick=joinRoom;$('leaveRoom').onclick=()=>{if(confirm('Leave this room? Your completed answers will remain on the server until the room expires.'))leaveRoom()};
