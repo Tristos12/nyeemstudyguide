@@ -6,6 +6,13 @@
 <section class="card" id="setup"><h2>Set up your room</h2><p class="notice">Pilot testing only. For the first test, use two different devices or browsers with separate student nicknames. Choose Untimed so you can check each step. This room is not yet part of the main student game.</p><p class="note">Use a first name or nickname, not a full name, learner code, telephone number or school ID. Rooms expire after 24 hours.</p><div class="controls"><label>Nickname<input id="nickname" maxlength="24" autocomplete="off" placeholder="e.g. BrainStar"></label><label>Category<select id="mode"><option value="all">All topics</option><option value="saintlucia">Saint Lucia and Student Companion</option><option value="school">All school subjects and Student Companion</option><option value="companion">Student Companion only</option></select></label><label>Time per question<select id="timer"><option value="0">Untimed</option><option value="60">60 seconds</option><option value="30">30 seconds</option></select></label></div><button id="create">Create private room</button><button id="join" class="secondary">Join a friend's room</button><p class="note" id="setupStatus" role="status"></p></section>
 <section class="card" id="invite" hidden><h2>Invite a friend</h2><p>Share this link privately. Anyone with this invitation may take the second seat, so do not post it publicly.</p><div class="controls"><label>Invitation URL<input id="inviteUrl" readonly></label></div><button id="copyInvite">Copy invitation</button><p class="note" id="copyStatus"></p></section>
 <section class="card" id="status" hidden><h2>Room <span id="roomCode"></span></h2><div class="scoreboard" id="players"></div><p id="roomMessage" role="status"></p><button id="leaveRoom" class="secondary">Leave this room</button></section>
+<section class="card" id="rematchPanel" hidden>
+<h2>🔁 New Challenge / Rematch</h2>
+<p id="rematchSummary">Complete the current match to request another round.</p>
+<p class="note">Both learners must agree. The same room, nicknames and private access are kept. Scores reset when both accept. This room still expires 24 hours after it was created.</p>
+<button id="rematchButton" type="button">Request rematch</button>
+<p id="rematchStatus" role="status" class="note"></p>
+</section>
 <section class="card" id="quickChat" hidden><h2>💬 Quick Chat</h2><p class="note">Send friendly, ready-made messages to your opponent. No typing required.</p><div class="quick-buttons" id="quickButtons"></div><p id="chatStatus" class="chat-status" role="status"></p><div id="chatMessages" aria-live="polite"></div>
 <hr><div><h3>Type a message</h3><p class="note">150 characters maximum. No personal information, contact details or links. Messages can be reported and hidden from both players; this does not automatically notify a teacher. Tell a trusted adult about serious concerns. Automatic filtering cannot catch everything.</p>
 <form id="typedChatForm" class="typed-form"><label for="typedChatInput">Your message<input id="typedChatInput" type="text" maxlength="150" autocomplete="off" placeholder="Write a friendly message..." required></label><button id="typedSend" type="submit">Send</button></form>
@@ -20,7 +27,7 @@ const $=id=>document.getElementById(id);
 const backend=(window.GK_MULTIPLAYER_API||'').trim().replace(/\/$/,'');
 const base=backend&&/^https:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(backend)?backend:null;
 const storageKey='gk_online_room_session_v1';
-let session=null,view=null,poll=null,clock=null,answerPending=false,shownQuestion=-1,quickSending=false,chatFingerprints={},typedSending=false,typedChatMuted=false;
+let session=null,view=null,poll=null,clock=null,answerPending=false,shownQuestion=-1,quickSending=false,chatFingerprints={},typedSending=false,typedChatMuted=false,rematchSending=false,lastSeenRound=null;
 const quickMessages=['👋 Good luck!','👏 Well done!','😄 Nice one!','💪 Keep going!','🔥 Great game!','🏆 Congratulations!'];
 try{const parsed=JSON.parse(sessionStorage.getItem(storageKey)||'null');if(parsed?.code&&parsed?.token)session=parsed}catch(e){}
 function message(txt){$('setupStatus').textContent=txt}
@@ -51,13 +58,20 @@ async function joinRoom(){
  }catch(e){message(e.message)}finally{$('join').disabled=false}
 }
 function showRoom(){hide('status',false);$('roomCode').textContent=session.code}
-function leaveRoom(){if(poll!==null){clearInterval(poll);poll=null}if(clock!==null){clearInterval(clock);clock=null}shownQuestion=-1;answerPending=false;session=null;view=null;save();hide('status',true);hide('quickChat',true);hide('questionPanel',true);hide('invite',true);hide('setup',false);$('roomMessage').textContent='';$('setupStatus').textContent='You have left this room. You can start or join another challenge.'}
+function leaveRoom(){if(poll!==null){clearInterval(poll);poll=null}if(clock!==null){clearInterval(clock);clock=null}shownQuestion=-1;answerPending=false;lastSeenRound=null;session=null;view=null;save();hide('status',true);hide('rematchPanel',true);hide('quickChat',true);hide('questionPanel',true);hide('invite',true);hide('setup',false);$('roomMessage').textContent='';$('setupStatus').textContent='You have left this room. You can start or join another challenge.'}
 function startPolling(){if(poll!==null)clearInterval(poll);poll=setInterval(()=>{refresh().catch(()=>{})},3000)}
 function startClock(deadline,index){if(clock!==null){clearInterval(clock);clock=null}if(!deadline){$('deadline').textContent='No time limit';return}const due=Date.parse(deadline);if(!Number.isFinite(due))return;const tick=()=>{if(!session||!view||view.nextIndex!==index||answerPending||!$('feedback').hidden){if(clock!==null){clearInterval(clock);clock=null}return}const remaining=Math.max(0,Math.ceil((due-Date.now())/1000));$('deadline').textContent='⏱ '+remaining+' seconds remaining';if(remaining===0){clearInterval(clock);clock=null;answer(index,null)}};tick();if(clock===null&&Date.now()<due)clock=setInterval(tick,250)}
 async function refresh(){
  if(!session||!base)return;
  try{
-  const data=await api('/api/state?code='+encodeURIComponent(session.code));view=data;
+  const data=await api('/api/state?code='+encodeURIComponent(session.code));
+  if(lastSeenRound!==null&&data.round!==lastSeenRound){
+    $('feedback').hidden=true;$('continue').hidden=true;shownQuestion=-1;answerPending=false;
+    if(clock!==null){clearInterval(clock);clock=null}
+    $('rematchStatus').textContent='New challenge started! Scores have been reset.';
+  }
+  lastSeenRound=data.round;view=data;
+  showRematch(data);
   $('quickChat').hidden=!data.started;
   if(data.started){renderQuickChat(data.players);renderTypedChat(data.messages||[],data.players)}
   $('players').replaceChildren();
@@ -81,6 +95,32 @@ async function answer(index,option){
   $('continue').hidden=false;$('continue').textContent=result.finished?'See final scores':'Next question';
  }catch(e){$('roomMessage').textContent=e.message;if(/already|out of order/i.test(e.message)){$('feedback').hidden=true;shownQuestion=-1;await refresh()}else for(const b of $('answerChoices').children)b.disabled=false}finally{answerPending=false}
 }
+
+
+function showRematch(data){
+ const panel=$('rematchPanel');panel.hidden=!data.bothFinished;
+ if(!data.bothFinished)return;
+ const mine=data.players.find(p=>p.seat===session.seat),other=data.players.find(p=>p.seat!==session.seat);
+ const button=$('rematchButton');
+ button.disabled=!!mine?.rematchReady||rematchSending;
+ button.textContent=mine?.rematchReady?'Waiting for friend...':'Request rematch';
+ const scores=data.players.map(p=>p.nickname+' '+p.score+'/600').join(' · ');
+ $('rematchSummary').textContent='Round '+data.round+' finished. '+scores;
+ if(mine?.rematchReady&&!other?.rematchReady)$('rematchStatus').textContent='Your request was sent. The next round starts once your friend also chooses Rematch.';
+ else if(!mine?.rematchReady)$('rematchStatus').textContent=other?.rematchReady?'Your friend is ready for a rematch. Select the button to begin.':'Both learners can choose to play again.';
+}
+async function requestRematch(){
+ if(!session||!view?.bothFinished||rematchSending)return;
+ rematchSending=true;$('rematchButton').disabled=true;
+ $('rematchStatus').textContent='Sending your rematch request...';
+ try{
+  const result=await api('/api/rematch?code='+encodeURIComponent(session.code),'POST',{round:view.round});
+  $('rematchStatus').textContent=result.status==='started'?'Both learners agreed. Starting a new challenge...':'Request received. Waiting for your friend to agree.';
+  await refresh();
+ }catch(e){$('rematchStatus').textContent=e.message;await refresh()}
+ finally{rematchSending=false;if(view?.bothFinished)showRematch(view)}
+}
+$('rematchButton').onclick=requestRematch;
 
 function renderQuickChat(players){
  const host=$('chatMessages');host.replaceChildren();
