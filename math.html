@@ -113,17 +113,43 @@ function render(){tabs.innerHTML="";[0,1,2,3].forEach(d=>{const b=el("button",da
 const intro=el("section","card");intro.append(el("h2","","Day "+(day+1)+" · Five mathematics sections"),el("p","","Each section has 12 questions with immediate feedback and explanations. Open one topic at a time."));view.append(intro);
 daily[day].forEach((qs,t)=>{const card=el("section","card"),details=document.createElement("details"),correct=qs.filter((q,i)=>data.daily[day+"-"+t+"-"+i]===q.answer).length;details.append(el("summary","",topics[t]+" · "+correct+"/12 correct"),el("p","muted",guides[t]));qs.forEach((q,i)=>details.append(question(q,day+"-"+t+"-"+i,data.daily,true)));card.append(details);view.append(card)});
 const working=el("section","card");working.append(el("h2","","Show your working"),el("p","","Choose two difficult problems and explain the steps you took."));const area=document.createElement("textarea");area.value=data.written[day]||"";area.oninput=()=>{data.written[day]=area.value;save()};working.append(area);view.append(working);progress()}
-function get(spec){return data.tests[spec.id]||{attempt:0,started:null,answers:{},result:null}}
+function get(spec){return data.tests[spec.id]||{attempt:0,started:null,answers:{},result:null,questionBankVersion:2}}
 function set(spec,x){data.tests[spec.id]=x;save()}
-function questions(spec,attempt){let out=[];const per=spec.n/5;for(let t=0;t<5;t++)for(let j=0;j<per;j++)out.push(pool[t][(attempt*23+j*7+t*13)%90]);return out}
-function score(spec,x,expired){const qs=questions(spec,x.attempt),correct=qs.filter((q,i)=>x.answers[i]===q.answer).length;x.result={correct,pct:Math.round(correct/spec.n*1000)/10,expired};set(spec,x)}
+// Earlier attempts use their original question order for accurate scoring and review.
+// New attempts use distinct prompts, including five additional introductory trigonometry items.
+const extraTrig=[
+{prompt:"In a right triangle, opposite = 8 cm and hypotenuse = 10 cm. What is sin θ?",options:["4/5","3/5","1/2","5/4"],answer:0,why:"Sine equals opposite divided by hypotenuse: 8/10 = 4/5."},
+{prompt:"In a right triangle, adjacent = 12 cm and hypotenuse = 13 cm. What is cos θ?",options:["12/13","5/13","13/12","5/12"],answer:0,why:"Cosine is adjacent divided by hypotenuse."},
+{prompt:"In a right triangle, opposite = 8 cm and adjacent = 15 cm. What is tan θ?",options:["8/15","15/8","8/17","15/17"],answer:0,why:"Tangent is opposite divided by adjacent."},
+{prompt:"If sin θ = 0.8 and the hypotenuse is 15 cm, find the opposite side.",options:["12 cm","15.8 cm","18.75 cm","7.5 cm"],answer:0,why:"Multiply the hypotenuse by sine: 15 × 0.8 = 12 cm."},
+{prompt:"A right triangle has shorter sides 8 cm and 15 cm. Find its hypotenuse.",options:["17 cm","23 cm","16 cm","19 cm"],answer:0,why:"Use the Pythagorean theorem: √(8²+15²) = 17."}
+];
+function questions(spec,attempt,version=2){
+ let out=[],per=spec.n/5;
+ if(version<2){for(let t=0;t<5;t++)for(let j=0;j<per;j++)out.push(pool[t][(attempt*23+j*7+t*13)%90]);return out}
+ for(let t=0;t<5;t++){
+  const candidates=t===4?pool[t].concat(extraTrig):pool[t],used=new Set(),start=(attempt*23+t*13)%candidates.length;
+  for(let step=0;step<candidates.length&&used.size<per;step++){
+   const q=candidates[(start+step*7)%candidates.length];
+   if(!used.has(q.prompt)){used.add(q.prompt);out.push(q)}
+  }
+  // Step 7 can cycle on a 95-item pool. Sequential fallback guarantees coverage.
+  for(let step=0;step<candidates.length&&used.size<per;step++){
+   const q=candidates[(start+step)%candidates.length];
+   if(!used.has(q.prompt)){used.add(q.prompt);out.push(q)}
+  }
+  if(used.size<per)throw Error("Not enough distinct mathematics questions for topic "+t);
+ }
+ return out;
+}
+function score(spec,x,expired){const qs=questions(spec,x.attempt,x.questionBankVersion||1),correct=qs.filter((q,i)=>x.answers[i]===q.answer).length;x.result={correct,pct:Math.round(correct/spec.n*1000)/10,expired};set(spec,x)}
 function renderFinal(){view.innerHTML="";const box=el("section","card");box.append(el("h2","","Day 4 · Mathematics examinations"),el("p","","Complete both examinations. Aim for 90% or higher on each. The timed examination clock continues after a refresh."));const first=get(specs[0]).result,second=get(specs[1]).result;box.append(el("p","feedback"+(first&&second&&first.pct>=90&&second.pct>=90?"":" wrong"),"Untimed: "+(first?first.pct+"%":"Not taken")+" | Timed: "+(second?second.pct+"%":"Not taken")+(first&&second&&first.pct>=90&&second.pct>=90?" | Both mastery targets met!":" | Mastery in progress")));view.append(box);
 const chooser=el("nav","tabs");specs.forEach((sp,i)=>{const b=el("button",finalTab===i?"active":"",sp.label);b.onclick=()=>{finalTab=i;renderFinal()};chooser.append(b)});view.append(chooser);
 const sp=specs[finalTab],x=get(sp),panel=el("section","card");panel.append(el("h2","",sp.label));view.append(panel);
 if(sp.seconds&&x.started&&!x.result&&Date.now()-x.started>=sp.seconds*1000){score(sp,x,true);renderFinal();return}
-if(x.result){panel.append(el("p","feedback"+(x.result.pct>=90?"":" wrong"),"Attempt "+(x.attempt+1)+": "+x.result.correct+"/"+sp.n+" = "+x.result.pct+"%."+(x.result.expired?" Time expired.":"")));const review=document.createElement("details");review.append(el("summary","","Review answers and worked explanations"));questions(sp,x.attempt).forEach((q,i)=>review.append(el("p","",q.prompt+" Your answer: "+(x.answers[i]===undefined?"Unanswered":q.options[x.answers[i]])+". Correct: "+q.options[q.answer]+". "+q.why)));panel.append(review);const repeat=el("button","primary",x.result.pct>=90?"Optional new test":"Try another test");repeat.onclick=()=>{set(sp,{attempt:x.attempt+1,started:null,answers:{},result:null});renderFinal()};panel.append(repeat);return}
+if(x.result){panel.append(el("p","feedback"+(x.result.pct>=90?"":" wrong"),"Attempt "+(x.attempt+1)+": "+x.result.correct+"/"+sp.n+" = "+x.result.pct+"%."+(x.result.expired?" Time expired.":"")));const review=document.createElement("details");review.append(el("summary","","Review answers and worked explanations"));questions(sp,x.attempt,x.questionBankVersion||1).forEach((q,i)=>review.append(el("p","",q.prompt+" Your answer: "+(x.answers[i]===undefined?"Unanswered":q.options[x.answers[i]])+". Correct: "+q.options[q.answer]+". "+q.why)));panel.append(review);const repeat=el("button","primary",x.result.pct>=90?"Optional new test":"Try another test");repeat.onclick=()=>{set(sp,{attempt:x.attempt+1,started:null,answers:{},result:null,questionBankVersion:2});renderFinal()};panel.append(repeat);return}
 if(sp.seconds&&!x.started){panel.append(el("p","","The 75-minute clock starts when you press Start and cannot be paused. Unanswered questions count as incorrect after time expires."));const start=el("button","primary","Start timed examination");start.onclick=()=>{x.started=Date.now();set(sp,x);renderFinal()};panel.append(start);return}
 const clock=el("p","feedback");panel.append(clock);let interval;function tick(){if(!sp.seconds){clock.textContent="Untimed | "+Object.keys(x.answers).length+"/"+sp.n+" answered";return}const remaining=Math.max(0,sp.seconds-Math.floor((Date.now()-x.started)/1000));clock.textContent="Time left: "+Math.floor(remaining/60)+":"+String(remaining%60).padStart(2,"0")+" | "+Object.keys(x.answers).length+"/"+sp.n+" answered";if(remaining===0&&!x.result){clearInterval(interval);score(sp,x,true);renderFinal()}}tick();if(sp.seconds)interval=setInterval(()=>{if(!panel.isConnected){clearInterval(interval);return}tick()},1000);
-questions(sp,x.attempt).forEach((q,i)=>{const item=question(q,"exam-"+sp.id+"-"+i,{[ "exam-"+sp.id+"-"+i ]:x.answers[i]},false);item.querySelector("h3").textContent=(i+1)+". "+q.prompt;item.querySelectorAll("input").forEach((radio,j)=>{radio.onchange=()=>{if(sp.seconds&&Date.now()-x.started>=sp.seconds*1000){score(sp,x,true);renderFinal();return}x.answers[i]=j;set(sp,x);tick()}});panel.append(item)});const submit=el("button","primary","Submit examination");submit.onclick=()=>{if(sp.seconds&&Date.now()-x.started>=sp.seconds*1000)score(sp,x,true);else{if(Object.keys(x.answers).length<sp.n&&!confirm("Some questions are unanswered and will count as incorrect. Submit?"))return;score(sp,x,false)}renderFinal()};panel.append(submit)}
+questions(sp,x.attempt,x.questionBankVersion||1).forEach((q,i)=>{const item=question(q,"exam-"+sp.id+"-"+i,{[ "exam-"+sp.id+"-"+i ]:x.answers[i]},false);item.querySelector("h3").textContent=(i+1)+". "+q.prompt;item.querySelectorAll("input").forEach((radio,j)=>{radio.onchange=()=>{if(sp.seconds&&Date.now()-x.started>=sp.seconds*1000){score(sp,x,true);renderFinal();return}x.answers[i]=j;set(sp,x);tick()}});panel.append(item)});const submit=el("button","primary","Submit examination");submit.onclick=()=>{if(sp.seconds&&Date.now()-x.started>=sp.seconds*1000)score(sp,x,true);else{if(Object.keys(x.answers).length<sp.n&&!confirm("Some questions are unanswered and will count as incorrect. Submit?"))return;score(sp,x,false)}renderFinal()};panel.append(submit)}
 render();
 </script></body></html>
