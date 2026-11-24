@@ -106,3 +106,43 @@ still sensitive and should not be posted to public groups.
 Run \`npm test\` in \`multiplayer\` to check deterministic questions and
 server scoring. This is not a replacement for browser, database, CORS,
 load, and end-to-end deployment testing.
+
+
+## Challenge Centre (24 November 2026)
+
+The learner-facing page is `/challenge-centre.html`. A notification banner is
+loaded near the top of the main Learning Hub and General Knowledge page.
+This is an **opt-in private inbox**, not an account system or school student
+directory. The school four-digit learner code is deliberately not used for
+online authentication.
+
+Each learner generates a random 10-character address (Challenge Code) and
+a 32-byte secret. Only the SHA-256 hash of that secret is stored in Neon. The
+browser keeps its secret in profile-specific local storage; it is **never**
+put into links or shared with classmates. The Challenge Code may be shared
+with a friend. A friend can enter this code while creating a live room or
+independent challenge to deliver one invitation to the recipient's inbox.
+
+The recipient can see invitations, open the challenge, or dismiss them.
+In-page notifications refresh approximately every 20–25 seconds while a
+relevant page is open. No browser push notifications, email, phone alerts,
+identity verification, or teacher moderation service are provided.
+Sender nicknames are unverified.
+
+Server rate limits are 5 inbox creations per network per 24 hours, 15
+sent invitations per network per hour, and 20 invitations to one inbox per
+24 hours. Invitations are valid for 24 hours; inboxes expire after 30 days.
+Expired records are cleaned on service traffic, not by a guaranteed timed job.
+A learner may delete their inbox and its invitations. Deleting local browser
+data may strand a still-valid inbox until expiry. This is an educational pilot
+and not a secure school login.
+
+The separate backend uses `GET /api/inbox?code=...` with a private Bearer key,
+`POST /api/inbox` for create/accept/dismiss/delete, and `POST /api/send-invite`
+for sending validated in-domain live/shared links. Invitation URLs are
+validated to be from the Learning Hub on GitHub Pages. The existing Sigma
+database remains untouched.
+
+Before a school rollout, test invite delivery between two different learner
+profiles, expiry, dismissal, quota enforcement, and account switching on
+shared devices. Review the school's student safeguarding and privacy policy.
