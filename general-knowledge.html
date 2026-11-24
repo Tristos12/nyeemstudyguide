@@ -355,4 +355,42 @@ if(parseChallenge()){
   received.scrollIntoView({block:"start",behavior:"instant"});
  }
 }
-</script><script src="./challenge-centre-client.js"></script><script src="./challenge-centre-notifications.js"></script></body></html>
+</script><script src="./challenge-centre-client.js"></script><script src="./challenge-centre-notifications.js"></script><script src="./challenge-centre-client.js"></script>
+<script>
+(function(){
+"use strict";
+if(!window.bssStudent||!window.GKCentre)return;
+const link=document.createElement('a');
+link.href='./challenge-centre.html';
+link.id='challengeCentreShortcut';
+link.setAttribute('aria-label','Open your private Challenge Centre');
+link.style.cssText='display:block;background:#fff7df;color:#563c07;border:2px solid #d9a227;border-radius:13px;padding:15px 18px;margin:14px auto;max-width:1050px;text-decoration:none;font:700 17px/1.5 system-ui,Arial,sans-serif';
+link.textContent='🔔 Challenge Centre · Open my invitations';
+const place=document.querySelector('main');
+if(place)place.prepend(link);
+const status=document.createElement('span');
+status.id='challengeInboxCount';
+status.setAttribute('aria-live','polite');
+status.style.marginLeft='7px';
+link.append(status);
+let checking=false,lastCount=-1;
+async function check(){
+ if(checking||document.hidden)return;
+ const entry=window.GKCentre.get();
+ if(!entry){status.textContent='· Set up your private inbox';return}
+ checking=true;
+ try{
+  const data=await window.GKCentre.call('/api/inbox?code='+encodeURIComponent(entry.code),'GET',null,entry.secret);
+  const pending=(Array.isArray(data.items)?data.items:[]).filter(x=>x.status==='pending'&&Date.parse(x.expiresAt)>Date.now());
+  const n=pending.length;
+  status.textContent=n?'· '+n+' new invitation'+(n===1?'':'s'):'· No new invitations';
+  if(n>0&&n>lastCount&&lastCount>=0)link.style.boxShadow='0 0 0 4px rgba(217,162,39,.22)';
+  lastCount=n;
+ }catch(e){status.textContent='· Open to check invitations'}
+ finally{checking=false}
+}
+check();
+setInterval(check,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
+})();
+</script></body></html>
