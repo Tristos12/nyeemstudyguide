@@ -1,0 +1,34 @@
+name: Babonneau staff authentication checks
+
+on:
+  push:
+    branches:
+      - feature/teacher-staff-auth-20261124
+    paths:
+      - 'multiplayer/lib/staff-auth.js'
+      - 'multiplayer/tests/staff-auth.test.js'
+      - 'multiplayer/package.json'
+      - '.github/workflows/bss-staff-auth-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staff-auth-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: multiplayer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Run security and multiplayer tests
+        run: npm test
+      - name: Verify staff module syntax
+        run: node --check lib/staff-auth.js && node --check api/staff-me.js
