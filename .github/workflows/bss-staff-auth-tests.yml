@@ -6,6 +6,10 @@ on:
       - feature/teacher-staff-auth-20261124
     paths:
       - 'multiplayer/lib/staff-auth.js'
+      - 'multiplayer/lib/staff-audit.js'
+      - 'multiplayer/api/staff-me.js'
+      - 'multiplayer/tests/staff-audit.test.js'
+      - 'multiplayer/staff-audit-schema.sql'
       - 'multiplayer/tests/staff-auth.test.js'
       - 'multiplayer/tests/staff-jwt-crypto.test.js'
       - 'multiplayer/package.json'
