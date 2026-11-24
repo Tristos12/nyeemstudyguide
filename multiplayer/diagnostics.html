@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multiplayer Connection Check · Babonneau Secondary School</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f7fc;color:#163553;font:16px/1.55 system-ui,Arial,sans-serif}
+header{background:#173e68;color:white;padding:22px max(18px,calc((100vw - 800px)/2))}
+header a{color:white}h1{font-size:clamp(25px,4vw,34px);margin:8px 0}
+main{max-width:800px;margin:auto;padding:20px 16px 45px}
+.card{border:1px solid #cad8eb;border-radius:14px;background:white;padding:20px;margin-bottom:14px}
+button{padding:12px 18px;border:1px solid #173e68;border-radius:10px;background:#173e68;color:white;font:inherit;font-weight:700;cursor:pointer}
+button:disabled{opacity:.5}button:focus-visible,a:focus-visible{outline:3px solid #edae34;outline-offset:3px}
+#result{border-radius:12px;padding:15px;background:#eff5fc;border:1px solid #dae4f2}
+.ok{background:#e5f5ed!important;border-color:#8bd2b0!important}.warn{background:#fff3e7!important;border-color:#e6bd80!important}
+small{color:#56697c}.results{display:grid;gap:8px}
+.row{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+[hidden]{display:none!important}
+</style></head><body><header>
+<a href="../general-knowledge.html">← General Knowledge Challenge</a>
+<h1>Multiplayer Connection Check</h1><p>Teacher and administrator diagnostic screen</p>
+</header><main>
+<section class="card"><h2>Check the online multiplayer service</h2>
+<p>This checks whether the separate Vercel service can connect to the dedicated Neon database and find the required room tables. It does not create rooms, change student data, or require a password.</p>
+<button id="run" type="button">Check service connection</button>
+<p><small>The connection request is made from your browser to the multiplayer API. No learner information is sent.</small></p>
+<div id="result" role="status" aria-live="polite"><strong>Not tested in this browser.</strong></div>
+</section>
+<section class="card"><h2>What the results mean</h2>
+<div class="results">
+<div class="row"><strong>Ready</strong><span>The server and multiplayer tables respond</span></div>
+<div class="row"><strong>Not configured</strong><span>A required environment setting is missing</span></div>
+<div class="row"><strong>Schema missing</strong><span>Database is connected but room tables are missing</span></div>
+<div class="row"><strong>Connection blocked</strong><span>Network, deployment protection, or browser access may be preventing the request</span></div>
+</div>
+<p><small>A successful connection check does not mean a full two-learner match has passed testing. The student-facing multiplayer game remains separate until that test is completed.</small></p>
+</section></main>
+<script>
+const endpoint='https://babonneau-form1-multiplayer.vercel.app/api/health';
+const button=document.getElementById('run'),result=document.getElementById('result');
+function show(title,detail,ok){
+ result.className=ok?'ok':'warn';result.replaceChildren();
+ const h=document.createElement('strong');h.textContent=title;
+ const p=document.createElement('p');p.textContent=detail;result.append(h,p);
+}
+button.onclick=async()=>{
+ button.disabled=true;show('Checking...','Contacting the dedicated multiplayer service.',false);
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+ try{
+  const response=await fetch(endpoint,{method:'GET',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
+  const payload=await response.json().catch(()=>null);
+  if(response.ok&&payload?.status==='ready'&&payload.multiplayerAvailable===true){
+   show('Connection ready','The API responded and the multiplayer database tables are available. A two-player test is still required.',true);
+  }else{
+   const status=payload?.status||'Unexpected response';
+   show('Service not ready','Server status: '+status+'. HTTP '+response.status+'. Keep online rooms disabled until this is resolved.',false);
+  }
+ }catch(error){show('Connection could not be verified','Your browser could not complete the request. This may be due to deployment protection, network access or a temporary error. '+(error?.name==='AbortError'?'The request timed out.':''),false)}
+ finally{clearTimeout(timeout);button.disabled=false}
+};
+</script></body></html>
