@@ -40,7 +40,7 @@ button.secondary{color:#173e68;background:#fff}button:focus-visible,a:focus-visi
 <section class="card"><h2>Current technical boundaries</h2>
 <p>The live game currently uses private invitations and room-specific access. There is no authenticated staff moderation role, central teacher inbox, independent safeguarding alert, or school-wide report archive in this interface. Room invitations may be forwarded, so private links are not a substitute for student identity verification.</p>
 <p>Before broader deployment, the school should approve a secure staff sign-in, server-enforced moderation permissions, documented retention and deletion rules, clear reporting escalation, and a privacy assessment appropriate to minors.</p>
-<div class="flex"><a class="button" href="./multiplayer/room.html">Open multiplayer</a><a class="button" href="./challenge-centre.html">Challenge Centre</a></div></section>
+<div class="flex"><a class="button" href="./teacher-admin.html">Teacher administration status</a><a class="button" href="./multiplayer/room.html">Open multiplayer</a><a class="button" href="./challenge-centre.html">Challenge Centre</a></div></section>
 </main><script>
 (function(){const boxes=[...document.querySelectorAll('#checks input')],status=document.getElementById('checkStatus');function update(){status.textContent=boxes.filter(x=>x.checked).length+' of '+boxes.length+' preparation steps checked.'}boxes.forEach(x=>x.addEventListener('change',update));document.getElementById('reset').onclick=()=>{boxes.forEach(x=>x.checked=false);update()}})();
 </script></body></html>
