@@ -154,6 +154,7 @@ function finishFriend(){
  if(match.type==="local"){
   if(!localDuel.first){
    localDuel.first={name,score,correct:match.correct};
+   $("resultTitle").textContent="First learner finished!";$("resultText").textContent="Now it is the next learner's turn on the same device.";
    const outcome=$("friendOutcome");outcome.hidden=false;
    outcome.replaceChildren();const text=document.createElement("p");text.textContent=name+" scored "+score+". Hand the device to "+localDuel.second+" for the same 60 questions.";outcome.append(text);
    const btn=document.createElement("button");btn.className="primary";btn.textContent="Start "+localDuel.second+"'s turn";btn.onclick=()=>{startFriendMatch(c,true)};outcome.append(btn);
@@ -161,12 +162,13 @@ function finishFriend(){
   }
   const first=localDuel.first,other={name,score,correct:match.correct},result=first.score===other.score?"It's a draw!":first.score>other.score?first.name+" wins!":other.name+" wins!";
   $("resultTitle").textContent="🏆 "+result;$("resultText").textContent=first.name+" "+first.score+" points ("+first.correct+"/60), "+other.name+" "+other.score+" points ("+other.correct+"/60).";
+ $("again").textContent="Challenge the computer";
   $("friendOutcome").hidden=true;localDuel=null;return;
  }
  if(!saved.friendResults)saved.friendResults={};
  saved.friendResults[c.code]={score,correct:match.correct,name,at:new Date().toISOString()};
  persist();
- $("resultTitle").textContent="🎯 Friend challenge completed!";
+ $("again").textContent="Replay this friend challenge";$("resultTitle").textContent="🎯 Friend challenge completed!";
  $("resultText").textContent=name+" scored "+score+"/600 points ("+match.correct+"/60 correct). Send your result link to your friend to compare scores.";
  const panel=$("friendOutcome");panel.hidden=false;panel.replaceChildren();
  const field=document.createElement("input");field.readOnly=true;field.value=challengeUrl(c,score,name);field.setAttribute("aria-label","Result link");
@@ -200,7 +202,7 @@ function buildMatchQuestions(pool){
 }
 function currentLevel(){return Math.floor(match.round/LEVEL_SIZE)}
 function newMatch(){
- $("playerLabel").textContent="🎓 "+window.bssStudent.name;$("gameRivalName").textContent="💻 Computer";$("friendOutcome").hidden=true;
+ $("again").textContent="Play again";$("playerLabel").textContent="🎓 "+window.bssStudent.name;$("gameRivalName").textContent="💻 Computer";$("friendOutcome").hidden=true;
  stopQuestionTimer();const selected=buildMatchQuestions(poolFor($("category").value));
  const selectedMode=$("difficulty").value;
  match={round:0,questions:selected,player:0,computer:0,correct:0,answered:false,chosen:null,difficulty:difficultyProfiles[selectedMode]?selectedMode:"challenger",computerCorrect:false,computerAnswer:"",timeLimit:Number($("questionTime").value)||0,levelStats:[{correct:0,computerCorrect:0},{correct:0,computerCorrect:0},{correct:0,computerCorrect:0}]};
@@ -272,7 +274,7 @@ $("copyChallengeLink").onclick=()=>copyText(challengeLinkToShare,$("copyChalleng
 $("playMyChallenge").onclick=()=>{if(friendChallenge){$("friendOutcome").hidden=true;startFriendMatch(friendChallenge)}};
 $("acceptChallenge").onclick=()=>{if(friendChallenge){$("friendOutcome").hidden=true;startFriendMatch(friendChallenge)}};
 $("localChallenge").onclick=()=>{const other=cleanNickname($("friendName").value);if(!other){alert("Enter your friend’s first name or nickname.");$("friendName").focus();return}const c=createChallenge();localDuel={first:null,second:other};$("friendOutcome").hidden=true;startFriendMatch(c,true)};
-$("start").onclick=newMatch;$("again").onclick=newMatch;$("next").onclick=()=>{if(!match?.answered)return;match.round++;if(match.round>=match.questions.length)finish();else if(match.round%LEVEL_SIZE===0)showLevelSummary();else renderRound()};
+$("start").onclick=newMatch;$("again").onclick=()=>{if(match?.type==="friend")startFriendMatch(match.challenge);else newMatch()};$("next").onclick=()=>{if(!match?.answered)return;match.round++;if(match.round>=match.questions.length)finish();else if(match.round%LEVEL_SIZE===0)showLevelSummary();else renderRound()};
 $("continueLevel").onclick=()=>{if(!match||match.round%LEVEL_SIZE!==0)return;display("game");renderRound()};
 $("study").onclick=facts;$("factsAfter").onclick=facts;$("factCategory").onchange=renderFacts;
 $("exit").onclick=()=>{if(!match)return;if(!confirm("Leave this match? The unfinished game will not count toward your record."))return;stopQuestionTimer();match=null;display("none")};
