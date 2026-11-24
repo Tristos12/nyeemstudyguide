@@ -4,7 +4,12 @@
 </style></head><body><header><a href="../general-knowledge.html">← General Knowledge</a><h1>🔐 Private Learner Challenge Room</h1><p>Supervised pilot · Two learners · Same 60 questions · Automatic score comparison</p><p class="note" style="color:#dbeaff">Game version: 24 Nov · Rematch 1 <button type="button" id="refreshVersion" class="secondary" style="padding:5px 10px;font-size:13px;margin-left:8px">Load latest version</button></p></header><main>
 <section class="card" id="unavailable" hidden><h2>Online rooms are not available yet</h2><p>The school's private multiplayer service has not been activated. Use the current General Knowledge game to challenge a friend by sharing a link or taking turns on one device.</p><a href="../general-knowledge.html">Open the working challenge game</a></section>
 <section class="incoming-invite" id="incomingInvite" hidden role="region" aria-label="Live challenge invitation"><p><strong>🔔 Live challenge invitation</strong></p><h2>🎯 Your friend is waiting for you!</h2><p>Enter your nickname below and select <strong>Join a friend's room</strong> to start competing and chatting together.</p></section><section class="card" id="setup"><h2>Set up your room</h2><p class="notice">Pilot testing only. For the first test, use two different devices or browsers with separate student nicknames. Choose Untimed so you can check each step. This room is not yet part of the main student game.</p><p class="note">Use a first name or nickname, not a full name, learner code, telephone number or school ID. Rooms expire after 24 hours.</p><div class="controls"><label>Nickname<input id="nickname" maxlength="24" autocomplete="off" placeholder="e.g. BrainStar"></label><label>Category<select id="mode"><option value="all">All topics</option><option value="saintlucia">Saint Lucia and Student Companion</option><option value="school">All school subjects and Student Companion</option><option value="companion">Student Companion only</option></select></label><label>Time per question<select id="timer"><option value="0">Untimed</option><option value="60">60 seconds</option><option value="30">30 seconds</option></select></label></div><button id="create">Create private room</button><button id="join" class="secondary">Join a friend's room</button><p class="note" id="setupStatus" role="status"></p></section>
-<section class="card" id="invite" hidden><h2>Invite a friend</h2><p>Share this link privately. Anyone with this invitation may take the second seat, so do not post it publicly.</p><div class="controls"><label>Invitation URL<input id="inviteUrl" readonly></label></div><button id="copyInvite">Copy invitation</button><p class="note" id="copyStatus"></p></section>
+<section class="card" id="invite" hidden><h2>Invite a friend</h2><p>Share this link privately. Anyone with this invitation may take the second seat, so do not post it publicly.</p><div class="controls"><label>Invitation URL<input id="inviteUrl" readonly></label></div><button id="copyInvite">Copy invitation</button><p class="note" id="copyStatus"></p>
+<div style="border-top:1px solid #c5d8eb;margin-top:16px;padding-top:13px"><h3>🔔 Send to a friend's Challenge Centre</h3>
+<p class="note">Ask your friend for their private 10-character Challenge Code. This is optional; you can still share the invitation link directly.</p>
+<div class="controls"><label>Friend's Challenge Code<input id="inviteInboxCode" maxlength="12" autocomplete="off" placeholder="10-character code"></label></div>
+<button type="button" id="sendToCentre" class="secondary">Send private notification</button><p id="sendToCentreStatus" class="note" role="status"></p>
+</div></section>
 <section class="card" id="status" hidden><h2>Room <span id="roomCode"></span></h2><div class="scoreboard" id="players"></div><p id="roomMessage" role="status"></p><button id="leaveRoom" class="secondary">Leave this room</button></section>
 <section class="card" id="rematchPanel" hidden>
 <h2>🔁 New Challenge / Rematch</h2>
@@ -189,6 +194,20 @@ $('muteTextChat').onclick=()=>{
 $('refreshVersion').onclick=()=>{const link=new URL(location.href);link.searchParams.set('gameVersion','20261124-rematch-1');location.replace(link.toString())};
 $('continue').onclick=()=>{$('feedback').hidden=true;$('continue').hidden=true;shownQuestion=-1;refresh()};
 $('create').onclick=createRoom;$('join').onclick=joinRoom;$('leaveRoom').onclick=()=>{if(confirm('Leave this room? Your completed answers will remain on the server until the room expires.'))leaveRoom()};
+$('sendToCentre').onclick=async()=>{
+ const code=$('inviteInboxCode').value.trim().toUpperCase();
+ if(!/^[A-HJ-NP-Z2-9]{10}$/.test(code)){$('sendToCentreStatus').textContent='Enter your friend’s 10-character Challenge Code.';return}
+ const sender=($('nickname').value.trim()||(view?.players||[]).find(p=>p.seat===session?.seat)?.nickname||'');
+ if(!sender){$('sendToCentreStatus').textContent='Enter a nickname for this room first.';return}
+ const b=$('sendToCentre');b.disabled=true;
+ try{
+  const response=await fetch(base+'/api/send-invite',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({code,sender,kind:'live',url:$('inviteUrl').value})});
+  const value=await response.json().catch(()=>({error:'Unexpected service response'}));
+  if(!response.ok)throw Error(value.error||'Could not send invitation');
+  $('sendToCentreStatus').textContent='Invitation sent. Your friend can see it in their Challenge Centre.';
+ }catch(e){$('sendToCentreStatus').textContent=e.message}
+ finally{b.disabled=false}
+};
 $('copyInvite').onclick=async()=>{try{await navigator.clipboard.writeText($('inviteUrl').value);$('copyStatus').textContent='Invitation copied'}catch(e){$('inviteUrl').select();$('copyStatus').textContent='Select the URL and copy it'}};
 if(!base){hide('unavailable',false);hide('setup',true)}
 else if(session){hide('setup',true);showRoom();refresh();startPolling()}
