@@ -30,3 +30,11 @@ A successful 200 response does **not** enable access to student or incident reco
 
 ## Frontend
 `teacher-admin.html` remains disabled by design. It has no password input and no browser-trusted teacher role. Build a redirect-based OAuth/OIDC PKCE sign-in flow and secure session handling only after the school selects the provider and tests its supported claims.
+
+## Staff audit trail (development branch)
+
+A second migration, `multiplayer/staff-audit-schema.sql`, defines a restricted audit table, separate from existing student room and chat tables. Each entry records only the staff identity-provider subject, authorised school, staff role, fixed action type, resource reference where appropriate, outcome and timestamp. It must not contain message bodies, child identifiers, room access tokens or credentials.
+
+The `GET /api/staff-me` development endpoint now requires a successful audit insertion before returning an authenticated staff response. **Both** the staff accounts migration and audit migration must be applied in an isolated test database before any provider is configured. In production, preserve this deny-by-default behaviour if the audit store is unavailable.
+
+The database app role should have only INSERT access to the audit table. Audit deletion and retention must follow a school-approved policy and use a separate restricted maintenance role. Audit insertion and privileged state changes should be committed in one transaction where possible. No live moderation commands or incident review endpoints have been activated.
