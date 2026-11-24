@@ -2,6 +2,9 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Babonneau Secondary School · Form 1 Learning Hub</title>
 <style>
 :root{--navy:#173d72;--blue:#2867bb;--pale:#edf4ff;--ink:#182b43;--line:#dbe6f3}*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,Arial,sans-serif;background:#f5f8fd;color:var(--ink)}header{background:linear-gradient(120deg,#173d72,#2d75b9);color:white;padding:22px max(18px,calc((100vw - 1080px)/2))}h1{margin:0;font-size:clamp(26px,4vw,37px)}header p{margin:4px 0;color:#eaf2ff}main{max-width:1080px;margin:auto;padding:22px 16px 60px}.card{background:white;border:1px solid var(--line);border-radius:17px;padding:22px;margin:14px 0}.card h2{margin:0 0 8px}.muted,small{color:#52647d}.subjects{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin:17px 0}.subject{border:1px solid var(--line);border-radius:14px;background:white;padding:18px;text-align:left;font:inherit}.subject b,.subject span{display:block}.subject span{font-size:27px}.subject:not(:disabled){border:2px solid var(--blue);cursor:pointer}.subject:disabled{opacity:.65}.tabs,.actions{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}button{cursor:pointer;font:inherit}.tabs button,.btn{padding:11px 17px;border:1px solid #aac1de;background:white;color:var(--navy);border-radius:10px;font-weight:700}.tabs button.active,.btn.primary{background:var(--navy);color:white}.story{white-space:pre-line;background:var(--pale);padding:17px;border-radius:11px}.lesson{padding:10px 0;border-bottom:1px solid var(--line)}.question{border:1px solid var(--line);padding:15px;margin:12px 0;border-radius:12px}.options{display:grid;gap:7px}.option{display:block;padding:8px 10px;border:1px solid var(--line);border-radius:8px}.option:has(input:checked){background:#e8f2ff;border-color:var(--blue)}input{accent-color:var(--blue)}.feedback{padding:10px;border-radius:9px;margin-top:10px;background:#e7f7ee;color:#145f3c}.feedback.wrong{background:#fff0ec;color:#8c3325}textarea{width:100%;min-height:130px;padding:11px;border:1px solid #94abc9;border-radius:10px;font:inherit}.track{height:12px;background:#ddeafa;border-radius:20px;overflow:hidden}.track>div{height:100%;background:#299d72}footer{text-align:center;color:#52647d;margin-top:35px;font-size:13px}summary{cursor:pointer;font-weight:650}@media(max-width:550px){.card{padding:16px}}
+
+/* Form 1 dashboard, responsive navigation and accessible focus */
+[hidden]{display:none!important}.dashboard-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}.dashboard-head p{margin:3px 0}.dashboard-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 20px}.dashboard-summary>div{background:#f0f6ff;border:1px solid #d9e6f6;border-radius:12px;padding:14px}.dashboard-summary strong,.dashboard-summary small{display:block}.dashboard-summary strong{font-size:clamp(23px,3vw,34px);line-height:1.2}.dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.dashboard-subject{min-width:0;background:#fff;border:1px solid #d9e6f6;border-radius:12px;padding:14px}.dashboard-subject-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.dashboard-subject h3{font-size:16px;margin:0}.dashboard-subject p{font-size:13px;margin:8px 0;color:#52647d}.dashboard-subject .track{height:8px}.dashboard-subject .subject-link{display:inline-block;padding:8px 12px;margin-top:10px;color:white;background:#173d72;text-decoration:none;font-weight:650;border-radius:8px;font-size:14px}.dashboard-next{margin-top:17px;border-top:1px solid #dbe6f3;padding-top:15px}.dashboard-next h3{margin:0 0 5px}.dashboard-next p{margin:5px 0 12px}.dashboard-footnote{font-size:12px;margin-bottom:0}.subject:focus-visible,.subject-link:focus-visible,button:focus-visible,input:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #f0ad38;outline-offset:3px}button,.subject,.subject-link{touch-action:manipulation}@media(max-width:720px){.dashboard-grid{grid-template-columns:1fr}.subjects{grid-template-columns:repeat(2,minmax(0,1fr))}.subject{padding:13px}.card{padding:16px}.dashboard-summary>div{padding:10px}.dashboard-head .btn{width:100%}}@media(max-width:390px){.subjects{grid-template-columns:1fr}.dashboard-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.dashboard-summary strong{font-size:21px}.dashboard-summary small{font-size:11px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style><script>
 (function(){
 "use strict";
@@ -25,7 +28,7 @@ window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the cu
 </script></head><body>
 <header><h1>📚 Babonneau Secondary School Learning Hub</h1><p>Learn a little. Practise often. Grow with confidence.</p></header>
 <main><section id="learnerAccess" class="card" aria-label="Choose your learner profile"><h2>Start learning</h2><p>Enter your first name or nickname, class and your own four-digit learner code. Use the same details when returning to this browser to see your saved work.</p><form id="learnerForm"><label for="learnerName">First name or nickname</label><input id="learnerName" required minlength="2" maxlength="40" autocomplete="off" placeholder="e.g. Jayden" style="display:block;width:100%;max-width:360px;padding:11px;margin:5px 0 12px;border:1px solid #aac1de;border-radius:8px"><label for="learnerRoom">Class / room</label><input id="learnerRoom" required maxlength="25" autocomplete="off" placeholder="e.g. 1R11" style="display:block;width:100%;max-width:360px;padding:11px;margin:5px 0 12px;border:1px solid #aac1de;border-radius:8px"><label for="learnerCode">Your four-digit learner code</label><input id="learnerCode" required pattern="[0-9]{4}" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="4 digits" type="password" style="display:block;width:100%;max-width:200px;padding:11px;margin:5px 0 12px;border:1px solid #aac1de;border-radius:8px"><button type="submit" class="btn primary">Enter learning hub</button></form><p class="muted">No full name, email address or account required. Your code separates local progress; it is not a secure password. On shared devices, switch learners before starting. Work does not sync to other devices.</p></section><section class="card" id="learnerBanner" hidden><h2 id="learnerGreeting"></h2><p id="learnerDetails"></p><button type="button" class="btn" onclick="bssSwitchStudent()">Switch learner</button></section>
-<section class="card"><small>FORM 1 · INDEPENDENT LEARNING</small><h2>Welcome to Form 1! 👋</h2><p>Choose a subject, practise new questions and build your confidence before your examinations.</p><strong>ELA progress <span id="progress">0 / 30</span></strong><div class="track"><div id="bar" style="width:0%"></div></div></section>
+<section class="card" id="welcomeIntro" hidden><small>FORM 1 · INDEPENDENT LEARNING</small><h2>My learning dashboard</h2><p>Choose a subject, practise a skill and return to see your progress. Your learning is saved in this browser under your learner profile.</p><strong>English Language Arts: <span id="progress">0 / 480 attempted</span></strong><div class="track"><div id="bar" style="width:0%"></div></div></section><section id="studentDashboard" class="card" hidden aria-label="Student learning progress"><div class="dashboard-head"><div><small>MY REVISION OVERVIEW</small><h2 id="dashboardName">Your subjects</h2><p id="dashboardSubtitle" class="muted">Progress from this browser</p></div><button class="btn" type="button" id="refreshDashboard">Refresh progress</button></div><div class="dashboard-summary"><div><strong id="dashboardSubjectsStarted">0</strong><small>Subjects started</small></div><div><strong id="dashboardTotalAnswers">0</strong><small>Practice questions answered</small></div><div><strong id="dashboardBestTests">0</strong><small>Tests at 90% or above</small></div></div><div id="dashboardSubjects" class="dashboard-grid"></div><section id="dashboardNext" class="dashboard-next" aria-label="Suggested next activity"></section><p class="muted dashboard-footnote">Scores reflect the saved work in this browser, not official school grades. Progress cannot transfer to other devices automatically.</p></section>
 <section class="subjects" id="subjectChoices"><button class="subject" onclick="document.getElementById('study').scrollIntoView({behavior:'smooth'})"><span>📖</span><b>English Language Arts</b><small>Open now · 4 days</small></button><button class="subject" onclick="window.location.href='./math.html'"><span>🔢</span><b>Mathematics</b><small>Open now · Grade 7 · 4 days</small></button><button class="subject" onclick="window.location.href='./general-science.html'"><span>🔬</span><b>General Science</b><small>Open now · Grade 7 Term 1</small></button><button class="subject" onclick="window.location.href='./social-studies.html'"><span>🌎</span><b>Social Studies</b><small>Open now · Grade 7 Term 1</small></button><button class="subject" onclick="window.location.href='./it-term1-exam.html'"><span>💻</span><b>Information Technology</b><small>Open now · Ergonomics & Keyboard Skills</small></button><button class="subject" onclick="window.location.href='./food-nutrition-health.html'"><span>🥗</span><b>Food, Nutrition and Health</b><small>Open now · Grade 7 Term 1</small></button><button class="subject" onclick="window.location.href='./physical-education.html'"><span>🏅</span><b>Physical Education</b><small>Open now · Grade 7 Term 1</small></button><button class="subject" onclick="window.location.href='./french.html'"><span>🇫🇷</span><b>French</b><small>Open now · Form 1 Term 1</small></button><button class="subject" onclick="window.location.href='./technical-drawing.html'"><span>📐</span><b>Technical Drawing</b><small>Open now · Form 1 Term 1</small></button><button class="subject" disabled><span>🎨</span><b>Other Subjects</b><small>Add later</small></button></section>
 <section id="reportTools" class="card" hidden><h2>My progress report</h2><p>Save a copy of your scores to share with your teacher. The report includes your nickname and class, but not your four-digit learner code or written responses.</p><button type="button" class="btn primary" id="downloadReport">Download my report</button><p class="muted">Your teacher must receive the downloaded file from you. There is no automatic upload or central tracking.</p></section><section id="study"><nav class="tabs" id="tabs" aria-label="Revision days"></nav><div id="view"></div></section>
 <footer>Original revision questions · No sign-in required · Individual answers and writing saved in this browser only; not a secure account</footer>
@@ -225,6 +228,8 @@ document.getElementById("learnerBanner").hidden=!active;
 document.getElementById("subjectChoices").hidden=!active;
 document.getElementById("study").hidden=!active;
 document.getElementById("reportTools").hidden=!active;
+document.getElementById("welcomeIntro").hidden=!active;
+document.getElementById("studentDashboard").hidden=!active;
 if(active){
 document.getElementById("learnerGreeting").textContent="Welcome, "+window.bssStudent.name+"!";
 document.getElementById("learnerDetails").textContent="Form 1 · "+window.bssStudent.room+" · Your answers are saved separately in this browser.";
@@ -264,5 +269,67 @@ const link=document.createElement("a");link.href=url;link.download="form1-progre
 }
 document.getElementById("downloadReport").onclick=exportLearnerReport;
 
-if(window.bssStudent)render();
+
+/* Subject progress dashboard. Display actual locally saved counts, never synthetic grades. */
+const dashboardCatalog=[
+{name:"English Language Arts",url:"#study",key:"nyeem_v4_practice",limit:480,kind:"ela",exam:"nyeem_v4_finals",icon:"📖"},
+{name:"Mathematics",url:"./math.html",key:"nyeem_grade7_math_v1",limit:180,kind:"daily",icon:"🔢"},
+{name:"Social Studies",url:"./social-studies.html",key:"nyeem_social_studies_v1",limit:216,kind:"daily",icon:"🌎"},
+{name:"Information Technology",url:"./it-term1-exam.html",key:"form1_it_v1",limit:180,kind:"it",exam:"form1_it_exam_v1",icon:"💻"},
+{name:"General Science",url:"./general-science.html",key:"form1_general_science_v1",limit:180,kind:"daily",icon:"🔬"},
+{name:"Food, Nutrition and Health",url:"./food-nutrition-health.html",key:"form1_fnh_v1",limit:180,kind:"daily",icon:"🥗"},
+{name:"Physical Education",url:"./physical-education.html",key:"form1_pe_v1",limit:180,kind:"practice",icon:"🏅"},
+{name:"French",url:"./french.html",key:"form1_french_v1",limit:180,kind:"daily",icon:"🇫🇷"},
+{name:"Technical Drawing",url:"./technical-drawing.html",key:"form1_td_v1",limit:180,kind:"practice",icon:"📐"}
+];
+function dashboardData(subject){
+ const raw=getJson(subject.key)||{},primary=subject.kind==="ela"?raw:subject.kind==="practice"?raw.practice||{}:raw.daily||{};
+ const answered=Object.keys(primary).filter(k=>/^[012]-\d+-\d+$/.test(k)).length;
+ const tests=subject.kind==="ela"?(getJson(subject.exam)||{}):(raw.tests||{});
+ const testResults=Object.values(tests).filter(v=>v&&typeof v==="object"&&v.result&&Number.isFinite(v.result.percent??v.result.pct)).map(v=>Number(v.result.percent??v.result.pct));
+ const highest=testResults.length?Math.max(...testResults):null;
+ const mastered=testResults.filter(v=>v>=90).length;
+ const extra=subject.kind==="it"?(getJson(subject.exam)||{}):null;
+ const extraAttempted=extra?Object.keys(extra.practice||{}).length:0;
+ const examWritten=extra?.paper?.submitted===true;
+ return {...subject,answered:Math.min(subject.limit,answered),highest,mastered,extraAttempted,examWritten};
+}
+function createDashboardElement(tag,cls,value){const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e}
+function renderStudentDashboard(){
+ if(!window.bssStudent)return;
+ const subjectData=dashboardCatalog.map(dashboardData);
+ const total=subjectData.reduce((sum,x)=>sum+x.answered+x.extraAttempted,0);
+ const started=subjectData.filter(x=>x.answered>0||x.extraAttempted>0||x.highest!==null||x.examWritten).length;
+ const passed=subjectData.reduce((sum,x)=>sum+x.mastered,0);
+ document.getElementById("dashboardName").textContent="Welcome, "+window.bssStudent.name+"!";
+ document.getElementById("dashboardSubtitle").textContent=window.bssStudent.room+" · Nine subjects · Local progress";
+ document.getElementById("dashboardSubjectsStarted").textContent=String(started)+" / 9";
+ document.getElementById("dashboardTotalAnswers").textContent=String(total);
+ document.getElementById("dashboardBestTests").textContent=String(passed);
+ const list=document.getElementById("dashboardSubjects");list.replaceChildren();
+ subjectData.forEach(x=>{
+  const card=createDashboardElement("article","dashboard-subject");
+  const top=createDashboardElement("div","dashboard-subject-top"),title=createDashboardElement("h3","",x.icon+" "+x.name);
+  const pct=Math.round(x.answered/x.limit*100),pctLabel=createDashboardElement("strong","",pct+"%");
+  top.append(title,pctLabel);card.append(top);
+  const details=x.answered+" / "+x.limit+" practice answered"+(x.extraAttempted?" · "+x.extraAttempted+" additional IT exam questions":"");
+  card.append(createDashboardElement("p","",details));
+  const track=createDashboardElement("div","track"),fill=createDashboardElement("div");fill.style.width=pct+"%";
+  track.setAttribute("role","progressbar");track.setAttribute("aria-label",x.name+" practice completion");track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax",String(x.limit));track.setAttribute("aria-valuenow",String(x.answered));track.append(fill);card.append(track);
+  if(x.highest!==null)card.append(createDashboardElement("p","","Best objective test: "+x.highest.toFixed(1)+"%"));
+  const link=createDashboardElement("a","subject-link",x.answered?"Continue revision":"Start revision");link.href=x.url;
+  if(x.url==="#study")link.addEventListener("click",()=>{day=0;render()});
+  card.append(link);list.append(card);
+ });
+ // Recommend the least completed started subject, or ELA for brand-new learners.
+ const candidates=subjectData.filter(x=>x.answered>0&&x.answered<x.limit);
+ const next=(candidates.length?candidates.sort((a,b)=>a.answered/a.limit-b.answered/b.limit)[0]:subjectData.find(x=>x.answered===0))||subjectData[0];
+ const box=document.getElementById("dashboardNext");box.replaceChildren();
+ box.append(createDashboardElement("h3","","Suggested next activity"),createDashboardElement("p","",next.answered?"Continue "+next.name+". You have answered "+next.answered+" of "+next.limit+" daily revision questions.":"Begin with "+next.name+". Start Day 1 and review the explanations after each question."));
+ const go=createDashboardElement("a","subject-link","Go to "+next.name);go.href=next.url;if(next.url==="#study")go.addEventListener("click",()=>{day=0;render()});box.append(go);
+}
+document.getElementById("refreshDashboard").onclick=renderStudentDashboard;
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&window.bssStudent)renderStudentDashboard()});
+
+if(window.bssStudent){render();renderStudentDashboard();}
 </script></body></html>
