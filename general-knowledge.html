@@ -21,10 +21,10 @@ try{sessionStorage.setItem("bss_form1_student",JSON.stringify({name,room,code}))
 window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the current learner has finished. Their progress remains saved in this browser under their own details."))return;try{sessionStorage.removeItem("bss_form1_student")}catch(e){}location.href="./"};
 })();
 </script></head><body><header><a href="./">← Learning Hub</a><h1>🏆 General Knowledge Challenge</h1><p>Learn the facts. Challenge the computer. Celebrate Saint Lucia.</p><p id="studentName"></p></header><main>
-<section class="card"><h2>Choose your challenge</h2><p class="intro">Every question teaches a fact. You and the computer answer the same questions in a <strong>12-round match</strong>. Earn points, collect knowledge, and test what you remember.</p>
-<div class="controls"><label for="category">Questions from</label><select id="category"><option value="all">All subjects and Saint Lucia</option><option value="saintlucia">Saint Lucian knowledge and history</option><option value="school">All school subjects</option></select><label for="difficulty">Computer level</label><select id="difficulty"><option value="0.45">Explorer · Easier</option><option value="0.67" selected>Challenger · Medium</option><option value="0.83">Champion · Hard</option></select></div>
-<div class="actions" style="margin-top:15px"><button id="start" class="primary">Start a new match</button><button id="study" class="secondary">Explore fact cards</button></div><p class="muted small">The opponent is a simulated computer player, not a live person or AI account. Difficulty changes its chance of answering correctly. No personal data is sent to a server.</p></section>
-<section class="card" id="game" hidden><div class="score-row"><div class="score"><small id="playerLabel">You</small><strong id="playerScore">0</strong></div><div class="score vs">VS</div><div class="score"><small>💻 Computer</small><strong id="computerScore">0</strong></div></div><div class="bar"><div id="roundProgress" style="width:0%"></div></div><p id="roundLabel" class="muted" aria-live="polite"></p><span class="topic-pill" id="topic"></span><h2 id="prompt">Ready?</h2><div class="answers" id="choices"></div><div id="feedback" aria-live="polite" hidden></div><div class="actions" style="margin-top:15px"><button class="primary" id="next" hidden>Next question</button><button id="exit" class="secondary">Leave match</button></div></section>
+<section class="card"><h2>Choose your challenge</h2><p class="intro">Every question teaches a fact. You and the computer answer the same questions in a <strong>three levels of 20 questions each (60 questions per match)</strong>. Earn points, collect knowledge, and test what you remember.</p>
+<div class="controls"><label for="category">Questions from</label><select id="category"><option value="all">All subjects and Saint Lucia</option><option value="saintlucia">Saint Lucian knowledge and history</option><option value="school">All school subjects</option></select><label for="difficulty">Computer level</label><select id="difficulty"><option value="explorer">Explorer · Easier</option><option value="challenger" selected>Challenger · Medium</option><option value="champion">Champion · Hard</option></select></div>
+<div class="actions" style="margin-top:15px"><button id="start" class="primary">Start a new match</button><button id="study" class="secondary">Explore fact cards</button></div><p class="muted small">The opponent is a simulated computer player, not a live person or AI account. The computer gets stronger at each level, and later rounds favour harder questions. No personal data is sent to a server.</p></section>
+<section class="card" id="game" hidden><div class="score-row"><div class="score"><small id="playerLabel">You</small><strong id="playerScore">0</strong></div><div class="score vs">VS</div><div class="score"><small>💻 Computer</small><strong id="computerScore">0</strong></div></div><div class="bar"><div id="roundProgress" style="width:0%"></div></div><p id="roundLabel" class="muted" aria-live="polite"></p><p id="levelSummary" class="muted small"></p><span class="topic-pill" id="topic"></span><h2 id="prompt">Ready?</h2><div class="answers" id="choices"></div><div id="feedback" aria-live="polite" hidden></div><div class="actions" style="margin-top:15px"><button class="primary" id="next" hidden>Next question</button><button id="exit" class="secondary">Leave match</button></div></section>
 <section class="card" id="outcome" hidden><h2 id="resultTitle"></h2><div class="result" id="resultText"></div><div class="actions" style="margin-top:14px"><button class="primary" id="again">Play again</button><button id="factsAfter">Review fact cards</button></div></section>
 <section class="card" id="factLibrary" hidden><h2>📚 Learn the facts</h2><p class="muted">Read a fact, then choose Play to check your knowledge. Facts are grouped by topic and are appropriate for introductory Form 1 revision.</p><div class="controls"><label for="factCategory">Fact category</label><select id="factCategory"></select></div><div id="factCards" class="facts-grid" style="margin-top:15px"></div><p class="small muted">Saint Lucia history, culture, geography and national identity facts are linked to supporting references. Other facts are drawn from introductory Form 1 subject knowledge.</p></section>
 <section class="card"><h2>My challenge record</h2><div id="record">No matches played yet.</div><p class="small muted">Scores are for practice and friendly motivation, not official grades. Results are kept on this device under your selected learner profile.</p></section>
@@ -42,18 +42,41 @@ const $=id=>document.getElementById(id);
 let match=null;
 function persist(){storage.setItem(storeKey,JSON.stringify(saved))}
 function randShuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
-function poolFor(mode){const selected=mode==="saintlucia"?lucianCategories:mode==="school"?categories.filter(x=>!lucianCategories.includes(x)):categories;return selected.flatMap(cat=>bank[cat].map((q,i)=>({category:cat,id:cat+"-"+i,question:q[0],answer:q[1],wrong:q.slice(2,5),fact:q[5],source:q[6]||null})))}
+function poolFor(mode){const selected=mode==="saintlucia"?lucianCategories:mode==="school"?categories.filter(x=>!lucianCategories.includes(x)):categories;return selected.flatMap(cat=>bank[cat].map((q,i)=>({category:cat,id:cat+"-"+i,question:q[0],answer:q[1],wrong:q.slice(2,5),fact:q[5],source:q[6]||null,level:q[7]||1})))}
 function display(mode){for(const id of ["game","outcome","factLibrary"])$(id).hidden=id!==mode}
-function scoreRecord(){const box=$("record");box.replaceChildren();const line=document.createElement("p");line.textContent=saved.matches+" matches · "+saved.wins+" wins · "+saved.draws+" draws · "+saved.losses+" losses · "+saved.correct+"/"+saved.answered+" correct answers · Best score "+saved.best;box.append(line);if(saved.last){const last=document.createElement("p");last.className="muted";last.textContent="Last match: "+saved.last.result+" · You "+saved.last.player+" : Computer "+saved.last.computer+" · "+saved.last.correct+"/12 correct";box.append(last)}}
+function scoreRecord(){const box=$("record");box.replaceChildren();const line=document.createElement("p");line.textContent=saved.matches+" matches · "+saved.wins+" wins · "+saved.draws+" draws · "+saved.losses+" losses · "+saved.correct+"/"+saved.answered+" correct answers · Best score "+saved.best;box.append(line);if(saved.last){const last=document.createElement("p");last.className="muted";last.textContent="Last match: "+saved.last.result+" · You "+saved.last.player+" : Computer "+saved.last.computer+" · "+saved.last.correct+"/"+(saved.last.total||12)+" correct";box.append(last)}}
+const LEVEL_SIZE=20,LEVEL_COUNT=3,TOTAL_QUESTIONS=60;
+const difficultyProfiles={explorer:[0.45,0.65,0.85],challenger:[0.60,0.80,0.94],champion:[0.75,0.90,0.98]};
+function buildMatchQuestions(pool){
+ if(pool.length<TOTAL_QUESTIONS)throw Error("Not enough questions for the selected category");
+ let unused=randShuffle(pool),selected=[];
+ for(let level=1;level<=LEVEL_COUNT;level++){
+  const preferred=unused.filter(q=>level===1?q.level===1:level===2?q.level>=2:q.level>=3);
+  const chosen=randShuffle(preferred).slice(0,LEVEL_SIZE);
+  if(chosen.length<LEVEL_SIZE){
+   const picked=new Set(chosen.map(q=>q.id));
+   chosen.push(...randShuffle(unused.filter(q=>!picked.has(q.id))).slice(0,LEVEL_SIZE-chosen.length));
+  }
+  const chosenIds=new Set(chosen.map(q=>q.id));
+  unused=unused.filter(q=>!chosenIds.has(q.id));
+  selected.push(...randShuffle(chosen));
+ }
+ if(selected.length!==TOTAL_QUESTIONS||new Set(selected.map(q=>q.id)).size!==TOTAL_QUESTIONS)throw Error("Duplicate or missing question");
+ return selected;
+}
+function currentLevel(){return Math.floor(match.round/LEVEL_SIZE)}
 function newMatch(){
- const pool=poolFor($("category").value);const selected=randShuffle(pool).slice(0,12);
- match={round:0,questions:selected,player:0,computer:0,correct:0,answered:false,chosen:null,difficulty:Number($("difficulty").value),computerCorrect:false,computerAnswer:""};
+ const selected=buildMatchQuestions(poolFor($("category").value));
+ const selectedMode=$("difficulty").value;
+ match={round:0,questions:selected,player:0,computer:0,correct:0,answered:false,chosen:null,difficulty:difficultyProfiles[selectedMode]?selectedMode:"challenger",computerCorrect:false,computerAnswer:""};
  display("game");renderRound();
 }
 function renderRound(){
  if(!match)return;
  const q=match.questions[match.round];match.answered=false;match.chosen=null;
- $("roundLabel").textContent="Round "+(match.round+1)+" of "+match.questions.length;
+ const level=currentLevel(),number=match.round%LEVEL_SIZE+1;
+ $("roundLabel").textContent="Level "+(level+1)+" of 3 · Question "+number+" of 20 · "+["Explorer round","Challenge round","Expert round"][level];
+ $("levelSummary").textContent="Computer chance of a correct answer: "+Math.round(difficultyProfiles[match.difficulty][level]*100)+"% · Question "+(match.round+1)+" of 60 overall";
  $("roundProgress").style.width=(100*match.round/match.questions.length)+"%";
  $("topic").textContent=q.category;$("prompt").textContent=q.question;
  $("playerScore").textContent=match.player;$("computerScore").textContent=match.computer;
@@ -66,7 +89,7 @@ function submit(choice){
  match.answered=true;const q=match.questions[match.round];match.chosen=choice;
  const correct=choice===q.answer;
  if(correct){match.player+=10;match.correct++}
- match.computerCorrect=Math.random()<match.difficulty;
+ match.computerCorrect=Math.random()<difficultyProfiles[match.difficulty][currentLevel()];
  match.computerAnswer=match.computerCorrect?q.answer:randShuffle(q.wrong)[0];
  if(match.computerCorrect)match.computer+=10;
  $("playerScore").textContent=match.player;$("computerScore").textContent=match.computer;
@@ -81,17 +104,17 @@ function submit(choice){
  const comp=document.createElement("p");comp.textContent="💻 Computer chose: "+match.computerAnswer+(match.computerCorrect?" (+10)":" (0 points)");
  f.append(label,detail,comp);
  if(q.source){const ref=document.createElement("a");ref.href=q.source;ref.target="_blank";ref.rel="noopener noreferrer";ref.textContent="Learn more from the source";ref.className="small";f.append(ref)}
- $("next").textContent=match.round===match.questions.length-1?"See final result":"Next round";$("next").hidden=false;
+ $("next").textContent=match.round===match.questions.length-1?"See final result":(match.round+1)%LEVEL_SIZE===0?"Advance to Level "+(currentLevel()+2):"Next question";$("next").hidden=false;
 }
 function finish(){
  if(!match)return;
  const result=match.player>match.computer?"WIN":match.player<match.computer?"LOSS":"DRAW";
  saved.matches++;saved.correct+=match.correct;saved.answered+=match.questions.length;saved.best=Math.max(saved.best,match.player);
  if(result==="WIN")saved.wins++;else if(result==="LOSS")saved.losses++;else saved.draws++;
- saved.last={result,player:match.player,computer:match.computer,correct:match.correct,at:new Date().toISOString()};
+ saved.last={result,player:match.player,computer:match.computer,correct:match.correct,total:match.questions.length,at:new Date().toISOString()};
  persist();scoreRecord();display("outcome");
  $("resultTitle").textContent=result==="WIN"?"🏆 You beat the computer!":result==="DRAW"?"🤝 It's a draw!":"💡 The computer wins this time!";
- $("resultText").textContent="You scored "+match.player+" and the computer scored "+match.computer+". You answered "+match.correct+" of "+match.questions.length+" questions correctly. Read the fact cards and try again.";
+ $("resultText").textContent="You scored "+match.player+" and the computer scored "+match.computer+". You answered "+match.correct+" of "+match.questions.length+" questions correctly across three levels. Read the fact cards and try again.";
  $("roundProgress").style.width="100%";
 }
 function facts(){
