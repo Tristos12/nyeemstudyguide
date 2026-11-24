@@ -6,7 +6,7 @@ export default async function handler(req,res){
  try{
   const code=codeParam(req),viewer=await verify(req,code);
   if(!viewer)return fail(res,401,'Room access invalid or expired');
-  const players=await db().query('SELECT seat,nickname,score,next_index,quick_message,quick_message_at FROM gk_players WHERE room_code=$1 ORDER BY seat',[code]);
+  const players=await db().query('SELECT seat,nickname,score,next_index,quick_message,quick_message_at,rematch_ready FROM gk_players WHERE room_code=$1 ORDER BY seat',[code]);
   const started=!!viewer.started_at,finished=viewer.next_index===60;
   // Show only short-lived messages that have not been reported.
   const chatRows=started?await db().query(
@@ -16,10 +16,10 @@ export default async function handler(req,res){
   const q=started&&!finished?getQuestions(viewer.mode,Number(viewer.seed))[viewer.next_index]:null;
   res.status(200).json({
    code,seat:viewer.seat,mode:viewer.mode,secondsPerQuestion:viewer.seconds_per_question,
-   started,finished,nextIndex:viewer.next_index,score:viewer.score,
+   started,finished,nextIndex:viewer.next_index,score:viewer.score,round:Number(viewer.round_no),
    question:q?questionView(q,Number(viewer.seed),viewer.next_index):null,
    deadline:q&&viewer.seconds_per_question>0&&viewer.question_started_at?new Date(new Date(viewer.question_started_at).getTime()+viewer.seconds_per_question*1000).toISOString():null,
-   players:players.map(p=>({seat:p.seat,nickname:p.nickname,score:p.score,answered:p.next_index,finished:p.next_index===60,quickMessage:Number.isInteger(p.quick_message)?p.quick_message:null,quickMessageAt:p.quick_message_at||null})),
+   players:players.map(p=>({seat:p.seat,nickname:p.nickname,score:p.score,answered:p.next_index,finished:p.next_index===60,rematchReady:p.rematch_ready===true,quickMessage:Number.isInteger(p.quick_message)?p.quick_message:null,quickMessageAt:p.quick_message_at||null})),
    messages:chatRows.reverse().map(m=>({id:Number(m.id),seat:m.sender_seat,text:m.message_text,at:m.created_at})),
    bothFinished:players.length===2&&players.every(p=>p.next_index===60)
   });
