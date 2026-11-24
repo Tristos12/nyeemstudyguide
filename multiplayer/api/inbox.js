@@ -18,6 +18,7 @@ export default async function handler(req,res){
   if(req.method==='POST'&&action==='create'){
    const rate=ipKey(req),sql=db();
    // Clear expired capability-only inboxes, with dependent invitations.
+   await sql.query('DELETE FROM gk_invitations WHERE expires_at<now()');
    await sql.query('DELETE FROM gk_inboxes WHERE expires_at<now()');
    const count=await sql.query("SELECT count(*)::int AS n FROM gk_inboxes WHERE rate_key=$1 AND created_at>now()-interval '24 hours'",[rate]);
    if(count[0].n>=5)return fail(res,429,'Too many inboxes created from this network today');
@@ -29,6 +30,7 @@ export default async function handler(req,res){
   const code=(req.method==='GET'?req.query?.code:body(req)?.code);
   if(!await verifiedInbox(req,code))return fail(res,401,'Private inbox access invalid or expired');
   if(req.method==='GET'){
+   await db().query('DELETE FROM gk_invitations WHERE expires_at<now()');
    const items=await db().query("SELECT id,sender_nickname,kind,invitation_url,status,created_at,expires_at FROM gk_invitations WHERE inbox_code=$1 AND expires_at>now() ORDER BY created_at DESC LIMIT 30",[code]);
    return res.status(200).json({items:items.map(i=>({id:Number(i.id),sender:i.sender_nickname,kind:i.kind,url:i.invitation_url,status:i.status,at:i.created_at,expiresAt:i.expires_at}))});
   }
