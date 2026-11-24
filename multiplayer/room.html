@@ -7,7 +7,7 @@
 <section class="card" id="invite" hidden><h2>Invite a friend</h2><p>Share this link privately. Anyone with this invitation may take the second seat, so do not post it publicly.</p><div class="controls"><label>Invitation URL<input id="inviteUrl" readonly></label></div><button id="copyInvite">Copy invitation</button><p class="note" id="copyStatus"></p></section>
 <section class="card" id="status" hidden><h2>Room <span id="roomCode"></span></h2><div class="scoreboard" id="players"></div><p id="roomMessage" role="status"></p><button id="leaveRoom" class="secondary">Leave this room</button></section>
 <section class="card" id="quickChat" hidden><h2>💬 Quick Chat</h2><p class="note">Send friendly, ready-made messages to your opponent. No typing required.</p><div class="quick-buttons" id="quickButtons"></div><p id="chatStatus" class="chat-status" role="status"></p><div id="chatMessages" aria-live="polite"></div>
-<hr><div><h3>Type a message</h3><p class="note">150 characters maximum. No personal information, contact details or links. Messages can be reported; automatic filtering cannot catch everything.</p>
+<hr><div><h3>Type a message</h3><p class="note">150 characters maximum. No personal information, contact details or links. Messages can be reported and hidden from both players; this does not automatically notify a teacher. Tell a trusted adult about serious concerns. Automatic filtering cannot catch everything.</p>
 <form id="typedChatForm" class="typed-form"><label for="typedChatInput">Your message<input id="typedChatInput" type="text" maxlength="150" autocomplete="off" placeholder="Write a friendly message..." required></label><button id="typedSend" type="submit">Send</button></form>
 <p id="typedChatStatus" class="chat-status" role="status"></p>
 <button type="button" class="secondary" id="muteTextChat">Hide typed chat</button>
@@ -113,7 +113,7 @@ function renderTypedChat(messages,players){
   const name=document.createElement('strong');name.textContent=players.find(p=>p.seat===m.seat)?.nickname||'Player';
   const text=document.createElement('p');text.textContent=m.text;entry.append(name,text);
   if(m.seat!==session.seat){
-   const report=document.createElement('button');report.type='button';report.className='secondary';report.textContent='Report message';
+   const report=document.createElement('button');report.type='button';report.className='secondary';report.textContent='Report & hide';
    report.onclick=()=>reportTypedMessage(m.id,report);entry.append(report)
   }
   list.append(entry);
