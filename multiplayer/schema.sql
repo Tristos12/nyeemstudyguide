@@ -21,9 +21,20 @@ CREATE TABLE IF NOT EXISTS gk_players (
  finished_at TIMESTAMPTZ,
  quick_message SMALLINT CHECK (quick_message BETWEEN 0 AND 5),
  quick_message_at TIMESTAMPTZ,
+ typed_message_at TIMESTAMPTZ,
  PRIMARY KEY (room_code,seat),
  UNIQUE (room_code,token_hash)
 );
+CREATE TABLE IF NOT EXISTS gk_typed_messages (
+ id BIGSERIAL PRIMARY KEY,
+ room_code VARCHAR(8) NOT NULL REFERENCES gk_rooms(code) ON DELETE CASCADE,
+ sender_seat SMALLINT NOT NULL CHECK(sender_seat IN (1,2)),
+ message_text VARCHAR(150) NOT NULL CHECK (char_length(message_text) BETWEEN 1 AND 150),
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ reported_at TIMESTAMPTZ,
+ reported_by_seat SMALLINT CHECK(reported_by_seat IN (1,2))
+);
+CREATE INDEX IF NOT EXISTS gk_message_room_idx ON gk_typed_messages(room_code,id DESC);
 CREATE INDEX IF NOT EXISTS gk_room_expiry ON gk_rooms(expires_at);
 -- Schedule server-side expiry cleanup using a service maintenance job.
 -- Example: DELETE FROM gk_rooms WHERE expires_at < now();
