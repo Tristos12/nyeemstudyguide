@@ -6,7 +6,7 @@ function safeUrl(value,kind){
   const url=new URL(value);
   if(url.protocol!=='https:'||url.host!=='tristos12.github.io'||url.username||url.password)return null;
   if(kind==='live'){
-   if(url.pathname!=='/nyeemstudyguide/multiplayer/room.html'||url.search)return null;
+   if(url.pathname!=='/nyeemstudyguide/multiplayer/room.html'||[...url.searchParams.keys()].some(k=>k!=='gameVersion'))return null;
    const hash=new URLSearchParams(url.hash.slice(1));
    if(!/^[A-HJ-NP-Z2-9]{8}$/.test(hash.get('room')||'')||!/^[A-Za-z0-9_-]{42,50}$/.test(hash.get('invite')||''))return null;
    return 'https://tristos12.github.io/nyeemstudyguide/multiplayer/room.html#room='+encodeURIComponent(hash.get('room'))+'&invite='+encodeURIComponent(hash.get('invite'));
