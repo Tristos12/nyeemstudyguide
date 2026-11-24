@@ -9,6 +9,8 @@ export default async function handler(req,res){
  if(!process.env.ROOM_RATE_SECRET)return fail(res,503,'Room rate limit is not configured');
  try{
   const sql=db(),code=roomCode(),invite=token(),hostToken=token(),seed=randomInt(1,4294967296);
+  // Remove expired room and player rows opportunistically. Schedule daily cleanup after deployment.
+  await sql.query('DELETE FROM gk_rooms WHERE expires_at < now()');
   const ip=String(req.headers['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].slice(0,80);
   const rateKey=digest(process.env.ROOM_RATE_SECRET+ip);
   const recent=await sql.query("SELECT count(*)::int AS n FROM gk_rooms WHERE rate_key=$1 AND created_at>now()-interval '1 hour'",[rateKey]);
