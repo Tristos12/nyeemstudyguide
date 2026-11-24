@@ -15,6 +15,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ecaf
 .invite.pending{border-left:6px solid #c98e19;background:#fffaf0}.invite p{margin:7px 0}
 .pill{display:inline-block;border-radius:100px;padding:2px 9px;background:#e6f1ff;font-size:12px;font-weight:750}
 .bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:15px 0}.stats div{border:1px solid #d4e1ef;border-radius:10px;text-align:center;background:#f5f9ff;padding:12px 5px}.stats strong{display:block;font-size:clamp(20px,3vw,30px)}.stats small{font-size:12px;color:#546c83}.result-row{display:grid;grid-template-columns:1fr auto;gap:10px;border-bottom:1px solid #dce5f0;padding:10px 0}.result-row:last-child{border:0}.result-row p{margin:3px 0}.result-row strong{overflow-wrap:anywhere}@media(max-width:600px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 [hidden]{display:none!important}
 @media(max-width:600px){.card{padding:15px}.row button{flex:1 1 auto}}
 </style><script>
@@ -38,7 +39,7 @@ try{sessionStorage.setItem("bss_form1_student",JSON.stringify({name,room,code}))
 window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the current learner has finished. Their progress remains saved in this browser under their own details."))return;try{sessionStorage.removeItem("bss_form1_student")}catch(e){}location.href="./"};
 })();
 </script>
-<script src="./challenge-centre-client.js"></script></head><body>
+<script src="./challenge-centre-client.js"></script><script src="./challenge-history.js"></script></head><body>
 <header><a href="./">← Learning Hub</a><h1>🔔 My Challenge Centre</h1><p>Your private invitation inbox and current competitions</p></header>
 <main>
 <section id="noProfile" class="card" hidden><h2>Choose your learner profile</h2><p>Open the Learning Hub and enter your learner details to use a private challenge inbox on this browser.</p><a class="button-link" href="./">Go to Learning Hub</a></section>
@@ -56,6 +57,19 @@ window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the cu
 </section>
 <section class="card"><h2>🎮 My current live match</h2><p id="currentMatch" class="small">No active match saved in this browser tab.</p><a class="button-link" href="./multiplayer/room.html">Open multiplayer game</a>
 <p class="small">Live rooms are tied to the tab where you joined. If you opened a match in another tab or device, return to that tab to continue.</p></section>
+<section class="card" id="resultsSection"><div class="bar"><h2>🏆 My challenge results</h2><button class="secondary" type="button" id="refreshResults">Refresh results</button></div>
+<p class="small">Completed live multiplayer games played with this learner profile on this browser are recorded here. No public rankings or student directory.</p>
+<div class="stats" aria-label="Private challenge statistics">
+<div><strong id="resultTotal">0</strong><small>Matches</small></div>
+<div><strong id="resultWins">0</strong><small>Wins</small></div>
+<div><strong id="resultLosses">0</strong><small>Losses</small></div>
+<div><strong id="resultDraws">0</strong><small>Draws</small></div>
+<div><strong id="resultBest">—</strong><small>Best / 600</small></div>
+</div>
+<h3>Recent completed games</h3><div id="matchHistory" aria-live="polite"></div>
+<div class="row" style="margin-top:12px"><button class="secondary" id="clearResults" type="button">Clear my saved results</button></div>
+<p class="small">Results are recorded only after both players finish all 60 questions. Earlier matches and matches from other devices cannot be recovered here. Clearing these browser records cannot delete scores held temporarily by the game server.</p>
+</section>
 <section class="card"><h2>Send a challenge</h2>
 <p>Ask your friend to share their Challenge Code. You can then send either a live multiplayer invitation or a shared-link challenge from the corresponding game page.</p>
 <div class="row"><a class="button-link" href="./multiplayer/room.html">Live multiplayer</a><a class="button-link" href="./general-knowledge.html">Independent challenge</a></div>
@@ -124,6 +138,31 @@ $('deleteInbox').onclick=async()=>{
  const entry=centre.get();if(!entry)return;
  try{await centre.call('/api/inbox','POST',{action:'delete',code:entry.code},entry.secret);centre.clear();setSetup();$('unreadCount').textContent='0 new';$('invitations').replaceChildren(createNode('p','small','Inbox deleted. Create a new one to receive invitations.'));showStatus('Inbox deleted.')}catch(e){showStatus(e.message)}
 };
+function renderResults(){
+ const data=window.GKHistory?.stats();
+ if(!data)return;
+ $('resultTotal').textContent=String(data.total);
+ $('resultWins').textContent=String(data.wins);
+ $('resultLosses').textContent=String(data.losses);
+ $('resultDraws').textContent=String(data.draws);
+ $('resultBest').textContent=data.best===null?'—':String(data.best);
+ const host=$('matchHistory');host.replaceChildren();
+ if(!data.records.length){host.append(createNode('p','small','No completed games have been saved for this learner on this device yet.'));return}
+ data.records.forEach(r=>{
+  const line=createNode('div','result-row');
+  const left=createNode('div');
+  const outcome=r.outcome==='win'?'Win':r.outcome==='loss'?'Loss':'Draw';
+  left.append(createNode('strong',null,outcome+' · '+r.score+' to '+r.opponentScore));
+  left.append(createNode('p','small','Against '+r.opponent+' · '+new Date(r.at).toLocaleString()));
+  const round=createNode('span','pill','Round '+r.round);
+  line.append(left,round);host.append(line);
+ });
+}
+$('refreshResults').onclick=renderResults;
+$('clearResults').onclick=()=>{
+ if(!confirm('Clear your saved match history from this browser? This cannot be undone.'))return;
+ window.GKHistory?.clear();renderResults();
+};
 try{
  const saved=JSON.parse(sessionStorage.getItem('gk_online_room_session_v1')||'null');
  if(saved?.code&&saved?.token&&/^[A-HJ-NP-Z2-9]{8}$/.test(saved.code)){
@@ -131,5 +170,5 @@ try{
  }
 }catch{}
 if(!window.bssStudent){$('noProfile').hidden=false}
-else{$('centre').hidden=false;setSetup();if(centre.get())refresh();setInterval(()=>{if(!document.hidden&&centre.get())refresh()},20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()})}
+else{$('centre').hidden=false;renderResults();setSetup();if(centre.get())refresh();setInterval(()=>{if(!document.hidden&&centre.get())refresh()},20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()})}
 </script></body></html>
