@@ -28,6 +28,7 @@ export default async function handler(req,res){
  if(!validCode(code)||!sender||!url)return fail(res,400,'Check the recipient code, nickname and invitation link');
  try{
   const sql=db();
+  await sql.query('DELETE FROM gk_invitations WHERE expires_at<now()');
   const target=await sql.query('SELECT code FROM gk_inboxes WHERE code=$1 AND expires_at>now()',[code]);
   // Do not reveal which inbox codes exist to unauthorised senders.
   if(!target.length)return fail(res,400,'Invitation could not be sent. Check the private inbox code.');
