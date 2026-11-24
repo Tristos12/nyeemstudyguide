@@ -1,11 +1,12 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Private General Knowledge Room · Babonneau Secondary School</title>
 <style>
-:root{font:16px/1.5 system-ui,Arial,sans-serif;color:#183550;background:#f3f7fc}*{box-sizing:border-box}body{margin:0}header{background:#173e68;color:white;padding:20px max(16px,calc((100vw - 920px)/2))}header a{color:white}h1{margin:8px 0;font-size:clamp(23px,4vw,34px)}main{max-width:920px;margin:auto;padding:16px}.card{background:white;padding:20px;border-radius:16px;border:1px solid #ccdaeb;margin:13px 0}.controls{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.controls label{flex:1 1 190px;font-weight:650}.controls input,.controls select{width:100%;padding:10px;margin-top:6px;border:1px solid #9fb9d2;border-radius:9px;font:inherit}button{border:1px solid #1b4c81;background:#1b4c81;color:white;border-radius:10px;padding:11px 15px;font:inherit;cursor:pointer;font-weight:700;margin:4px 6px 4px 0}button.secondary{background:white;color:#1b4c81}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f0aa2d;outline-offset:2px}.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.answers button{background:#f2f7ff;color:#15375b;text-align:left;min-height:56px}.scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.score{padding:12px;border:1px solid #b7cce5;border-radius:12px;background:#f3f9ff}.score strong{display:block;font-size:27px}.note{font-size:13px;color:#526d86}.notice{background:#fdf6e8;padding:12px;border:1px solid #eed7a8;border-radius:10px}.feedback{padding:14px;border-radius:10px;background:#e8f5ec;margin-top:12px}.feedback.wrong{background:#fff0e9}[hidden]{display:none!important}@media(max-width:600px){.answers,.scoreboard{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+:root{font:16px/1.5 system-ui,Arial,sans-serif;color:#183550;background:#f3f7fc}*{box-sizing:border-box}body{margin:0}header{background:#173e68;color:white;padding:20px max(16px,calc((100vw - 920px)/2))}header a{color:white}h1{margin:8px 0;font-size:clamp(23px,4vw,34px)}main{max-width:920px;margin:auto;padding:16px}.card{background:white;padding:20px;border-radius:16px;border:1px solid #ccdaeb;margin:13px 0}.controls{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.controls label{flex:1 1 190px;font-weight:650}.controls input,.controls select{width:100%;padding:10px;margin-top:6px;border:1px solid #9fb9d2;border-radius:9px;font:inherit}button{border:1px solid #1b4c81;background:#1b4c81;color:white;border-radius:10px;padding:11px 15px;font:inherit;cursor:pointer;font-weight:700;margin:4px 6px 4px 0}button.secondary{background:white;color:#1b4c81}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f0aa2d;outline-offset:2px}.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.answers button{background:#f2f7ff;color:#15375b;text-align:left;min-height:56px}.scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.score{padding:12px;border:1px solid #b7cce5;border-radius:12px;background:#f3f9ff}.score strong{display:block;font-size:27px}.note{font-size:13px;color:#526d86}.notice{background:#fdf6e8;padding:12px;border:1px solid #eed7a8;border-radius:10px}.feedback{padding:14px;border-radius:10px;background:#e8f5ec;margin-top:12px}.feedback.wrong{background:#fff0e9}.quick-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.quick-buttons button{font-size:14px;padding:9px;background:#edf4fd;color:#173e68;text-align:left}.quick-message{margin:7px 0;padding:9px;border-radius:9px;background:#edf4fd}.quick-message.mine{background:#e5f7ec}.chat-status{font-size:13px;color:#526d86}[hidden]{display:none!important}@media(max-width:600px){.answers,.scoreboard{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style></head><body><header><a href="../general-knowledge.html">← General Knowledge</a><h1>🔐 Private Learner Challenge Room</h1><p>Supervised pilot · Two learners · Same 60 questions · Automatic score comparison</p></header><main>
 <section class="card" id="unavailable" hidden><h2>Online rooms are not available yet</h2><p>The school's private multiplayer service has not been activated. Use the current General Knowledge game to challenge a friend by sharing a link or taking turns on one device.</p><a href="../general-knowledge.html">Open the working challenge game</a></section>
 <section class="card" id="setup"><h2>Set up your room</h2><p class="notice">Pilot testing only. For the first test, use two different devices or browsers with separate student nicknames. Choose Untimed so you can check each step. This room is not yet part of the main student game.</p><p class="note">Use a first name or nickname, not a full name, learner code, telephone number or school ID. Rooms expire after 24 hours.</p><div class="controls"><label>Nickname<input id="nickname" maxlength="24" autocomplete="off" placeholder="e.g. BrainStar"></label><label>Category<select id="mode"><option value="all">All topics</option><option value="saintlucia">Saint Lucia and Student Companion</option><option value="school">All school subjects and Student Companion</option><option value="companion">Student Companion only</option></select></label><label>Time per question<select id="timer"><option value="0">Untimed</option><option value="60">60 seconds</option><option value="30">30 seconds</option></select></label></div><button id="create">Create private room</button><button id="join" class="secondary">Join a friend's room</button><p class="note" id="setupStatus" role="status"></p></section>
 <section class="card" id="invite" hidden><h2>Invite a friend</h2><p>Share this link privately. Anyone with this invitation may take the second seat, so do not post it publicly.</p><div class="controls"><label>Invitation URL<input id="inviteUrl" readonly></label></div><button id="copyInvite">Copy invitation</button><p class="note" id="copyStatus"></p></section>
 <section class="card" id="status" hidden><h2>Room <span id="roomCode"></span></h2><div class="scoreboard" id="players"></div><p id="roomMessage" role="status"></p><button id="leaveRoom" class="secondary">Leave this room</button></section>
+<section class="card" id="quickChat" hidden><h2>💬 Quick Chat</h2><p class="note">Send friendly, ready-made messages to your opponent. No typing required.</p><div class="quick-buttons" id="quickButtons"></div><p id="chatStatus" class="chat-status" role="status"></p><div id="chatMessages" aria-live="polite"></div></section>
 <section class="card" id="questionPanel" hidden><p id="roundLabel"></p><h2 id="question"></h2><div id="answerChoices" class="answers"></div><p id="deadline" role="timer" aria-live="off"></p><div id="feedback" hidden class="feedback" aria-live="polite"></div><button id="continue" hidden>Continue</button></section>
 <section class="card"><p class="notice">Supervised classroom pilot only. The separate server and database are connected, but a complete two-device match is still being evaluated. Do not share full names, school ID numbers, passwords or private information. Scores are visible only to people who have access to the room, not to a public leaderboard.</p></section>
 </main><script src="./config.js"></script><script>
@@ -13,7 +14,8 @@ const $=id=>document.getElementById(id);
 const backend=(window.GK_MULTIPLAYER_API||'').trim().replace(/\/$/,'');
 const base=backend&&/^https:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(backend)?backend:null;
 const storageKey='gk_online_room_session_v1';
-let session=null,view=null,poll=null,clock=null,answerPending=false,shownQuestion=-1;
+let session=null,view=null,poll=null,clock=null,answerPending=false,shownQuestion=-1,quickSending=false,chatFingerprints={};
+const quickMessages=['👋 Good luck!','👏 Well done!','😄 Nice one!','💪 Keep going!','🔥 Great game!','🏆 Congratulations!'];
 try{const parsed=JSON.parse(sessionStorage.getItem(storageKey)||'null');if(parsed?.code&&parsed?.token)session=parsed}catch(e){}
 function message(txt){$('setupStatus').textContent=txt}
 function save(){if(session)sessionStorage.setItem(storageKey,JSON.stringify(session));else sessionStorage.removeItem(storageKey)}
@@ -43,13 +45,15 @@ async function joinRoom(){
  }catch(e){message(e.message)}finally{$('join').disabled=false}
 }
 function showRoom(){hide('status',false);$('roomCode').textContent=session.code}
-function leaveRoom(){if(poll!==null){clearInterval(poll);poll=null}if(clock!==null){clearInterval(clock);clock=null}shownQuestion=-1;answerPending=false;session=null;view=null;save();hide('status',true);hide('questionPanel',true);hide('invite',true);hide('setup',false);$('roomMessage').textContent='';$('setupStatus').textContent='You have left this room. You can start or join another challenge.'}
+function leaveRoom(){if(poll!==null){clearInterval(poll);poll=null}if(clock!==null){clearInterval(clock);clock=null}shownQuestion=-1;answerPending=false;session=null;view=null;save();hide('status',true);hide('quickChat',true);hide('questionPanel',true);hide('invite',true);hide('setup',false);$('roomMessage').textContent='';$('setupStatus').textContent='You have left this room. You can start or join another challenge.'}
 function startPolling(){if(poll!==null)clearInterval(poll);poll=setInterval(()=>{refresh().catch(()=>{})},3000)}
 function startClock(deadline,index){if(clock!==null){clearInterval(clock);clock=null}if(!deadline){$('deadline').textContent='No time limit';return}const due=Date.parse(deadline);if(!Number.isFinite(due))return;const tick=()=>{if(!session||!view||view.nextIndex!==index||answerPending||!$('feedback').hidden){if(clock!==null){clearInterval(clock);clock=null}return}const remaining=Math.max(0,Math.ceil((due-Date.now())/1000));$('deadline').textContent='⏱ '+remaining+' seconds remaining';if(remaining===0){clearInterval(clock);clock=null;answer(index,null)}};tick();if(clock===null&&Date.now()<due)clock=setInterval(tick,250)}
 async function refresh(){
  if(!session||!base)return;
  try{
   const data=await api('/api/state?code='+encodeURIComponent(session.code));view=data;
+  $('quickChat').hidden=!data.started;
+  if(data.started)renderQuickChat(data.players);
   $('players').replaceChildren();
   data.players.forEach(p=>{const box=document.createElement('div');box.className='score';const name=document.createElement('div');name.textContent=p.nickname+(p.seat===session.seat?' (You)':'');const score=document.createElement('strong');score.textContent=p.score+' / 600';const info=document.createElement('small');info.textContent=p.answered+'/60 questions';box.append(name,score,info);$('players').append(box)});
   $('roomMessage').textContent=!data.started?'Waiting for your friend to join...':data.bothFinished?(data.players[0].score===data.players[1].score?'Both learners finished. It is a draw!':data.players.reduce((winner,p)=>p.score>winner.score?p:winner).nickname+' wins! Both learners finished.'):data.finished?'You finished. Waiting for the other learner...':'Challenge underway. Scores update automatically.';
@@ -71,6 +75,27 @@ async function answer(index,option){
   $('continue').hidden=false;$('continue').textContent=result.finished?'See final scores':'Next question';
  }catch(e){$('roomMessage').textContent=e.message;if(/already|out of order/i.test(e.message)){$('feedback').hidden=true;shownQuestion=-1;await refresh()}else for(const b of $('answerChoices').children)b.disabled=false}finally{answerPending=false}
 }
+
+function renderQuickChat(players){
+ const host=$('chatMessages');host.replaceChildren();
+ const recent=players.filter(p=>Number.isInteger(p.quickMessage)&&p.quickMessage>=0&&p.quickMessage<quickMessages.length&&p.quickMessageAt)
+  .sort((a,b)=>Date.parse(a.quickMessageAt)-Date.parse(b.quickMessageAt));
+ if(!recent.length){const p=document.createElement('p');p.className='note';p.textContent='No quick messages yet.';host.append(p);return}
+ recent.forEach(p=>{const line=document.createElement('p');line.className='quick-message'+(p.seat===session.seat?' mine':'');
+ line.textContent=p.nickname+': '+quickMessages[p.quickMessage];host.append(line)});
+}
+async function sendQuickMessage(messageId){
+ if(quickSending||!session||!view?.started)return;
+ quickSending=true;$('chatStatus').textContent='Sending message...';
+ for(const b of $('quickButtons').children)b.disabled=true;
+ try{await api('/api/chat?code='+encodeURIComponent(session.code),'POST',{messageId});
+ $('chatStatus').textContent='Sent! You can send another message after five seconds.';
+ await refresh();
+ }catch(error){$('chatStatus').textContent=error.message}
+ finally{quickSending=false;for(const b of $('quickButtons').children)b.disabled=false}
+}
+quickMessages.forEach((text,index)=>{const btn=document.createElement('button');btn.type='button';btn.textContent=text;btn.onclick=()=>sendQuickMessage(index);$('quickButtons').append(btn)});
+
 $('continue').onclick=()=>{$('feedback').hidden=true;$('continue').hidden=true;shownQuestion=-1;refresh()};
 $('create').onclick=createRoom;$('join').onclick=joinRoom;$('leaveRoom').onclick=()=>{if(confirm('Leave this room? Your completed answers will remain on the server until the room expires.'))leaveRoom()};
 $('copyInvite').onclick=async()=>{try{await navigator.clipboard.writeText($('inviteUrl').value);$('copyStatus').textContent='Invitation copied'}catch(e){$('inviteUrl').select();$('copyStatus').textContent='Select the URL and copy it'}};
