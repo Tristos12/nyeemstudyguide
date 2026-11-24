@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS gk_rooms (
  code VARCHAR(8) PRIMARY KEY,
  invite_hash CHAR(64) NOT NULL,
+ rate_key CHAR(64) NOT NULL,
  seed BIGINT NOT NULL CHECK(seed BETWEEN 1 AND 4294967295),
  mode VARCHAR(20) NOT NULL CHECK (mode IN ('all','school','saintlucia','companion')),
  seconds_per_question SMALLINT NOT NULL CHECK (seconds_per_question IN (0,30,60)),
