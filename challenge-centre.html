@@ -1,0 +1,126 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Challenge Centre · Babonneau Secondary School</title>
+<style>
+:root{font:16px/1.55 system-ui,Arial,sans-serif;background:#f4f7fc;color:#183550}*{box-sizing:border-box}
+body{margin:0}header{background:#173e68;color:white;padding:22px max(16px,calc((100vw - 850px)/2))}
+header a{color:white}header h1{font-size:clamp(25px,4vw,37px);margin:8px 0}
+main{max-width:850px;margin:0 auto;padding:18px 16px 55px}.card{background:#fff;border:1px solid #cddcea;border-radius:15px;padding:20px;margin:13px 0}
+.notice{background:#fff7e6;border-left:5px solid #c58b1d;border-radius:10px;padding:12px;margin:10px 0}
+button,.button-link{display:inline-block;background:#174a79;color:white;border:1px solid #174a79;padding:10px 14px;border-radius:9px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}
+button.secondary{color:#174a79;background:white}button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ecaf37;outline-offset:3px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.row>*{flex:0 0 auto}.code{font:800 clamp(24px,5vw,35px)/1.2 ui-monospace,Consolas,monospace;letter-spacing:.12em;padding:13px;background:#edf5ff;border-radius:9px;display:inline-block}
+.small{font-size:13px;color:#546c83}h2{margin:0 0 8px}h3{margin:0 0 7px}
+.invite{border:1px solid #bfcfe0;border-radius:12px;padding:14px;margin:10px 0;background:#f8fbff}
+.invite.pending{border-left:6px solid #c98e19;background:#fffaf0}.invite p{margin:7px 0}
+.pill{display:inline-block;border-radius:100px;padding:2px 9px;background:#e6f1ff;font-size:12px;font-weight:750}
+.bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+[hidden]{display:none!important}
+@media(max-width:600px){.card{padding:15px}.row button{flex:1 1 auto}}
+</style><script>
+(function(){
+"use strict";
+function validStudent(s){return s&&typeof s.name==="string"&&s.name.length<=40&&typeof s.room==="string"&&s.room.length<=25&&/^\d{4}$/.test(s.code||"")}
+let s=null;try{s=JSON.parse(sessionStorage.getItem("bss_form1_student")||"null")}catch(e){}
+if(!validStudent(s)){s=null;try{sessionStorage.removeItem("bss_form1_student")}catch(e){}}
+window.bssStudent=s;
+function identityKey(s){const input=(s.name.trim().toLowerCase()+"|"+s.room.trim().toLowerCase()+"|"+s.code);let h1=2166136261,h2=2246822519;for(let i=0;i<input.length;i++){h1=Math.imul(h1^input.charCodeAt(i),16777619);h2=Math.imul(h2^input.charCodeAt(i),3266489917)}return (h1>>>0).toString(36)+"-"+(h2>>>0).toString(36)}
+window.bssStorage={
+getItem:function(key){if(!window.bssStudent)return null;try{return localStorage.getItem("bssform1:"+identityKey(window.bssStudent)+":"+key)}catch(e){return null}},
+setItem:function(key,value){if(!window.bssStudent)return;try{localStorage.setItem("bssform1:"+identityKey(window.bssStudent)+":"+key,String(value))}catch(e){}},
+removeItem:function(key){if(!window.bssStudent)return;try{localStorage.removeItem("bssform1:"+identityKey(window.bssStudent)+":"+key)}catch(e){}}
+};
+window.bssChooseStudent=function(name,room,code){
+name=(name||"").trim().replace(/\s+/g," ");room=(room||"").trim().toUpperCase();code=(code||"").trim();
+if(name.length<2||name.length>40||room.length<2||room.length>25||!/^\d{4}$/.test(code))return false;
+try{sessionStorage.setItem("bss_form1_student",JSON.stringify({name,room,code}));location.reload();return true}catch(e){alert("This browser does not allow the learner profile to be saved. Enable session storage and try again.");return false}
+};
+window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the current learner has finished. Their progress remains saved in this browser under their own details."))return;try{sessionStorage.removeItem("bss_form1_student")}catch(e){}location.href="./"};
+})();
+</script>
+<script src="./challenge-centre-client.js"></script></head><body>
+<header><a href="./">← Learning Hub</a><h1>🔔 My Challenge Centre</h1><p>Your private invitation inbox and current competitions</p></header>
+<main>
+<section id="noProfile" class="card" hidden><h2>Choose your learner profile</h2><p>Open the Learning Hub and enter your learner details to use a private challenge inbox on this browser.</p><a class="button-link" href="./">Go to Learning Hub</a></section>
+<div id="centre" hidden>
+<section class="card"><h2>My private inbox</h2>
+<p>Share your <strong>Challenge Code</strong> privately with a friend to receive an invitation. Only this browser's learner profile holds the private key needed to read your inbox.</p>
+<div id="notSetup"><button id="createInbox">Create my private Challenge Code</button></div>
+<div id="inboxSetup" hidden><div class="row"><span id="inboxCode" class="code" aria-label="My Challenge Code"></span><button id="copyCode" class="secondary">Copy code</button></div>
+<p class="small">This inbox lasts 30 days. Challenge invitations expire after 24 hours. This code is an invitation address, not a password. Keep your private inbox key on your own device.</p>
+<div class="row"><button id="refreshInbox">Check invitations</button><button id="deleteInbox" class="secondary">Delete my inbox</button></div></div>
+<p id="inboxStatus" role="status" class="small" aria-live="polite"></p>
+</section>
+<section class="card"><div class="bar"><h2>📨 My Invitations <span id="unreadCount" class="pill">0 new</span></h2></div>
+<div id="invitations" aria-live="polite"><p class="small">Create a private inbox to receive invitations.</p></div>
+</section>
+<section class="card"><h2>🎮 My current live match</h2><p id="currentMatch" class="small">No active match saved in this browser tab.</p><a class="button-link" href="./multiplayer/room.html">Open multiplayer game</a>
+<p class="small">Live rooms are tied to the tab where you joined. If you opened a match in another tab or device, return to that tab to continue.</p></section>
+<section class="card"><h2>Send a challenge</h2>
+<p>Ask your friend to share their Challenge Code. You can then send either a live multiplayer invitation or a shared-link challenge from the corresponding game page.</p>
+<div class="row"><a class="button-link" href="./multiplayer/room.html">Live multiplayer</a><a class="button-link" href="./general-knowledge.html">Independent challenge</a></div>
+</section>
+<section class="card"><h2>Privacy and safety</h2><p class="notice">No student directory, email address or phone number is needed. Sender nicknames are not identity-verified. Only accept invitations from someone you recognise. If an invitation feels uncomfortable, dismiss it and tell a trusted adult.</p>
+<p class="small">An inbox is linked only to the learner profile on this browser, not an official school account. Messages appear here and in the Learning Hub while those pages are open. These are in-page notifications, not phone push alerts. Deleting the browser's saved data may remove access to an existing inbox. Never share your private inbox key.</p></section>
+</div></main>
+<script>
+const $=id=>document.getElementById(id);
+const centre=window.GKCentre;
+let refreshing=false;
+function showStatus(t){$('inboxStatus').textContent=t}
+function setSetup(){
+ const entry=centre.get();$('notSetup').hidden=!!entry;$('inboxSetup').hidden=!entry;
+ if(entry)$('inboxCode').textContent=entry.code;
+}
+function createNode(tag,cls,value){const el=document.createElement(tag);if(cls)el.className=cls;if(value!==undefined)el.textContent=value;return el}
+async function renderInvites(){
+ const entry=centre.get();if(!entry)return;
+ const data=await centre.call('/api/inbox?code='+encodeURIComponent(entry.code),'GET',null,entry.secret);
+ const items=data.items||[], pending=items.filter(x=>x.status==='pending');
+ $('unreadCount').textContent=pending.length+' new';
+ const host=$('invitations');host.replaceChildren();
+ if(!items.length){host.append(createNode('p','small','No invitations yet. Share your Challenge Code with a friend.'));return}
+ for(const invite of items){
+  const card=createNode('article','invite'+(invite.status==='pending'?' pending':''));
+  const name=createNode('h3',null,(invite.kind==='live'?'🎮 Live multiplayer':'🎯 Independent challenge')+' invitation');
+  const desc=createNode('p',null,'From '+invite.sender+' · '+(invite.status==='pending'?'Ready to accept':invite.status==='accepted'?'Previously accepted':'Dismissed'));
+  const timing=createNode('p','small','Sent '+new Date(invite.at).toLocaleString()+' · Expires '+new Date(invite.expiresAt).toLocaleString());
+  card.append(name,desc,timing);
+  if(invite.status==='pending'){
+   const bar=createNode('div','row');
+   const accept=createNode('button',null,invite.kind==='live'?'Join live match':'Accept challenge');accept.type='button';
+   accept.onclick=async()=>{
+    accept.disabled=true;try{
+     await centre.call('/api/inbox','POST',{action:'update',code:entry.code,id:invite.id,status:'accepted'},entry.secret);
+     location.href=invite.url;
+    }catch(e){showStatus(e.message);accept.disabled=false}
+   };
+   const dismiss=createNode('button','secondary','Dismiss');dismiss.type='button';
+   dismiss.onclick=async()=>{dismiss.disabled=true;try{await centre.call('/api/inbox','POST',{action:'update',code:entry.code,id:invite.id,status:'dismissed'},entry.secret);await refresh();}catch(e){showStatus(e.message);dismiss.disabled=false}};
+   bar.append(accept,dismiss);card.append(bar);
+  }
+  host.append(card);
+ }
+}
+async function refresh(){
+ if(refreshing||!centre.get())return;refreshing=true;
+ try{await renderInvites();showStatus('Invitations checked.')}catch(e){showStatus(e.message);if(/expired|invalid/i.test(e.message))showStatus('Inbox access expired or invalid. Delete this inbox and create a new code.')}
+ finally{refreshing=false}
+}
+$('createInbox').onclick=async()=>{
+ $('createInbox').disabled=true;showStatus('Creating a private inbox...');
+ try{
+  const r=await centre.call('/api/inbox','POST',{action:'create'});
+  centre.save({code:r.code,secret:r.secret});setSetup();await refresh();showStatus('Your Challenge Code is ready. Share only the code, not your private key.');
+ }catch(e){showStatus(e.message)}finally{$('createInbox').disabled=false}
+};
+$('copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(centre.get().code);showStatus('Challenge Code copied.')}catch{showStatus('Select your Challenge Code and copy it manually.')}};
+$('refreshInbox').onclick=refresh;
+$('deleteInbox').onclick=async()=>{
+ if(!confirm('Delete your private inbox and its invitations? This cannot be undone.'))return;
+ const entry=centre.get();if(!entry)return;
+ try{await centre.call('/api/inbox','POST',{action:'delete',code:entry.code},entry.secret);centre.clear();setSetup();$('unreadCount').textContent='0 new';$('invitations').replaceChildren(createNode('p','small','Inbox deleted. Create a new one to receive invitations.'));showStatus('Inbox deleted.')}catch(e){showStatus(e.message)}
+};
+if(!window.bssStudent){$('noProfile').hidden=false}
+else{$('centre').hidden=false;setSetup();if(centre.get())refresh();setInterval(()=>{if(!document.hidden&&centre.get())refresh()},20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()})}
+</script></body></html>
