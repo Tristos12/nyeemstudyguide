@@ -5,7 +5,7 @@
 <section class="card" id="unavailable" hidden><h2>Online rooms are not available yet</h2><p>The school's private multiplayer service has not been activated. Use the current General Knowledge game to challenge a friend by sharing a link or taking turns on one device.</p><a href="../general-knowledge.html">Open the working challenge game</a></section>
 <section class="card" id="setup"><h2>Set up your room</h2><p class="note">Use a first name or nickname, not a full name, learner code, telephone number or school ID. Rooms expire after 24 hours.</p><div class="controls"><label>Nickname<input id="nickname" maxlength="24" autocomplete="off" placeholder="e.g. BrainStar"></label><label>Category<select id="mode"><option value="all">All topics</option><option value="saintlucia">Saint Lucia and Student Companion</option><option value="school">All school subjects and Student Companion</option><option value="companion">Student Companion only</option></select></label><label>Time per question<select id="timer"><option value="0">Untimed</option><option value="60">60 seconds</option><option value="30">30 seconds</option></select></label></div><button id="create">Create private room</button><button id="join" class="secondary">Join a friend's room</button><p class="note" id="setupStatus" role="status"></p></section>
 <section class="card" id="invite" hidden><h2>Invite a friend</h2><p>Share this link privately. Anyone with this invitation may take the second seat, so do not post it publicly.</p><div class="controls"><label>Invitation URL<input id="inviteUrl" readonly></label></div><button id="copyInvite">Copy invitation</button><p class="note" id="copyStatus"></p></section>
-<section class="card" id="status" hidden><h2>Room <span id="roomCode"></span></h2><div class="scoreboard" id="players"></div><p id="roomMessage" role="status"></p></section>
+<section class="card" id="status" hidden><h2>Room <span id="roomCode"></span></h2><div class="scoreboard" id="players"></div><p id="roomMessage" role="status"></p><button id="leaveRoom" class="secondary">Leave this room</button></section>
 <section class="card" id="questionPanel" hidden><p id="roundLabel"></p><h2 id="question"></h2><div id="answerChoices" class="answers"></div><p id="deadline" role="timer" aria-live="off"></p><div id="feedback" hidden class="feedback" aria-live="polite"></div><button id="continue" hidden>Continue</button></section>
 <section class="card"><p class="notice">Classroom practice only. This service requires a separate secure backend and teacher review before students use it. Student nicknames and results are private to their room, not a public leaderboard.</p></section>
 </main><script src="./config.js"></script><script>
@@ -43,6 +43,7 @@ async function joinRoom(){
  }catch(e){message(e.message)}finally{$('join').disabled=false}
 }
 function showRoom(){hide('status',false);$('roomCode').textContent=session.code}
+function leaveRoom(){if(poll!==null){clearInterval(poll);poll=null}session=null;view=null;save();hide('status',true);hide('questionPanel',true);hide('invite',true);hide('setup',false);$('roomMessage').textContent='';$('setupStatus').textContent='You have left this room. You can start or join another challenge.'}
 function startPolling(){if(poll!==null)clearInterval(poll);poll=setInterval(()=>{refresh().catch(()=>{})},3000)}
 async function refresh(){
  if(!session||!base)return;
@@ -68,7 +69,7 @@ async function answer(index,option){
  }catch(e){$('roomMessage').textContent=e.message;for(const b of $('answerChoices').children)b.disabled=false}
 }
 $('continue').onclick=()=>{$('feedback').hidden=true;$('continue').hidden=true;refresh()};
-$('create').onclick=createRoom;$('join').onclick=joinRoom;
+$('create').onclick=createRoom;$('join').onclick=joinRoom;$('leaveRoom').onclick=()=>{if(confirm('Leave this room? Your completed answers will remain on the server until the room expires.'))leaveRoom()};
 $('copyInvite').onclick=async()=>{try{await navigator.clipboard.writeText($('inviteUrl').value);$('copyStatus').textContent='Invitation copied'}catch(e){$('inviteUrl').select();$('copyStatus').textContent='Select the URL and copy it'}};
 if(!base){hide('unavailable',false);hide('setup',true)}
 else if(session){hide('setup',true);showRoom();refresh();startPolling()}
