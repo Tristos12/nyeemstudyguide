@@ -13,7 +13,7 @@ const $=id=>document.getElementById(id);
 const backend=(window.GK_MULTIPLAYER_API||'').trim().replace(/\/$/,'');
 const base=backend&&/^https:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(backend)?backend:null;
 const storageKey='gk_online_room_session_v1';
-let session=null,view=null,poll=null;
+let session=null,view=null,poll=null,clock=null,answerPending=false,shownQuestion=-1;
 try{const parsed=JSON.parse(sessionStorage.getItem(storageKey)||'null');if(parsed?.code&&parsed?.token)session=parsed}catch(e){}
 function message(txt){$('setupStatus').textContent=txt}
 function save(){if(session)sessionStorage.setItem(storageKey,JSON.stringify(session));else sessionStorage.removeItem(storageKey)}
@@ -28,7 +28,7 @@ async function createRoom(){
  const nickname=$('nickname').value.trim();if(nickname.length<2){message('Enter a short nickname first');return}
  $('create').disabled=true;
  try{
-  const data=await api('/api/rooms','POST',{nickname,mode:$('mode').value,secondsPerQuestion:Number($('timer').value)});
+  const data=await api('/api/create','POST',{nickname,mode:$('mode').value,secondsPerQuestion:Number($('timer').value)});
   session={code:data.code,token:data.token,seat:1};save();$('inviteUrl').value=invitation(data.code,data.invite);hide('invite',false);hide('setup',true);showRoom();await refresh();startPolling()
  }catch(e){message(e.message)}finally{$('create').disabled=false}
 }
@@ -38,37 +38,40 @@ async function joinRoom(){
  const nickname=$('nickname').value.trim();if(nickname.length<2){message('Enter your nickname to join');return}
  $('join').disabled=true;
  try{
-  const data=await api('/api/rooms/'+encodeURIComponent(code)+'/join','POST',{nickname,invite});
+  const data=await api('/api/join?code='+encodeURIComponent(code),'POST',{nickname,invite});
   session={code:data.code,token:data.token,seat:2};save();history.replaceState(null,'',location.pathname+location.search);hide('setup',true);showRoom();await refresh();startPolling()
  }catch(e){message(e.message)}finally{$('join').disabled=false}
 }
 function showRoom(){hide('status',false);$('roomCode').textContent=session.code}
-function leaveRoom(){if(poll!==null){clearInterval(poll);poll=null}session=null;view=null;save();hide('status',true);hide('questionPanel',true);hide('invite',true);hide('setup',false);$('roomMessage').textContent='';$('setupStatus').textContent='You have left this room. You can start or join another challenge.'}
+function leaveRoom(){if(poll!==null){clearInterval(poll);poll=null}if(clock!==null){clearInterval(clock);clock=null}shownQuestion=-1;answerPending=false;session=null;view=null;save();hide('status',true);hide('questionPanel',true);hide('invite',true);hide('setup',false);$('roomMessage').textContent='';$('setupStatus').textContent='You have left this room. You can start or join another challenge.'}
 function startPolling(){if(poll!==null)clearInterval(poll);poll=setInterval(()=>{refresh().catch(()=>{})},3000)}
+function startClock(deadline,index){if(clock!==null){clearInterval(clock);clock=null}if(!deadline){$('deadline').textContent='No time limit';return}const due=Date.parse(deadline);if(!Number.isFinite(due))return;const tick=()=>{if(!session||!view||view.nextIndex!==index||answerPending||!$('feedback').hidden){if(clock!==null){clearInterval(clock);clock=null}return}const remaining=Math.max(0,Math.ceil((due-Date.now())/1000));$('deadline').textContent='⏱ '+remaining+' seconds remaining';if(remaining===0){clearInterval(clock);clock=null;answer(index,null)}};tick();if(clock===null&&Date.now()<due)clock=setInterval(tick,250)}
 async function refresh(){
  if(!session||!base)return;
  try{
-  const data=await api('/api/rooms/'+encodeURIComponent(session.code));view=data;
+  const data=await api('/api/state?code='+encodeURIComponent(session.code));view=data;
   $('players').replaceChildren();
   data.players.forEach(p=>{const box=document.createElement('div');box.className='score';const name=document.createElement('div');name.textContent=p.nickname+(p.seat===session.seat?' (You)':'');const score=document.createElement('strong');score.textContent=p.score+' / 600';const info=document.createElement('small');info.textContent=p.answered+'/60 questions';box.append(name,score,info);$('players').append(box)});
   $('roomMessage').textContent=!data.started?'Waiting for your friend to join...':data.bothFinished?'Both learners finished. The higher score wins!':data.finished?'You finished. Waiting for the other learner...':'Challenge underway. Scores update automatically.';
   if(data.started&&!data.finished&&data.question){
-   if(!$('feedback').hidden)return;
+   if(!$('feedback').hidden||answerPending)return;
    hide('questionPanel',false);$('roundLabel').textContent='Level '+data.question.level+' · Question '+data.question.number+' / 60';$('question').textContent=data.question.prompt;
    $('answerChoices').replaceChildren();data.question.options.forEach((v,i)=>{const b=document.createElement('button');b.textContent=String.fromCharCode(65+i)+'. '+v;b.onclick=()=>answer(data.question.index,i);$('answerChoices').append(b)});
-   $('deadline').textContent=data.deadline?'Time limit applies · '+Math.max(0,Math.ceil((Date.parse(data.deadline)-Date.now())/1000))+' seconds remaining':'No time limit';
-  }else hide('questionPanel',true);
+   if(shownQuestion!==data.question.index){shownQuestion=data.question.index;startClock(data.deadline,data.question.index)}else if(!data.deadline){$('deadline').textContent='No time limit'}
+  }else{hide('questionPanel',true);if(clock!==null){clearInterval(clock);clock=null}shownQuestion=-1}
  }catch(e){$('roomMessage').textContent='Connection interrupted: '+e.message}
 }
 async function answer(index,option){
+ if(answerPending||!session)return;answerPending=true;
+ if(clock!==null){clearInterval(clock);clock=null}
  for(const b of $('answerChoices').children)b.disabled=true;
  try{
-  const result=await api('/api/rooms/'+encodeURIComponent(session.code)+'/answer','POST',{index,option});
+  const result=await api('/api/answer?code='+encodeURIComponent(session.code),'POST',{index,option});
   const box=$('feedback');box.hidden=false;box.className='feedback'+(result.correct?'':' wrong');box.textContent=(result.correct?'Correct! +10 points. ':'Not quite. ')+(result.expired?'Time expired. ':'')+result.explanation;
   $('continue').hidden=false;$('continue').textContent=result.finished?'See final scores':'Next question';
- }catch(e){$('roomMessage').textContent=e.message;for(const b of $('answerChoices').children)b.disabled=false}
+ }catch(e){$('roomMessage').textContent=e.message;if(/already|out of order/i.test(e.message)){$('feedback').hidden=true;shownQuestion=-1;await refresh()}else for(const b of $('answerChoices').children)b.disabled=false}finally{answerPending=false}
 }
-$('continue').onclick=()=>{$('feedback').hidden=true;$('continue').hidden=true;refresh()};
+$('continue').onclick=()=>{$('feedback').hidden=true;$('continue').hidden=true;shownQuestion=-1;refresh()};
 $('create').onclick=createRoom;$('join').onclick=joinRoom;$('leaveRoom').onclick=()=>{if(confirm('Leave this room? Your completed answers will remain on the server until the room expires.'))leaveRoom()};
 $('copyInvite').onclick=async()=>{try{await navigator.clipboard.writeText($('inviteUrl').value);$('copyStatus').textContent='Invitation copied'}catch(e){$('inviteUrl').select();$('copyStatus').textContent='Select the URL and copy it'}};
 if(!base){hide('unavailable',false);hide('setup',true)}
