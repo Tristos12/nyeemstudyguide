@@ -66,3 +66,28 @@ BEGIN
  WHERE p.room_code=p_code;
  RETURN QUERY SELECT 'started'::text,v_round+1;
 END; $$;
+
+
+-- Private Challenge Centre. Inbox codes can be shared, but mailbox secrets are
+-- stored only as hashes. Invitations expire after 24 hours. Inbox records expire
+-- after 30 days and are removed opportunistically on new inbox creation.
+CREATE TABLE IF NOT EXISTS gk_inboxes (
+ code VARCHAR(12) PRIMARY KEY,
+ token_hash CHAR(64) NOT NULL,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ expires_at TIMESTAMPTZ NOT NULL DEFAULT (now()+interval '30 days'),
+ rate_key CHAR(64)
+);
+CREATE TABLE IF NOT EXISTS gk_invitations (
+ id BIGSERIAL PRIMARY KEY,
+ inbox_code VARCHAR(12) NOT NULL REFERENCES gk_inboxes(code) ON DELETE CASCADE,
+ sender_nickname VARCHAR(24) NOT NULL,
+ kind VARCHAR(12) NOT NULL CHECK(kind IN ('live','shared')),
+ invitation_url TEXT NOT NULL CHECK(length(invitation_url) BETWEEN 50 AND 800),
+ status VARCHAR(12) NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','dismissed')),
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ expires_at TIMESTAMPTZ NOT NULL DEFAULT (now()+interval '24 hours'),
+ rate_key CHAR(64) NOT NULL
+);
+CREATE INDEX IF NOT EXISTS gk_invitations_mailbox ON gk_invitations(inbox_code,created_at DESC);
+CREATE INDEX IF NOT EXISTS gk_invitations_rate ON gk_invitations(rate_key,created_at DESC);
