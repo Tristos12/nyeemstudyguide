@@ -23,6 +23,7 @@ small{color:#56697c}.results{display:grid;gap:8px}
 <button id="run" type="button">Check service connection</button>
 <p><small>The connection request is made from your browser to the multiplayer API. No learner information is sent.</small></p>
 <div id="result" role="status" aria-live="polite"><strong>Not tested in this browser.</strong></div>
+<div style="margin-top:16px"><button id="technical" disabled type="button">Run two-player technical test</button><p><small>Only enabled after a successful connection check. Creates one temporary room with two artificial nicknames, sends two test answers, checks the scores and rejects a repeat submission. No actual student names are used.</small></p><div id="technicalResult" role="status" aria-live="polite" hidden></div></div>
 </section>
 <section class="card"><h2>What the results mean</h2>
 <div class="results">
@@ -35,25 +36,77 @@ small{color:#56697c}.results{display:grid;gap:8px}
 </section></main>
 <script>
 const endpoint='https://babonneau-form1-multiplayer.vercel.app/api/health';
-const button=document.getElementById('run'),result=document.getElementById('result');
+const button=document.getElementById('run'),result=document.getElementById('result'),technical=document.getElementById('technical'),technicalResult=document.getElementById('technicalResult');
 function show(title,detail,ok){
  result.className=ok?'ok':'warn';result.replaceChildren();
  const h=document.createElement('strong');h.textContent=title;
  const p=document.createElement('p');p.textContent=detail;result.append(h,p);
 }
 button.onclick=async()=>{
- button.disabled=true;show('Checking...','Contacting the dedicated multiplayer service.',false);
+ button.disabled=true;technical.disabled=true;show('Checking...','Contacting the dedicated multiplayer service.',false);
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
  try{
   const response=await fetch(endpoint,{method:'GET',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
   const payload=await response.json().catch(()=>null);
   if(response.ok&&payload?.status==='ready'&&payload.multiplayerAvailable===true){
-   show('Connection ready','The API responded and the multiplayer database tables are available. A two-player test is still required.',true);
+   show('Connection ready','The API responded and the multiplayer database tables are available. You may now run a two-player technical test.',true);technical.disabled=false;
   }else{
    const status=payload?.status||'Unexpected response';
    show('Service not ready','Server status: '+status+'. HTTP '+response.status+'. Keep online rooms disabled until this is resolved.',false);
   }
  }catch(error){show('Connection could not be verified','Your browser could not complete the request. This may be due to deployment protection, network access or a temporary error. '+(error?.name==='AbortError'?'The request timed out.':''),false)}
  finally{clearTimeout(timeout);button.disabled=false}
+};
+
+const base='https://babonneau-form1-multiplayer.vercel.app';
+async function request(path,method,payload,token){
+ const headers={Accept:'application/json'};
+ if(payload!==undefined)headers['Content-Type']='application/json';
+ if(token)headers.Authorization='Bearer '+token;
+ const response=await fetch(base+path,{method,cache:'no-store',headers,body:payload===undefined?undefined:JSON.stringify(payload)});
+ const parsed=await response.json().catch(()=>({error:'Non-JSON response'}));
+ return {status:response.status,data:parsed};
+}
+function testMessage(lines,ok){
+ technicalResult.hidden=false;technicalResult.className=ok?'ok':'warn';
+ technicalResult.replaceChildren();
+ const heading=document.createElement('strong');heading.textContent=ok?'Technical test passed':'Technical test did not finish';
+ const list=document.createElement('ol');
+ for(const line of lines){const li=document.createElement('li');li.textContent=line;list.append(li)}
+ technicalResult.append(heading,list);
+}
+technical.onclick=async()=>{
+ technical.disabled=true;
+ const steps=[];
+ try{
+  const created=await request('/api/create','POST',{nickname:'TestHost',mode:'companion',secondsPerQuestion:0});
+  if(created.status!==201||!created.data?.code||!created.data?.token||!created.data?.invite)throw Error('Room creation: HTTP '+created.status+' '+(created.data?.error||''));
+  const {code,token:hostToken,invite}=created.data;steps.push('Created a temporary private room');
+  const joined=await request('/api/join?code='+encodeURIComponent(code),'POST',{nickname:'TestGuest',invite});
+  if(joined.status!==200||!joined.data?.token)throw Error('Join: HTTP '+joined.status+' '+(joined.data?.error||''));
+  const guestToken=joined.data.token;steps.push('Second player joined with invitation');
+  const host=await request('/api/state?code='+encodeURIComponent(code),'GET',undefined,hostToken);
+  const guest=await request('/api/state?code='+encodeURIComponent(code),'GET',undefined,guestToken);
+  if(host.status!==200||guest.status!==200||!host.data?.started||!guest.data?.started||host.data?.question?.index!==0||guest.data?.question?.index!==0||host.data?.players?.length!==2)throw Error('Room status or first question was not returned correctly');
+  if(JSON.stringify(host.data.question)!==JSON.stringify(guest.data.question))throw Error('Learners did not receive identical questions');
+  steps.push('Both learners received the same first question');
+  const hostAnswer=await request('/api/answer?code='+encodeURIComponent(code),'POST',{index:0,option:null},hostToken);
+  if(hostAnswer.status!==200||hostAnswer.data?.nextIndex!==1||hostAnswer.data?.score!==0)throw Error('Server did not score skipped answer correctly');
+  steps.push('Host skipped a question; server advanced without points');
+  const duplicate=await request('/api/answer?code='+encodeURIComponent(code),'POST',{index:0,option:null},hostToken);
+  if(duplicate.status!==409)throw Error('Repeated answer not rejected (HTTP '+duplicate.status+')');
+  steps.push('Duplicate answer was correctly rejected');
+  const guestAnswer=await request('/api/answer?code='+encodeURIComponent(code),'POST',{index:0,option:0},guestToken);
+  if(guestAnswer.status!==200||guestAnswer.data?.nextIndex!==1||![0,10].includes(guestAnswer.data?.score))throw Error('Guest answer failed server scoring');
+  steps.push('Guest answer scored on the server');
+  const scoreboard=await request('/api/state?code='+encodeURIComponent(code),'GET',undefined,hostToken);
+  if(scoreboard.status!==200||scoreboard.data?.players?.length!==2||scoreboard.data.players.some(x=>x.answered!==1)||scoreboard.data.players[1].score!==guestAnswer.data.score)throw Error('The two-player scoreboard is inconsistent');
+  steps.push('Both players advanced and the shared scores matched');
+  const denied=await request('/api/state?code='+encodeURIComponent(code),'GET');
+  if(denied.status!==401)throw Error('Access without a private token was not denied');
+  steps.push('Room state access without a token was denied');
+  testMessage(steps,true);
+ }catch(error){steps.push('Stopped: '+(error?.message||'Network error'));testMessage(steps,false)}
+ finally{technical.disabled=false}
 };
 </script></body></html>
