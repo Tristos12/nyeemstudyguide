@@ -54,6 +54,9 @@ verification or teacher authentication exists.
 
 ## API contracts
 
+The four public endpoints are flat Vercel Function routes. Nested handlers are internal implementation files. The student client calls the flat endpoints so Vercel does not need framework-specific dynamic route detection. Answers are graded on the server, and the student page automatically skips an unanswered timed question at expiration.
+
+
 - \`POST /api/rooms\`: nickname, mode, secondsPerQuestion.
   Returns code, invitation secret and private host token.
 - \`POST /api/rooms/:code/join\`: nickname and invitation secret.
