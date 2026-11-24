@@ -7,6 +7,7 @@ on:
     paths:
       - 'multiplayer/lib/staff-auth.js'
       - 'multiplayer/tests/staff-auth.test.js'
+      - 'multiplayer/tests/staff-jwt-crypto.test.js'
       - 'multiplayer/package.json'
       - '.github/workflows/bss-staff-auth-tests.yml'
   workflow_dispatch:
