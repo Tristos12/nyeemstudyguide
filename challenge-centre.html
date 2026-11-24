@@ -99,6 +99,9 @@ async function renderInvites(){
    dismiss.onclick=async()=>{dismiss.disabled=true;try{await centre.call('/api/inbox','POST',{action:'update',code:entry.code,id:invite.id,status:'dismissed'},entry.secret);await refresh();}catch(e){showStatus(e.message);dismiss.disabled=false}};
    bar.append(accept,dismiss);card.append(bar);
   }
+  if(invite.status==='accepted'){
+   const open=createNode('a','button-link','Open challenge again');open.href=invite.url;card.append(open);
+  }
   host.append(card);
  }
 }
@@ -121,6 +124,12 @@ $('deleteInbox').onclick=async()=>{
  const entry=centre.get();if(!entry)return;
  try{await centre.call('/api/inbox','POST',{action:'delete',code:entry.code},entry.secret);centre.clear();setSetup();$('unreadCount').textContent='0 new';$('invitations').replaceChildren(createNode('p','small','Inbox deleted. Create a new one to receive invitations.'));showStatus('Inbox deleted.')}catch(e){showStatus(e.message)}
 };
+try{
+ const saved=JSON.parse(sessionStorage.getItem('gk_online_room_session_v1')||'null');
+ if(saved?.code&&saved?.token&&/^[A-HJ-NP-Z2-9]{8}$/.test(saved.code)){
+  $('currentMatch').textContent='Private room '+saved.code+' is saved in this browser tab. Select Open multiplayer game to resume and check whether it is still active.';
+ }
+}catch{}
 if(!window.bssStudent){$('noProfile').hidden=false}
 else{$('centre').hidden=false;setSetup();if(centre.get())refresh();setInterval(()=>{if(!document.hidden&&centre.get())refresh()},20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()})}
 </script></body></html>
