@@ -6,7 +6,7 @@ Sigma's production database, accounts or payment infrastructure.
 
 ## Status
 
-**Not deployed or activated.** GitHub Pages cannot run the server functions.
+**Vercel project created and build completed, but multiplayer is not activated.** The dedicated database is not attached. GitHub Pages cannot run the server functions.
 The working computer and link-based challenge games remain unchanged.
 The student room page at \`/multiplayer/room.html\` shows an honest
 "not available yet" message until an HTTPS API base URL is configured.
@@ -36,8 +36,7 @@ verification or teacher authentication exists.
 1. Create a **dedicated database**, separate from any existing Sigma or other
    production project. Review hosting cost and data-processing policy first.
 2. Run \`schema.sql\` against the new database.
-3. Deploy this \`multiplayer\` subdirectory as a **separate Vercel project**
-   (root directory \`multiplayer\`, Node.js 22 or later). Test on a preview URL.
+3. The separate Vercel project \`babonneau-form1-multiplayer\` has already been created from the \`multiplayer\` subdirectory and its build reached READY. It must still be tested against a dedicated database before student use.
 4. Add secret environment variables through Vercel settings ONLY:
    - \`DATABASE_URL\` = server-only connection string for the dedicated database
    - \`ROOM_RATE_SECRET\` = random, long server-only rate limiting secret
@@ -52,18 +51,22 @@ verification or teacher authentication exists.
    from the main General Knowledge game. Keep the existing sharing challenges
    active until online rooms are ready.
 
+## Database connection status (24 November 2026)
+
+The Vercel project has \`ALLOWED_ORIGIN\` and \`ROOM_RATE_SECRET\` configured but no \`DATABASE_URL\`. The attached Neon organisation is Vercel-managed, and direct project creation was rejected. The Vercel integration listing was also denied. A school administrator must provision a **new free-tier database** through Vercel Storage/Marketplace and attach it to \`babonneau-form1-multiplayer\`. Do not share database credentials in chat or copy Sigma's credentials. A health probe is available at \`GET /api/health\`: it returns HTTP 503 until the database is configured and queryable.
+
 ## API contracts
 
 The four public endpoints are flat Vercel Function routes. Nested handlers are internal implementation files. The student client calls the flat endpoints so Vercel does not need framework-specific dynamic route detection. Answers are graded on the server, and the student page automatically skips an unanswered timed question at expiration.
 
 
-- \`POST /api/rooms\`: nickname, mode, secondsPerQuestion.
+- \`POST /api/create\`: nickname, mode, secondsPerQuestion.
   Returns code, invitation secret and private host token.
-- \`POST /api/rooms/:code/join\`: nickname and invitation secret.
+- \`POST /api/join?code=:code\`: nickname and invitation secret.
   Returns a private guest token. The second seat is then locked.
-- \`GET /api/rooms/:code\`: Bearer token required. Returns the current question,
+- \`GET /api/state?code=:code\`: Bearer token required. Returns the current question,
   deadlines and both scores. Does not include future question answers.
-- \`POST /api/rooms/:code/answer\`: Bearer token required, index and option
+- \`POST /api/answer?code=:code\`: Bearer token required, index and option
   index (0..3), or null for a skipped question. Returns grading feedback.
   Only the server awards points; duplicate submissions are rejected.
 
