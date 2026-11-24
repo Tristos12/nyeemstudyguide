@@ -54,7 +54,7 @@ async function joinRoom(){
  $('join').disabled=true;
  try{
   const data=await api('/api/join?code='+encodeURIComponent(code),'POST',{nickname,invite});
-  session={code:data.code,token:data.token,seat:2};save();history.replaceState(null,'',location.pathname+location.search);hide('setup',true);showRoom();await refresh();startPolling()
+  session={code:data.code,token:data.token,seat:2};save();history.replaceState(null,'',location.pathname+location.search);hide('setup',true);hide('incomingInvite',true);showRoom();await refresh();startPolling()
  }catch(e){message(e.message)}finally{$('join').disabled=false}
 }
 function showRoom(){hide('status',false);$('roomCode').textContent=session.code}
