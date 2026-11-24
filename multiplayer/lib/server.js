@@ -27,6 +27,6 @@ export async function verify(req,code){
  if(!validCode(code))return null;
  const auth=req.headers.authorization||'';
  if(!/^Bearer [A-Za-z0-9_-]{42,50}$/.test(auth))return null;
- const rows=await db().query('SELECT p.room_code,p.seat,p.nickname,p.next_index,p.score,p.question_started_at,p.finished_at,r.seed,r.mode,r.seconds_per_question,r.started_at FROM gk_players p JOIN gk_rooms r ON p.room_code=r.code WHERE p.room_code=$1 AND p.token_hash=$2 AND r.expires_at>now() LIMIT 1',[code,digest(auth.slice(7))]);
+ const rows=await db().query('SELECT p.room_code,p.seat,p.nickname,p.next_index,p.score,p.question_started_at,p.finished_at,r.seed,r.mode,r.seconds_per_question,r.started_at,r.round_no FROM gk_players p JOIN gk_rooms r ON p.room_code=r.code WHERE p.room_code=$1 AND p.token_hash=$2 AND r.expires_at>now() LIMIT 1',[code,digest(auth.slice(7))]);
  return rows[0]||null;
 }
