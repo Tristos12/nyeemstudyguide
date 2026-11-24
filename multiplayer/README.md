@@ -4,12 +4,25 @@ This is a **separate, optional** service for the free Form 1 Learning Hub.
 It is not part of Sigma Caribbean Virtual Academy. Do not connect it to
 Sigma's production database, accounts or payment infrastructure.
 
-## Status
+## Status as of 24 November 2026
 
-**Vercel project created and build completed, but multiplayer is not activated.** The dedicated database is not attached. GitHub Pages cannot run the server functions.
-The working computer and link-based challenge games remain unchanged.
-The student room page at \`/multiplayer/room.html\` shows an honest
-"not available yet" message until an HTTPS API base URL is configured.
+**The separate Vercel service is deployed and the dedicated Neon database is connected.** The database
+project is `neon-carmine-lantern` (Neon ID `crimson-dew-83625355`), separate from Sigma's
+`educares-postgres`. Both `gk_rooms` and `gk_players` tables have been created and verified
+in that database. `DATABASE_URL`, `ROOM_RATE_SECRET`, and `ALLOWED_ORIGIN` exist in
+the Vercel multiplayer project.
+
+**Live room gameplay has not yet been independently verified.** Do not claim production readiness
+or publish online rooms to students until the full two-player technical test passes.
+
+A dedicated static connection and test page is available at
+`/multiplayer/diagnostics.html`. It tests the health endpoint first, then can create
+one room with two artificial nicknames, verify identical questions, submit answers,
+check duplicate protection, check the shared scoreboard, and verify rejection of
+unauthorised requests. Test rooms expire after 24 hours.
+
+The student room page at `/multiplayer/room.html` is deliberately disabled by the
+empty public `config.js` value, and the existing computer and share-link games remain unchanged.
 
 ## Features prepared
 
@@ -31,29 +44,28 @@ in the public revision game. These are practice scores, **not independently
 proctored or tamper-proof examination results**. No automated child identity
 verification or teacher authentication exists.
 
-## Deployment requirements
+## Activation checklist
 
-1. Create a **dedicated database**, separate from any existing Sigma or other
-   production project. Review hosting cost and data-processing policy first.
-2. Run \`schema.sql\` against the new database.
-3. The separate Vercel project \`babonneau-form1-multiplayer\` has already been created from the \`multiplayer\` subdirectory and its build reached READY. It must still be tested against a dedicated database before student use.
-4. Add secret environment variables through Vercel settings ONLY:
-   - \`DATABASE_URL\` = server-only connection string for the dedicated database
-   - \`ROOM_RATE_SECRET\` = random, long server-only rate limiting secret
-   - \`ALLOWED_ORIGIN\` = \`https://tristos12.github.io\`
-5. Test with two browsers using the preview API, including a 30-second timer,
-   incorrect answers, duplicate submissions, expired invitations and
-   room creation rate limits.
-6. **Only after review**, set the public static file \`multiplayer/config.js\`
-   to \`window.GK_MULTIPLAYER_API='https://YOUR-APP.vercel.app';\`.
-   Do not insert a database string or private token in the public config.
-7. Run a complete teacher-supervised pilot before linking the room page
-   from the main General Knowledge game. Keep the existing sharing challenges
-   active until online rooms are ready.
+1. Database separation and schema creation: **complete**.
+2. Vercel GitHub-connected project and server environment configuration: **complete**.
+3. Verify `GET /api/health` from a browser at
+   `https://tristos12.github.io/nyeemstudyguide/multiplayer/diagnostics.html`.
+4. On the same diagnostic page, click **Run two-player technical test** and verify that
+   room creation, joining, server scoring, duplicate rejection, and the scoreboard pass.
+5. Test manually from two separate student devices with a supervised trial, including
+   timed and untimed modes and a complete 60-round game.
+6. Review data retention, accessibility, service protection, and Vercel/Neon usage.
+7. After testing only, configure `multiplayer/config.js` with the public Vercel
+   API hostname (never a database URL or private key), and add a student-facing link.
+8. Retain the existing browser-only friend challenges as an offline-compatible fallback.
 
-## Database connection status (24 November 2026)
+### Security limitations
 
-The Vercel project has \`ALLOWED_ORIGIN\` and \`ROOM_RATE_SECRET\` configured but no \`DATABASE_URL\`. The attached Neon organisation is Vercel-managed, and direct project creation was rejected. The Vercel integration listing was also denied. A school administrator must provision a **new free-tier database** through Vercel Storage/Marketplace and attach it to \`babonneau-form1-multiplayer\`. Do not share database credentials in chat or copy Sigma's credentials. A health probe is available at \`GET /api/health\`: it returns HTTP 503 until the database is configured and queryable.
+A private room invitation is a shared secret: anyone possessing it may claim the second
+seat. Room tokens remain session-scoped. This is **not** a school identity system.
+The quiz content is public for educational revision, so scores are not verified exams.
+The rate limit is approximate and may not prevent concerted abuse. Teacher oversight
+is recommended for all student pilots.
 
 ## API contracts
 
