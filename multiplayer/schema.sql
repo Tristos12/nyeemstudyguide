@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS gk_players (
  score SMALLINT NOT NULL DEFAULT 0 CHECK(score BETWEEN 0 AND 600),
  question_started_at TIMESTAMPTZ,
  finished_at TIMESTAMPTZ,
+ quick_message SMALLINT CHECK (quick_message BETWEEN 0 AND 5),
+ quick_message_at TIMESTAMPTZ,
  PRIMARY KEY (room_code,seat),
  UNIQUE (room_code,token_hash)
 );
