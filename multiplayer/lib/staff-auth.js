@@ -35,10 +35,9 @@ function bearer(req){
  const m=/^Bearer ([A-Za-z0-9._~-]+)$/.exec(h);
  return m?m[1]:null;
 }
-async function verifyIdentity(token){
- const {STAFF_OIDC_ISSUER:issuer,STAFF_OIDC_AUDIENCE:audience,STAFF_OIDC_JWKS_URL:jwksUrl}=process.env;
- if(!secureUrl(issuer)||!secureUrl(jwksUrl))throw Error('OIDC configuration invalid');
- const {payload,protectedHeader}=await jwtVerify(token,getJwks(jwksUrl),{
+export async function verifyStaffJwt(token,jwks,{issuer,audience}={}){
+ if(!secureUrl(issuer)||typeof audience!=='string'||!audience.trim())throw Error('OIDC configuration invalid');
+ const {payload,protectedHeader}=await jwtVerify(token,jwks,{
   issuer,audience,clockTolerance:5,algorithms:['RS256','ES256']
  });
  if(!protectedHeader.kid||typeof payload.sub!=='string'||!payload.sub||!Number.isFinite(payload.exp)||!Number.isFinite(payload.iat))throw Error('Incomplete identity token');
@@ -47,6 +46,11 @@ async function verifyIdentity(token){
  const mfaSatisfied=Array.isArray(payload.amr)&&payload.amr.includes('mfa');
  if(!mfaSatisfied)throw Error('Staff MFA required');
  return {subject:payload.sub,verified:true,mfaSatisfied:true};
+}
+async function verifyIdentity(token){
+ const {STAFF_OIDC_ISSUER:issuer,STAFF_OIDC_AUDIENCE:audience,STAFF_OIDC_JWKS_URL:jwksUrl}=process.env;
+ if(!secureUrl(jwksUrl))throw Error('OIDC JWKS URL invalid');
+ return verifyStaffJwt(token,getJwks(jwksUrl),{issuer,audience});
 }
 async function staffLookup(subject){
  const rows=await db().query(
