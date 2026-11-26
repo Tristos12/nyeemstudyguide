@@ -1,0 +1,26 @@
+name: Form 3 French validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'form-3-french.html'
+      - 'form-3-french-bank.js'
+      - 'form-3-french-written.js'
+      - 'form-3-french-lessons.js'
+      - 'form-3-french-app.js'
+      - 'form-3-french-verify.cjs'
+      - 'form3-answer-tools.js'
+      - 'form3-answer-tools-verify.cjs'
+      - '.github/workflows/form3-french-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node form-3-french-verify.cjs && node form3-answer-tools-verify.cjs
