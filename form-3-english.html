@@ -16,7 +16,7 @@ button,select,input,textarea{font:inherit}button{background:#fff;border:1px soli
 <div class="tile"><h3>✍️ Paper 2</h3><p>Reading comprehension (16 marks), formal-letter writing (20 marks) and notice writing (15 marks). Build responses, use checklists and save drafts.</p><button class="primary" data-go="paper2">Start Paper 2 practice</button></div>
 <div class="tile"><h3>🎯 Recommended method</h3><p>Review an example, practise a few questions, read the explanation, and revisit questions answered incorrectly. For writing, plan, draft and improve.</p><button data-go="review">View my revision record</button></div><div class="tile"><h3>📘 Learn before practising</h3><p>Eight short lessons with clear examples and links to the relevant skill activities.</p><button class="primary" data-go="lessons">Open mini lessons</button></div><div class="tile"><h3>⏱ Mock examinations</h3><p>Paper 1 includes 51 objective items in 90 minutes. Paper 2 includes reading and written tasks for teacher marking.</p><button class="primary" data-go="mock">Open mock exams</button></div>
 </div><p class="notice small">The Paper 2 cover lists notice writing before formal letters, while the paper itself presents formal-letter writing as Section B and notice writing as Section C. The practice area follows the tasks, with their stated marks.</p></div></section>
-<section id="paper1" class="view" hidden><div class="card"><h2>Paper 1: Objective Practice</h2><p>Choose a skill, then select Practice 1, Practice 2, Practice 3, Practice 4 or Practice 5. Each is a separate exercise with its own score. Correct answers and explanations are shown only after the selected practice is finished.</p><div class="controls"><label for="skillSelect">Practice area</label><select id="skillSelect"></select><label for="practiceSelect">Practice set</label><select id="practiceSelect"><option value="0">Practice 1</option><option value="1">Practice 2</option><option value="2">Practice 3</option><option value="3">Practice 4</option><option value="4">Practice 5</option></select><button class="primary" id="startQuiz">Start selected practice</button></div><p class="small muted" id="quizMeta"></p><div id="practiceButtons" class="grid" aria-label="Five separate practice exercises"></div></div>
+<section id="paper1" class="view" hidden><div class="card"><h2>Paper 1: Objective Practice</h2><p>Choose a skill, then select Practice 1, Practice 2, Practice 3, Practice 4 or Practice 5. Each is a full 50-question exercise with its own score. Correct answers and explanations are shown only after the selected practice is finished.</p><div class="controls"><label for="skillSelect">Practice area</label><select id="skillSelect"></select><label for="practiceSelect">Practice set</label><select id="practiceSelect"><option value="0">Practice 1</option><option value="1">Practice 2</option><option value="2">Practice 3</option><option value="3">Practice 4</option><option value="4">Practice 5</option></select><button class="primary" id="startQuiz">Start selected practice</button></div><p class="small muted" id="quizMeta"></p><div id="practiceButtons" class="grid" aria-label="Five separate practice exercises"></div></div>
 <div id="quiz" class="card" hidden><div class="controls"><strong id="questionCounter"></strong><span class="muted" id="questionSkill"></span></div><div class="progress"><div id="quizBar"></div></div><div id="readingText" class="passage" hidden></div><h2 id="questionPrompt"></h2><div id="answers" class="answers"></div><div id="feedback" role="status" aria-live="polite" hidden></div><div class="controls"><button id="nextQuestion" class="primary" hidden>Next question</button><button id="exitQuiz">Choose another skill</button></div></div>
 <div id="quizResults" class="card" hidden><h2>Practice complete</h2><p id="quizSummary"></p><div id="sectionAnswerReview" aria-label="Answer review"></div><button id="quizAgain" class="primary">Retry this practice</button><button id="nextPracticeSet" type="button">Go to next practice</button><button data-go="review">Review my answers</button></div></section>
 <section id="paper2" class="view" hidden>
@@ -63,6 +63,8 @@ When the library reopened, visitors could locate books more easily. The voluntee
 <section class="card" id="extraWrittenPractice"><h2>More Paper 2 Practice</h2><p>Choose one of five additional activities in each writing area. Your responses are saved on this browser and can be reviewed later. Written answers require teacher assessment.</p><div id="extraReadingPractice"></div><div id="extraLetterPractice"></div><div id="extraNoticePractice"></div></section></section>
 <section id="review" class="view" hidden><div class="card"><h2>My Review</h2><p>Review your current answers and identify topics to practise again.</p><div id="latestMock" class="tile"></div><div id="reviewList"></div><h3>Saved writing</h3><p id="writingStatus" class="muted"></p><div class="controls"><button id="exportProgress">Download my practice summary</button><button id="clearProgress">Clear this learner's saved English work</button></div><p class="small muted">Downloaded summaries contain your nickname, class and practice totals, not your full writing drafts. No scores are sent automatically to teachers.</p></div></section>
 <footer>Babonneau Secondary School · Form Three English Language Arts · Original revision activities aligned to Term 1 examination skills · No public scoreboard</footer></main>
+<script src="./form-3-expanded-a.js"></script>
+<script src="./form-3-expanded-b.js"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -219,6 +221,18 @@ reading:[
 Object.entries(moreQuestions).forEach(([key,items])=>questions[key].push(...items));
 
 const passage='THE BEACH CARE PROJECT\n\nOn Saturday morning, a group of Form 3 students joined a supervised beach-care project. Before beginning, a volunteer explained why plastic waste can damage marine life. The organisers asked students to bring reusable water bottles and wear suitable shoes.\n\nWorking in teams, the students collected litter and recorded the types of waste they found. They noticed that food wrappers and plastic bottles were common near the entrance. After the clean-up, the groups compared their findings and prepared a short presentation for their school assembly.\n\nTheir teacher encouraged them to monitor the site during future visits and share useful information with the community. The students learned that small actions can make a difference when people work together.';
+// Preserve existing exam-aligned questions and expand each of the six banks.
+for(const source of [window.FORM3_EXPANDED_A,window.FORM3_EXPANDED_B]){
+ if(!source||typeof source!=='object')continue;
+ for(const [section,items] of Object.entries(source)){
+  if(Array.isArray(questions[section])&&Array.isArray(items))questions[section].push(...items);
+ }
+}
+for(const [section,items] of Object.entries(questions)){
+ if(items.length<50||items.some(q=>!Array.isArray(q)||q.length<4||!Array.isArray(q[1])||q[1].length!==4||new Set(q[1]).size!==4||!Number.isInteger(q[2])||q[2]<0||q[2]>3)){
+  throw Error('Invalid practice bank: '+section);
+ }
+}
 const skillNames={spelling:'Spelling',vocabulary:'Vocabulary: Synonyms & Antonyms',grammar:'Grammar',equivalent:'Equivalent Sentences',mainidea:'Main Idea',reading:'Reading Comprehension'};
 const comprehension=[
 ['1. What is the main idea of the passage?','State the overall message rather than listing an isolated detail.'],
@@ -244,7 +258,17 @@ function switchView(view){document.querySelectorAll('.view').forEach(el=>el.hidd
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>switchView(b.dataset.view));document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>switchView(b.dataset.go));
 const selector=$('skillSelect');Object.entries(skillNames).forEach(([key,label])=>{const o=document.createElement('option');o.value=key;o.textContent=label+' ('+questions[key].length+')';selector.append(o)});
 let skill='spelling',order=[],index=0,score=0,answered=false,sectionResponses=[],practiceNumber=0;
-function practiceIds(key,num){const total=questions[key].length;const start=Math.floor(total*num/5),end=Math.floor(total*(num+1)/5);return Array.from({length:end-start},(_,i)=>start+i)}
+function practiceIds(key,num){
+ const total=questions[key].length;
+ // Independent full 50-question practices, selecting 50 distinct question
+ // indices per attempt. The wider bank is shared, so some items can recur
+ // across practices; the selection and order differ for each practice.
+ const steps=[7,11,13,17,19,23,29,31,37,41,43,47,53];
+ const gcd=(a,b)=>b?gcd(b,a%b):a;
+ const stride=steps.find(s=>gcd(s,total)===1)||1;
+ const start=(num*13+num*num*7)%total;
+ return Array.from({length:50},(_,i)=>(start+i*stride)%total);
+}
 function practiceResultKey(key,num){return key+':practice:'+num}
 function begin(){
  skill=selector.value;practiceNumber=Number($('practiceSelect').value);order=practiceIds(skill,practiceNumber);index=0;score=0;answered=false;
