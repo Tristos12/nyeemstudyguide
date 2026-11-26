@@ -33,12 +33,23 @@ const el=(name,attrs={},text)=>{
  if(text!==undefined)n.textContent=text;
  return n
 };
-function mount({container,namespace,index,readonly=false,expanded=false}){
+function drawMusicStaffGuide(ctx){
+ ctx.save();ctx.globalCompositeOperation='source-over';ctx.strokeStyle='#aebed0';ctx.lineWidth=1.1;
+ for(const top of [82,254])for(let line=0;line<5;line++){
+  const y=top+line*18;ctx.beginPath();ctx.moveTo(72,y);ctx.lineTo(856,y);ctx.stroke()
+ }
+ if(typeof ctx.fillText==='function'){
+  ctx.fillStyle='#657993';ctx.font='14px sans-serif';ctx.fillText('Treble staff',74,65);ctx.fillText('Treble staff',74,237)
+ }
+ ctx.restore()
+}
+function mount({container,namespace,index,readonly=false,expanded=false,staffTemplate=false}){
  const root=el('details',{className:'f3-answer-tools'});root.open=!!expanded;
  root.style.cssText='margin:12px 0;padding:12px;border:1px solid #c8dbe8;border-radius:12px;background:#f7fbff';
  const heading=el('summary',{},expanded?'Drawing and upload workspace (open)':'Draw or attach a file (optional)');heading.style.cssText='font-weight:700;cursor:pointer;padding:3px 0';root.append(heading);
- const intro=el('p',{},'Type above, draw your working, or attach a photo, PDF or Word document. Media stays on this device until you download and share it.');
+ const intro=el('p',{},'Type above, draw your working, or attach a photo, PDF or Word document. Music questions may display guide staves. Media stays on this device until you download and share it.');
  intro.style.fontSize='13px';root.append(intro);
+ if(staffTemplate){const guidance=el('p',{},'Music staff guide is enabled for drawing notes and ledger lines.');guidance.style.fontSize='13px';root.append(guidance)}
  const toolbar=el('div',{role:'toolbar','aria-label':'Drawing tools'});
  toolbar.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:9px 0';
  const label=el('label',{},'Pen colour '),color=el('select',{'aria-label':'Pen colour'});
@@ -59,7 +70,7 @@ function mount({container,namespace,index,readonly=false,expanded=false}){
  const filesList=el('div',{'aria-label':'Attached files'});root.append(filesList);
  const status=el('p',{role:'status'});status.style.fontSize='13px';root.append(status);
  container.append(root);
- let value={strokes:[],files:[]},mode='pen',current=null,active=false,loaded=false;
+ let value={strokes:[],files:[],staffTemplate:!!staffTemplate},mode='pen',current=null,active=false,loaded=false;
  const ctx=canvas.getContext('2d');
  const showStatus=s=>{status.textContent=s};
  function strokeDraw(stroke){
@@ -71,7 +82,7 @@ function mount({container,namespace,index,readonly=false,expanded=false}){
   if(stroke.points.length===1){const [x,y]=stroke.points[0];ctx.lineTo(x+.01,y+.01)}
   ctx.stroke();ctx.restore()
  }
- function repaint(){ctx.clearRect(0,0,canvas.width,canvas.height);value.strokes.forEach(strokeDraw)}
+ function repaint(){ctx.clearRect(0,0,canvas.width,canvas.height);value.strokes.forEach(strokeDraw);if(value.staffTemplate)drawMusicStaffGuide(ctx)}
  function listFiles(){
   filesList.replaceChildren();
   value.files.forEach((file,i)=>{
@@ -118,7 +129,7 @@ function mount({container,namespace,index,readonly=false,expanded=false}){
  });
  if(readonly){toolbar.hidden=true;uploadLabel.hidden=true;canvas.style.touchAction='auto'}
  get(namespace,index).then(v=>{
-  value={strokes:Array.isArray(v.strokes)?v.strokes:[],files:Array.isArray(v.files)?v.files:[]};
+  value={strokes:Array.isArray(v.strokes)?v.strokes:[],files:Array.isArray(v.files)?v.files:[],staffTemplate:!!(v.staffTemplate||staffTemplate)};
   loaded=true;repaint();listFiles();showStatus(readonly?'Saved drawing and uploads for this response.':'Drawing and uploads are saved locally.')
  }).catch(()=>{loaded=true;showStatus('Drawing and upload storage is not available in this browser.')});
  return {element:root}
@@ -152,6 +163,7 @@ async function exportBundle({namespace,questions,answers,filename}){
     ctx.strokeStyle=stroke.mode==='erase'?'white':stroke.color;ctx.beginPath();
     stroke.points.forEach(([x,y],k)=>k?ctx.lineTo(x,y):ctx.moveTo(x,y));
     if(stroke.points.length===1){const [x,y]=stroke.points[0];ctx.lineTo(x+.01,y+.01)}ctx.stroke();ctx.restore()}
+   if(media.staffTemplate)drawMusicStaffGuide(ctx);
    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(blob)entries.push({name:'question-'+(i+1)+'/drawing.png',blob})
   }
   for(const [index,file] of (media.files||[]).entries())entries.push({name:'question-'+(i+1)+'/attachment-'+(index+1)+'-'+file.name.replace(/[\/\\]/g,'_'),blob:file.blob});
