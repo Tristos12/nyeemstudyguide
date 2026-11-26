@@ -229,9 +229,11 @@ for(const source of [window.FORM3_EXPANDED_A,window.FORM3_EXPANDED_B]){
  }
 }
 for(const [section,items] of Object.entries(questions)){
- if(items.length<50||items.some(q=>!Array.isArray(q)||q.length<4||!Array.isArray(q[1])||q[1].length!==4||new Set(q[1]).size!==4||!Number.isInteger(q[2])||q[2]<0||q[2]>3)){
-  throw Error('Invalid practice bank: '+section);
- }
+ if(items.length<50)throw Error('Insufficient questions: '+section+' '+items.length);
+ items.forEach((q,i)=>{
+  if(!Array.isArray(q)||q.length<4||!Array.isArray(q[1])||q[1].length!==4||new Set(q[1]).size!==4||!Number.isInteger(q[2])||q[2]<0||q[2]>3)
+   throw Error('Invalid practice bank: '+section+' item '+i+' '+JSON.stringify(q));
+ });
 }
 const skillNames={spelling:'Spelling',vocabulary:'Vocabulary: Synonyms & Antonyms',grammar:'Grammar',equivalent:'Equivalent Sentences',mainidea:'Main Idea',reading:'Reading Comprehension'};
 const comprehension=[
