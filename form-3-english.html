@@ -10,6 +10,7 @@ button,select,input,textarea{font:inherit}button{background:#fff;border:1px soli
 <div class="controls"><label for="nickname">Learner nickname</label><input id="nickname" maxlength="24" placeholder="Optional nickname" autocomplete="off"><label for="classRoom">Class</label><input id="classRoom" type="text" maxlength="20" placeholder="Enter your class, e.g. 3R11" autocomplete="off"><button id="saveProfile">Save on this device</button></div><p class="small muted" id="profileNote">No full name or student ID required. Your work stays in this browser. On shared devices, clear your progress before another learner uses the page.</p>
 </section>
 <section class="card"><h2>My learning progress</h2><div class="score-grid"><div class="score-box"><strong id="attempted">0</strong><span>Questions attempted</span></div><div class="score-box"><strong id="accuracy">0%</strong><span>Current accuracy</span></div><div class="score-box"><strong id="draftCount">0</strong><span>Writing drafts saved</span></div></div><div class="progress"><div id="masteryBar"></div></div><p class="small muted">Progress is for practice, not an official grade. Objective-question scores are stored by question so revisions can improve your record.</p></section>
+<section class="card" id="assessmentSnapshot" aria-label="Assessment progress and grades"><div class="controls" style="justify-content:space-between"><div><h2 style="margin:0">My Assessment Results</h2><p class="muted small" style="margin:5px 0">Full practices, Paper 2 submissions and mock examinations.</p></div><a href="./form-3-english-assessments.html" style="display:inline-block;background:#183b6a;color:#fff;padding:11px 16px;border-radius:10px;text-decoration:none;font-weight:700">Assessment Centre</a></div><div class="score-grid"><div class="score-box"><strong id="snapshotSubmitted">0</strong><span>Completed</span></div><div class="score-box"><strong id="snapshotAverage">No grades</strong><span>Objective average</span></div><div class="score-box"><strong id="snapshotAwaiting">0</strong><span>Awaiting marking</span></div></div><button class="primary" type="button" data-go="grades">View all my grades and progress</button></section>
 <nav class="tabs" aria-label="English revision sections"><button class="active" data-view="overview">Overview</button><button data-view="paper1">Paper 1 Practice</button><button data-view="paper2">Paper 2 Exams & Writing</button><button data-view="lessons">Mini Lessons</button><button data-view="mock">4 Mock Exams</button><button data-view="grades">Progress & Grades</button><button data-view="review">My Review</button></nav>
 <section id="overview" class="view"><div class="card"><h2>Your revision pathway</h2><div class="grid">
 <div class="tile"><h3>📝 Paper 1</h3><p>Five complete 60-question English practice papers with rigorous multiple-choice questions, reading passages and end-of-paper scoring.</p><button class="primary" data-go="paper1">Start Paper 1 practice</button></div>
@@ -572,6 +573,7 @@ function renderGrades(){
  $('gradeCompleted').textContent=completed;
  $('gradeAverage').textContent=percentages.length?Math.round(percentages.reduce((a,b)=>a+b,0)/percentages.length)+'%':'No grades';
  $('gradePending').textContent=pending;
+ $('snapshotSubmitted').textContent=completed;$('snapshotAverage').textContent=$('gradeAverage').textContent;$('snapshotAwaiting').textContent=pending;
  const host=$('gradeSummary');host.replaceChildren();
  const table=document.createElement('table');table.style.width='100%';
  const head=document.createElement('tr');
@@ -584,5 +586,6 @@ function renderGrades(){
  host.append(table);
 }
 
-profile();updateStats();switchView('overview');
+profile();updateStats();renderGrades();switchView('overview');
+window.addEventListener('pageshow',()=>renderGrades());
 </script></body></html>
