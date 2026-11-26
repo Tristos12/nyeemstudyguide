@@ -96,7 +96,7 @@ function renderQuestion(){
   if(it.q.reference==='production'){
    const title=document.createElement('h4');title.textContent='Match five office departments to their functions';
    const table=document.createElement('table');const head=document.createElement('tr');['Department','Function'].forEach(t=>{const th=document.createElement('th');th.textContent=t;head.append(th)});table.append(head);
-   it.paper.departments.forEach(([name,description])=>{const row=document.createElement('tr');[name,description].forEach(t=>{const td=document.createElement('td');td.textContent=t;row.append(td)});table.append(row)});host.append(title,table);
+   const shuffled=[2,4,1,0,3];it.paper.departments.forEach(([name],index)=>{const row=document.createElement('tr');[name,it.paper.departments[shuffled[index]][1]].forEach(t=>{const td=document.createElement('td');td.textContent=t;row.append(td)});table.append(row)});host.append(title,table);
   }
   if(it.q.reference==='drawing'||it.q.reference==='production'){
    const diagram=window.BSS_OFFICE_DIAGRAMS.draw(it.q.reference==='drawing'?'office':'production');
