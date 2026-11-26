@@ -25,6 +25,7 @@ const context={window:{open(){}},document:{createElement:tag=>new Element(tag)},
  indexedDB:{open(){const req={result:db};queueMicrotask(()=>req.onsuccess?.());return req}},
  URL:{createObjectURL(blob){exports.push(blob);return 'blob:local'},revokeObjectURL(){}}
 };
+context.window.indexedDB=context.indexedDB;
 vm.runInNewContext(source,context);
 const tools=context.window.BSSAnswerTools;
 assert.equal(typeof tools.mount,'function');assert.equal(typeof tools.exportBundle,'function');
