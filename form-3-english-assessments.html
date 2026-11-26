@@ -226,4 +226,6 @@ $('reviewBtn').onclick=()=>{
 $('resultBack').onclick=home;
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&selected?.limit&&attempt?.status==='draft')tick()});
 home();
+const requestedExam=new URLSearchParams(location.search).get('exam');
+if(requestedExam&&configs.some(cfg=>cfg.id===requestedExam))start(requestedExam);
 </script></body></html>
