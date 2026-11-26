@@ -161,5 +161,15 @@ async function exportBundle({namespace,questions,answers,filename}){
  a.href=url;a.download=(filename||'form3-written-answers')+'.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000)
 }
 async function hasContent(namespace,index){try{const v=await get(namespace,index);return !!(v.strokes?.length||v.files?.length)}catch{return false}}
-window.BSSAnswerTools={mount,exportBundle,hasContent};
+async function clearNamespace(namespace,count){
+ const connection=await db();
+ for(let index=0;index<count;index++){
+  await new Promise((resolve,reject)=>{
+   const tx=connection.transaction(STORE,'readwrite'),request=tx.objectStore(STORE).delete(key(namespace,index));
+   request.onsuccess=()=>resolve();request.onerror=()=>reject(request.error||Error('Unable to clear old answer media'))
+  })
+ }
+ return true
+}
+window.BSSAnswerTools={mount,exportBundle,hasContent,clearNamespace};
 })();
