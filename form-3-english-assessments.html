@@ -34,10 +34,10 @@ table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px s
 <div class="card notice"><strong>Assessment and safeguarding</strong><p class="small">Timed papers run against the device clock; an expired paper is automatically submitted with any unanswered questions left blank. Writing is never automatically awarded marks. These are revision activities, not official examination grades or supervised assessments.</p></div>
 </section>
 <section id="active" hidden><div class="card"><div class="row between"><div><h2 id="activeTitle"></h2><span id="activeInfo" class="status"></span></div><div id="clock" role="timer" aria-live="off"></div></div><p id="autosave" class="small muted" role="status">Progress saves automatically.</p><div class="progress"><div id="activeProgress"></div></div><div id="assessmentBody"></div><div class="row"><button id="saveExit">Save and return</button><button id="submit" class="primary">Submit assessment</button></div></div></section>
-<section id="result" hidden><div class="card"><h2 id="resultTitle"></h2><div id="resultSummary"></div><div id="lessonNextSteps" class="notice" style="margin:14px 0" aria-label="Recommended mini lessons" hidden></div><div id="resultDetail"></div><div class="row"><button id="reviewBtn">Review answers</button><button id="resultBack" class="primary">Return to dashboard</button></div></div></section>
+<section id="result" hidden><div class="card"><h2 id="resultTitle"></h2><div id="resultSummary"></div><div id="lessonNextSteps" class="notice" style="margin:14px 0" aria-label="Recommended mini lessons" hidden></div><div id="resultDetail"></div><div class="row"><button id="reviewBtn">Review answers</button><button id="downloadFull" class="primary" hidden>Download full submission (ZIP)</button><button id="resultBack" class="primary">Return to dashboard</button></div></div></section>
 <footer>Babonneau Secondary School · Form 3 English Language Arts · Locally saved assessment progress</footer>
 </main>
-<script src="./form-3-paper2-bank.js"></script><script src="./form-3-expanded-a.js"></script><script src="./form-3-expanded-b.js"></script><script src="./form-3-paper-additions.js"></script>
+<script src="./form3-answer-tools.js"></script><script src="./form-3-paper2-bank.js"></script><script src="./form-3-expanded-a.js"></script><script src="./form-3-expanded-b.js"></script><script src="./form-3-paper-additions.js"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),paper2=window.BSS_FORM3_PAPER2;
