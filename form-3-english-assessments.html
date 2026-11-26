@@ -154,14 +154,18 @@ function renderWritten(){
   const lab=document.createElement('label');lab.htmlFor='response-'+i;lab.textContent=(i+1)+'. '+question+' ('+marks+(marks===1?' mark)':' marks)');
   const area=document.createElement('textarea');area.id='response-'+i;area.rows=3;area.style.minHeight='105px';area.maxLength=4000;area.value=attempt.values[i];
   area.addEventListener('input',()=>{attempt.values[i]=area.value;persist();$('activeProgress').style.width=percentage(attempt.values.filter(v=>v.trim()).length,11)});
-  wrap.append(lab,area);host.append(wrap)
+  wrap.append(lab,area);
+  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:wrap,namespace:'bss-english-'+selected.id,index:i,readonly:false});
+  host.append(wrap)
  });
  for(const [idx,title,prompt] of [[9,'Section B · Formal Letter (20 marks)',paper.letter],[10,'Section C · Notice Writing (15 marks)',paper.notice]]){
   const section=document.createElement('div');section.className='question';const h=document.createElement('h3');h.textContent=title;
   const inst=document.createElement('p');inst.textContent=prompt;const lab=document.createElement('label');lab.htmlFor='response-'+idx;lab.textContent='Your complete response';
   const area=document.createElement('textarea');area.id='response-'+idx;area.rows=11;area.maxLength=16000;area.value=attempt.values[idx];
   area.oninput=()=>{attempt.values[idx]=area.value;persist();$('activeProgress').style.width=percentage(attempt.values.filter(v=>v.trim()).length,11)};
-  section.append(h,inst,lab,area);host.append(section)
+  section.append(h,inst,lab,area);
+  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:section,namespace:'bss-english-'+selected.id,index:idx,readonly:false});
+  host.append(section)
  }
 }
 $('saveExit').onclick=()=>{persist();home()};
@@ -181,6 +185,7 @@ function submitAttempt(expired=false){
 $('submit').onclick=()=>submitAttempt(false);
 function showResult(){
  stopClock();show('result');$('resultTitle').textContent=selected.title+(attempt.expired?' · Time expired':' · Submitted');
+ $('downloadFull').hidden=selected.kind!=='written';
  const summary=$('resultSummary');summary.replaceChildren();
  const p=document.createElement('p');p.className=selected.kind==='objective'?'success':'notice';
  p.textContent=selected.kind==='objective'?'Automatically marked result: '+attempt.grade+'/60 ('+percentage(attempt.grade,60)+').':'Written Paper 2 submitted. Grade pending teacher marking (out of 51). No automatic writing marks have been assigned.';
@@ -244,6 +249,20 @@ $('reviewBtn').onclick=()=>{
   };detail.append(download);
   attempt.values.forEach((text,i)=>{const block=document.createElement('div');block.className='question';const h=document.createElement('h3');h.textContent=i<9?((i+1)+'. '+paper.questions[i][0]):i===9?'Formal letter':'Notice';const p=document.createElement('p');p.style.whiteSpace='pre-wrap';p.textContent=text||'(No response)';block.append(h,p);detail.append(block)})
  }
+};
+$('downloadFull').onclick=async()=>{
+ if(selected?.kind!=='written')return;
+ const btn=$('downloadFull');btn.disabled=true;btn.textContent='Preparing ZIP...';
+ try{
+  const paper=paper2[selected.source];
+  await window.BSSAnswerTools.exportBundle({
+   namespace:'bss-english-'+selected.id,
+   questions:paper.questions.map(([q,marks])=>q+' ('+marks+' marks)').concat(['Formal Letter (20 marks): '+paper.letter,'Notice Writing (15 marks): '+paper.notice]),
+   answers:attempt.values,
+   filename:'form3-english-'+selected.id
+  })
+ }catch(e){alert('Could not export. '+e.message)}
+ finally{btn.disabled=false;btn.textContent='Download full submission (ZIP)'}
 };
 $('resultBack').onclick=home;
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&selected?.limit&&attempt?.status==='draft')tick()});
