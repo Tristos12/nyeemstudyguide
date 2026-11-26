@@ -34,6 +34,9 @@ function render(){
  $('questionText').textContent=q.stem;$('questionMarks').textContent=q.marks+(q.marks===1?' mark':' marks');
  $('response').value=record.answers[index]||'';
  $('bar').style.width=(100*record.answers.filter(x=>typeof x==='string'&&x.trim()).length/10)+'%';
+ let host=$('writtenInputTools');if(!host){host=document.createElement('div');host.id='writtenInputTools';$('response').insertAdjacentElement('afterend',host)}
+ host.replaceChildren();
+ if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:'bss-math-structured-'+number,index,readonly:false});
  $('previous').disabled=index===0;$('next').disabled=index===9;
 }
 $('response').oninput=()=>{record.answers[record.position]=$('response').value;persist()};
@@ -64,11 +67,16 @@ function review(){
  host.hidden=false;host.scrollIntoView({behavior:'smooth'});
 }
 $('review').onclick=review;
-$('download').onclick=()=>{
- const lines=['BABONNEAU SECONDARY SCHOOL','FORM 3 MATHEMATICS','Structured Paper '+number,'Marks available: 30','Written work requires teacher marking',''];
- questions.forEach((q,i)=>{lines.push('Section '+q.section+' · Question '+(i+1)+' ('+q.marks+' marks)',q.stem,'Student response:',record.answers[i]||'[No response]','')});
- const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
- a.href=url;a.download='form3-maths-structured-'+number+'-answers.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)
+$('download').onclick=async()=>{
+ const btn=$('download');btn.disabled=true;btn.textContent='Preparing download...';
+ try{
+  await window.BSSAnswerTools.exportBundle({
+   namespace:'bss-math-structured-'+number,
+   questions:questions.map(q=>'Section '+q.section+' ('+q.marks+' marks): '+q.stem),
+   answers:record.answers,filename:'form3-maths-structured-'+number
+  });
+ }catch(e){alert('Could not export the submission. '+e.message)}
+ finally{btn.disabled=false;btn.textContent='Download full submission (ZIP)'}
 };
 $('retry').onclick=()=>{
  if(!confirm('Start a new attempt? Your previous submitted answers will be replaced.'))return;
