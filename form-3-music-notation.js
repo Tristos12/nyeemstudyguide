@@ -48,19 +48,19 @@ function draw(spec){
  if(!spec)return null;
  if(spec.type==='signature'){
   const svg=create('0 0 420 160','Treble clef staff with time signature '+spec.top+' over '+spec.bottom);
-  staff(svg,38,375,116,11);label(svg,'𝄞',40,124,62);
+  staff(svg,38,375,116,5.5);label(svg,'𝄞',40,124,62);
   label(svg,spec.top,105,79,31);label(svg,spec.bottom,105,112,31);
   return svg
  }
  if(spec.type==='staff'){
   const svg=create('0 0 420 170','Treble staff with one note. Identify its letter name.');
-  staff(svg,37,378,111,11);label(svg,'𝄞',43,121,66);
+  staff(svg,37,378,111,5.5);label(svg,'𝄞',43,121,66);
   note(svg,spec.pitch,224,111,5.5,4);
   return svg
  }
  if(spec.type==='note'||spec.type==='rest'){
   const svg=create('0 0 420 168',spec.type==='note'?'Music note symbol':'Music rest symbol');
-  staff(svg,37,379,114,11);label(svg,'𝄞',43,122,64);
+  staff(svg,37,379,114,5.5);label(svg,'𝄞',43,122,64);
   if(spec.type==='note'){
    const val={whole:4,half:2,quarter:1,eighth:.5,sixteenth:.25}[spec.value]||1;
    note(svg,'B4',213,114,5.5,val)
@@ -70,7 +70,7 @@ function draw(spec){
  if(spec.type==='excerpt'){
   const melody=window.BSS_MUSIC?.melody(spec.version)||[];
   const svg=create('0 0 860 185','Four-bar music notation in treble clef with time signature and a quarter rest');
-  staff(svg,25,834,133,12);label(svg,'𝄞',29,142,69);label(svg,'4',82,94,28);label(svg,'4',82,128,28);
+  staff(svg,25,834,133,6);label(svg,'𝄞',29,142,69);label(svg,'4',82,94,28);label(svg,'4',82,128,28);
   const starts=[125,310,495,680],width=150;
   melody.forEach((measure,i)=>{
    label(svg,'Bar '+(i+1),starts[i]+15,27,12);
