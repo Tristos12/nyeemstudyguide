@@ -2,7 +2,7 @@
 const variants=[
 {project:'a dining table used by a large family',safety:'Student A wears safety goggles; Student B runs carrying a chisel; Student C leaves timber offcuts on the floor.',injury:'A learner accidentally cuts a finger while using a sharp tool.',length:75,available:700},
 {project:'strong classroom bookshelves',safety:'Student A wears required goggles; Student B leaves a saw on the walkway; Student C plays near moving workshop equipment.',injury:'A classmate receives a small cut while preparing a timber joint.',length:85,available:790},
-{project:'a durable wooden door frame',safety:'Student A checks protective equipment; Student B runs with a hand tool; Student C leaves scraps in the passage.',injury:'A learner's hand is injured while handling timber.',length:95,available:850}
+{project:'a durable wooden door frame',safety:'Student A checks protective equipment; Student B runs with a hand tool; Student C leaves scraps in the passage.',injury:'A learner has a hand injury while handling timber.',length:95,available:850}
 ];
 const papers=variants.map((v,i)=>{
 const x=i*2,measure=[5+x,8+x,120+10*i,250+10*i,45+5*i,360+20*i,v.length,v.available];
