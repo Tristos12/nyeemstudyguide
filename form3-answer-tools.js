@@ -34,9 +34,9 @@ const el=(name,attrs={},text)=>{
  return n
 };
 function mount({container,namespace,index,readonly=false}){
- const root=el('section',{className:'f3-answer-tools'});
+ const root=el('details',{className:'f3-answer-tools'});
  root.style.cssText='margin:12px 0;padding:12px;border:1px solid #c8dbe8;border-radius:12px;background:#f7fbff';
- const heading=el('h4',{},'Other ways to answer');root.append(heading);
+ const heading=el('summary',{},'Draw or attach a file (optional)');heading.style.cssText='font-weight:700;cursor:pointer;padding:3px 0';root.append(heading);
  const intro=el('p',{},'Type above, draw your working, or attach a photo, PDF or Word document. Media stays on this device until you download and share it.');
  intro.style.fontSize='13px';root.append(intro);
  const toolbar=el('div',{role:'toolbar','aria-label':'Drawing tools'});
@@ -109,7 +109,7 @@ function mount({container,namespace,index,readonly=false}){
   const allowed=['image/png','image/jpeg','image/webp','application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
   for(const file of upload.files){
    const ext=/\.(docx?|pdf|png|jpe?g|webp)$/i.test(file.name);
-   if(!allowed.includes(file.type)&&!ext){showStatus('Unsupported file type: '+file.name);continue}
+   if((file.type&&!allowed.includes(file.type))||(!file.type&&!ext)){showStatus('Unsupported file type: '+file.name);continue}
    if(file.size>MAX_FILE){showStatus('Maximum file size is 5 MB: '+file.name);continue}
    if(value.files.length>=MAX_FILES){showStatus('Maximum three files per question.');break}
    value.files.push({name:file.name.replace(/[/\\\x00-\x1f]/g,'_').slice(0,90),blob:file,type:file.type});
