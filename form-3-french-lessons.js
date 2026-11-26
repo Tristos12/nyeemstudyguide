@@ -1,0 +1,38 @@
+/* Form 3 French Grade 9 instruction aligned to uploaded Term 1 exam. */
+window.BSS_FRENCH_LESSONS=[
+{key:'requests',title:'Asking Permission and Making Requests',goals:['Ask for permission politely','Request school supplies','Choose tu and vous correctly'],steps:[
+['Polite requests','Use Puis-je + infinitive? to ask may I. Example: Puis-je aller aux toilettes, s’il vous plaît ? means May I go to the bathroom, please? Puis-je entrer ? means May I enter?'],
+['Asking a teacher','Use vous when addressing a teacher formally. Pouvez-vous répéter, s’il vous plaît ? means Could you repeat, please? Pouvez-vous m’aider ? means Can you help me?'],
+['Asking a friend','With a classmate, the familiar imperative is natural: Prête-moi un stylo, s’il te plaît. This means Lend me a pen, please. Use une gomme for an eraser, une règle for a ruler, and un cahier for a notebook.'],
+['Avoid the wrong situation','A response about being late is not a request to use the bathroom. Identify the exact situation before choosing the French sentence.']],example:'Situation: You need an eraser. Appropriate response: Prête-moi une gomme, s’il te plaît.',check:['Ask your teacher to repeat an explanation.','Ask a classmate to lend you a ruler.','Explain the difference between s’il te plaît and s’il vous plaît.']},
+{key:'responses',title:'Classroom Responses, Apologies and Gratitude',goals:['Respond when called','Apologise appropriately','State when work is finished or not understood'],steps:[
+['Responding to your teacher','Oui, Madame or Oui, Monsieur is a respectful response when a teacher calls on you. Answering a name call does not require an apology.'],
+['When you do not understand','Je ne comprends pas means I do not understand. You may add Pouvez-vous expliquer encore une fois ? to ask for another explanation.'],
+['When you finish','Madame, j’ai fini means Madam, I have finished. Je n’ai pas encore fini means I have not yet finished. Pay close attention to the negative ne ... pas.'],
+['Apologies and reasons','Désolé, Madame, je suis en retard means Sorry, Madam, I am late. J’ai oublié mon cahier chez moi means I forgot my exercise book at home.'],
+['Thanking others','Merci or Merci beaucoup expresses thanks; De rien is an appropriate answer to thanks.']],example:'Situation: You were late and wish to apologise. Say Désolé, Madame, je suis en retard.',check:['Say that you do not understand.','Say that you have finished your work.','Write one polite apology and one reply to Merci.']},
+{key:'rules',title:'Classroom Rules in French',goals:['Interpret il faut','Describe punctuality and respect','Choose rules appropriate to a situation'],steps:[
+['The expression il faut','Il faut + infinitive expresses what one must or should do. Il faut écouter means It is necessary to listen. In school rules, it usually communicates an expectation.'],
+['Punctuality and participation','Il faut être à l’heure means one must be on time. Il faut participer aux cours means students must participate in lessons.'],
+['Respect and behaviour','Il faut respecter les autres means respect others. Taisez-vous means be quiet; it is more direct and can sound strong, so tone and politeness matter.'],
+['Homework and organisation','Il faut remettre ses devoirs à temps means hand in homework on time. Il faut garder la salle bien rangée means keep the room tidy.'],
+['Match the rule to the behaviour','When a student is refusing to join an activity, the rule about participation is more appropriate than a rule about arriving early.']],example:'Problem: A pupil keeps arriving late. Rule: Il faut être à l’heure.',check:['Give a rule about keeping a room tidy.','Write a rule requiring students to participate.','Explain what il faut contributes to a sentence.']},
+{key:'objects',title:'School Objects, Gender and Vocabulary',goals:['Recognise common classroom nouns','Use un and une','Distinguish easily confused items'],steps:[
+['Basic objects','Un crayon = pencil; un stylo = pen; un cahier = exercise book; un livre = book; un pupitre = school desk; un sac à dos = backpack.'],
+['Feminine school nouns','Une trousse = pencil case; une gomme = eraser; une règle = ruler; une porte = door; une fenêtre = window; une chaise = chair.'],
+['Gender matters','Un is used with masculine nouns and une with feminine nouns. Memorise new vocabulary together with its article. You say une trousse but un crayon.'],
+['Look for meaning and context','Do not confuse stylo (pen) with crayon (pencil). A trousse is the container for pens and pencils, not the same item as a cahier.']],example:'Translate “my red pencil case”: ma trousse rouge. Trousse is feminine and rouge follows the noun.',check:['Translate pencil, pen, ruler and eraser.','Write articles for cahier, trousse and stylo.','Explain the difference between un pupitre and un tableau.']},
+{key:'positions',title:'Prepositions and Locating Objects',goals:['Understand location words','Answer Où est ... ?','Use negative location statements'],steps:[
+['Position words','Sur = on; sous = under; dans = in; derrière = behind; devant = in front of; près de = near; à côté de = next to.'],
+['Asking where','Où est mon crayon ? asks Where is my pencil? Il est dans ton sac ? asks Is it in your bag?'],
+['Combining prepositions and nouns','Sur le pupitre = on the desk; derrière la porte = behind the door; à côté du livre = beside the book; près de la fenêtre = near the window. Du combines de + le.'],
+['Negation','Le crayon n’est pas sur le pupitre means The pencil is not on the desk. Il n’est pas là means It is not there. Do not overlook the ne ... pas around the verb.'],
+['Working with a conversation','Follow each suggested location carefully. A speaker may reject the first location and eventually find an object elsewhere. The final location and the first suggested location are different comprehension details.']],example:'Question: Où est le livre ? Response: Il est sur la table. The book is on the table.',check:['Translate under the chair and behind the door.','Answer a question asking where your pencil is.','Explain what Il n’est pas là means.']},
+{key:'reading',title:'French Dialogue Reading Comprehension',goals:['Read a conversation for literal details','Track locations and speakers','Answer questions in full English sentences'],steps:[
+['Identify the speakers and the problem','Read the opening exchange. Note who is speaking, what object has been lost, and what is being requested. Dialogue labels help you avoid confusing one character with another.'],
+['Find literal details','Underline object vocabulary, colours and position words. If the text says ma trousse est rouge, the pencil case is red. Do not answer with a colour from another sentence.'],
+['Follow the sequence','The first place suggested may not be the place where an item is found. Write down the sequence of suggestions and each response (oui or non).'],
+['Handle negatives','Non, il n’est pas là means No, it is not there. This rules out a location and should not be presented as the final answer.'],
+['Answer in English when instructed','For a question worth 2 or 3 marks, write a complete sentence with enough specific information. Example: “She found the pencil in front of the board, near the socket.”'],
+['Check evidence','Review the actual French line before submitting. Do not invent a detail if the text is unclear or does not supply it.']],example:'Text: « Mon cahier est sous la chaise, à côté du sac. » Answer: Her exercise book is under the chair, next to the bag.',check:['Identify the item being searched for in a short dialogue.','Record the first suggested location and final location separately.','Explain the meaning of non, pas là and de rien.']}
+];
