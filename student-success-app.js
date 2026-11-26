@@ -41,7 +41,7 @@ function saveAttempt(){
 }
 function hideQuiz(){if(clockId!==null){clearInterval(clockId);clockId=null}cfg=null;attempt=null;questions=[];$('quizView').hidden=true;$('quizResult').hidden=true}
 function renderNav(tab){select('.tab').forEach(x=>x.hidden=x.id!==tab);select('nav button[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
-function tab(name){hideQuiz();const allowed=['overview','lessons','practice','planner','flashcards','progress'];renderNav(allowed.includes(name)?name:'overview');if(name==='overview'||!name)renderOverview();if(name==='progress')renderProgress();if(name==='planner')renderPlan()}
+function tab(name){hideQuiz();const allowed=['overview','lessons','practice','planner','flashcards','progress'];renderNav(allowed.includes(name)?name:'overview');if(name==='overview'||!name)renderOverview();if(name==='practice')renderPracticeCards();if(name==='progress')renderProgress();if(name==='planner')renderPlan()}
 function openLesson(topic,index){
  if(!L[topic])return tab('lessons');
  hideQuiz();renderNav('lessons');$('lessonTopic').value=topic;renderLessons();
@@ -89,8 +89,7 @@ function renderLessons(){
  const done=studyMarks();
  L[topic].lessons.forEach((lesson,i)=>{
   const card=node('article');card.className='lesson';card.id='lesson-'+topic+'-'+i;
-  card.append(node('h3',(i+1)+'. '+lesson.title),node('p','Learning goals: '+lesson.body?.length||'')); // replaced below
-  card.removeChild(card.lastChild);
+  card.append(node('h3',(i+1)+'. '+lesson.title));
   const goals=node('p');goals.className='muted';goals.textContent='Learning goal: '+(lesson.title||'Study this topic');card.append(goals);
   card.append(node('p',lesson.body));
   const example=node('p');example.style.marginTop='9px';example.append(node('strong','Example: '),document.createTextNode(lesson.example));card.append(example);
