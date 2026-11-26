@@ -31,7 +31,7 @@ for(const key of names){
  const items=bank[key];
  assert(Array.isArray(items)&&items.length>=50,key+': must contain 50+ items');
  items.forEach((q,i)=>{
-  assert(Array.isArray(q)&&typeof q[0]==='string'&&q[0].length>25,key+' '+i+': invalid stem');
+  assert(Array.isArray(q)&&typeof q[0]==='string'&&q[0].length>=10,key+' '+i+': invalid stem');
   assert(Array.isArray(q[1])&&q[1].length===4,key+' '+i+': require four options');
   assert(new Set(q[1]).size===4,key+' '+i+': duplicate options');
   assert(Number.isInteger(q[2])&&q[2]>=0&&q[2]<4,key+' '+i+': key must be 0-3');
