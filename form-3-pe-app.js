@@ -8,8 +8,8 @@ const configs=[
  ...Array.from({length:3},(_,i)=>({id:'structured-'+(i+1),title:'Structured Paper '+(i+1),kind:'written',paper:i,minutes:0})),
  {id:'mock-u1',title:'Untimed Mock 1',kind:'mixed',paper:0,minutes:0},
  {id:'mock-u2',title:'Untimed Mock 2',kind:'mixed',paper:1,minutes:0},
- {id:'mock-t1',title:'Timed Mock 1',kind:'mixed',paper:2,minutes:75},
- {id:'mock-t2',title:'Timed Mock 2',kind:'mixed',paper:3,minutes:75}
+ {id:'mock-t1',title:'Timed Mock 1',kind:'mixed',paper:2,minutes:45},
+ {id:'mock-t2',title:'Timed Mock 2',kind:'mixed',paper:3,minutes:45}
 ];
 const read=id=>{try{return JSON.parse(localStorage.getItem(key(id))||'null')}catch{return null}};
 const write=(id,value)=>{try{localStorage.setItem(key(id),JSON.stringify(value));return true}catch{return false}};
