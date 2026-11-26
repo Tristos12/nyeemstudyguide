@@ -13,7 +13,7 @@ class Element {
  toBlob(cb){cb(new Blob(['png-test'],{type:'image/png'}))}
  click(){this.clicked=true}
 }
-const records=new Map(),exports=[];
+const records=new Map(),zipExports=[];
 const db={
  objectStoreNames:{contains:()=>true},
  transaction(){return {objectStore(){return {
@@ -23,7 +23,7 @@ const db={
 };
 const context={window:{open(){}},document:{createElement:tag=>new Element(tag)},console,Blob,TextEncoder,Uint8Array,Promise,Set,Math,Date,String,Number,Object,Array,JSON,encodeURIComponent,setTimeout:(f)=>f(),confirm:()=>true,
  indexedDB:{open(){const req={result:db};queueMicrotask(()=>req.onsuccess?.());return req}},
- URL:{createObjectURL(blob){exports.push(blob);return 'blob:local'},revokeObjectURL(){}}
+ URL:{createObjectURL(blob){zipExports.push(blob);return 'blob:local'},revokeObjectURL(){}}
 };
 context.window.indexedDB=context.indexedDB;
 vm.runInNewContext(source,context);
@@ -52,8 +52,8 @@ async function tick(){await new Promise(resolve=>setImmediate(resolve))}
  const saved=records.get('test-exam::0');
  assert.equal(saved.files.length,1,'Attachment did not persist');
  await tools.exportBundle({namespace:'test-exam',questions:['Calculate 2 + 2'],answers:['4'],filename:'test-form3'});
- assert(exports.length>=1,'ZIP was not downloaded');
- const zip=await exports.at(-1).arrayBuffer(),bytes=new Uint8Array(zip),asText=Buffer.from(bytes).toString('utf8');
+ assert(zipExports.length>=1,'ZIP was not downloaded');
+ const zip=await zipExports.at(-1).arrayBuffer(),bytes=new Uint8Array(zip),asText=Buffer.from(bytes).toString('utf8');
  assert.equal(Buffer.from(bytes.slice(0,4)).toString('hex'),'504b0304','Archive is not a ZIP');
  assert(asText.includes('answers.txt')&&asText.includes('drawing.png')&&asText.includes('working.png'),'Missing written/drawn/uploaded assets in ZIP');
  console.log('PASS: drawing pointer input, IndexedDB save, uploaded image, local media check and ZIP export');
