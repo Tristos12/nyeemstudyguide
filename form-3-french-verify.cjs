@@ -57,7 +57,7 @@ for(const id of ['practice-1','practice-2','practice-3','practice-4','practice-5
  document.getElementById('next').onclick();
  assert(document.getElementById('assessmentStatus').textContent.includes('Question 2 of'),id+' cannot go to question 2');
  if(id.startsWith('mock')){
-  for(let j=2;j<=16;j++)document.getElementById('next').onclick();
+  for(let j=2;j<=15;j++)document.getElementById('next').onclick();
   assert(document.getElementById('assessmentStatus').textContent.includes('Question 16 of 22'),id+' cannot reach reading section');
   assert.equal(document.getElementById('readingPassage').hidden,false,id+' missing French dialogue on question 16');
   assert(document.getElementById('questionHost').children.some(node=>node.tagName==='textarea'),id+' missing reading input');
