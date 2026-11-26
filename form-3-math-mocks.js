@@ -51,6 +51,7 @@ function render(){
  const i=Math.min(items.length-1,Math.max(0,Number.isInteger(state.position)?state.position:0));
  state.position=i;
  const item=items[i],host=$('question');host.replaceChildren();
+ $('mathWritingToolsNotice').hidden=item.type==='objective';
  $('examTitle').textContent=cfg.title;
  const done=state.answers.filter((ans,j)=>items[j].type==='objective'?ans!==null:typeof ans==='string'&&!!ans.trim()).length;
  $('positionLabel').textContent='Question '+(i+1)+' of 30 · '+done+' answered';
