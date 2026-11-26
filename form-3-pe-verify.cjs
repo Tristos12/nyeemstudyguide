@@ -51,13 +51,20 @@ for(const id of ['practice-1','practice-2','practice-3','practice-4','practice-5
   first.find(c=>c.tagName==='div').children[0].onclick();
   const rec=JSON.parse(store.get('bss_form3_pe_2026_'+id));
   assert.equal(rec.answers[0],0,'Answer did not save');
+ }else if(isMock){
+  assert(doc.getElementById('assessmentStatus').textContent.includes('of 19'),id+' question count');
+  assert(first.some(c=>c.tagName==='div'&&c.children.length===4),id+' initial objective answers missing');
+  for(let n=0;n<10;n++)doc.getElementById('next').onclick();
+  assert(doc.getElementById('assessmentStatus').textContent.includes('Question 11 of 19'),id+' must reach Section B');
+  assert(doc.getElementById('questionHost').children.some(c=>c.tagName==='textarea'),id+' no written response in Section B');
+  assert(doc.getElementById('questionHost').children.some(c=>c.tagName==='draw'),id+' drawing workspace unavailable');
  }else{
   assert(first.some(c=>c.tagName==='textarea'),id+' no text response');
   assert(first.some(c=>c.tagName==='draw'),id+' drawing workspace unavailable');
-  assert(doc.getElementById('assessmentStatus').textContent.includes('of '+(isMock?19:9)),id+' question count');
+  assert(doc.getElementById('assessmentStatus').textContent.includes('of 9'),id+' question count');
  }
  doc.getElementById('next').onclick();
- assert(doc.getElementById('assessmentStatus').textContent.includes('Question 2 of'),id+' next question did not open');
+ assert(doc.getElementById('assessmentStatus').textContent.includes('Question '+(isMock?12:2)+' of'),id+' next question did not open');
  if(isMock&&id.includes('t'))assert(doc.getElementById('timer').textContent.includes('Time left'),id+' timed mock missing clock');
  totalChecked++;
  console.log('PASS '+id+' opens first and second questions and saves progress');
