@@ -35,7 +35,7 @@ footer{text-align:center;font-size:13px;color:#61788e;padding:15px}.hide,[hidden
  <div class="row"><button id="previous">Previous</button><button id="next" class="primary">Next question</button><button id="finish" hidden>Submit all 60 answers</button><button id="backToPapers">Return to practice menu</button></div>
  </section>
 </section>
-<section id="results" hidden><section class="card"><h2 id="resultsTitle">Practice complete</h2><p id="resultsScore"></p><div id="resultsBreakdown"></div>
+<section id="results" hidden><section class="card"><h2 id="resultsTitle">Practice complete</h2><p id="resultsScore"></p><div id="resultsBreakdown"></div><div id="recommendedLessons" class="notice" style="margin:15px 0" aria-label="Recommended lessons after assessment"></div>
 <div class="row"><button id="reviewToggle" class="primary">Review questions and explanations</button><button id="backAfterResult">Choose another practice</button><button id="retry">Retry this practice</button></div></section>
 <section id="answerReview" class="card" hidden><h2>Answers and explanations</h2><div id="reviewItems"></div></section></section>
 <footer>Babonneau Secondary School Form 3 ELA · Five self-marked multiple-choice practices · Scores stored locally on your device</footer>
@@ -149,6 +149,25 @@ function renderResults(score){
   const row=document.createElement('tr');for(const value of [names[key],String(correct),String(count)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell)}body.append(row);
  }
  table.append(body);host.append(table);
+ const suggested=[];
+ for(const [key,count] of distribution){
+  const ids=items.map((item,i)=>item.skill===key?i:-1).filter(i=>i>=0);
+  const correct=ids.filter(i=>response[i]===items[i].q[2]).length;
+  if(correct/count<0.85)suggested.push({key,label:names[key],percent:Math.round(correct/count*100)})
+ }
+ suggested.sort((a,b)=>a.percent-b.percent);
+ const suggestionHost=$('recommendedLessons');suggestionHost.replaceChildren();
+ const title=document.createElement('strong');title.textContent=suggested.length?'Recommended mini lessons based on this paper':'Your skill results are strong';suggestionHost.append(title);
+ const guidance=document.createElement('p');guidance.className='tiny';
+ guidance.textContent=suggested.length?'Study the lower-scoring skills before your next paper.':'Each section scored at least 85%. You can review any lesson to maintain your skills.';
+ suggestionHost.append(guidance);
+ for(const s of suggested.slice(0,3)){
+  const a=document.createElement('a');a.className='action';a.href='./form-3-english.html?lesson='+encodeURIComponent(s.key);
+  a.textContent='Study '+s.label+' ('+s.percent+'%)';a.style.margin='4px';suggestionHost.append(a)
+ }
+ if(!suggested.length){
+  const a=document.createElement('a');a.className='action';a.href='./form-3-english.html?tab=lessons';a.textContent='Browse all lessons';suggestionHost.append(a)
+ }
  $('answerReview').hidden=true;$('reviewItems').replaceChildren();
  show('results');
 }
