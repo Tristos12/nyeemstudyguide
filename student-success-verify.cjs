@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const paths=['student-success-lessons.js','student-success-bank.js','student-success-videos.js','student-success-app.js'];
+const paths=['student-success-lessons.js','student-success-bank.js','student-success-videos.js','student-success-vocabulary-extra.js','student-success-app.js'];
 const src=Object.fromEntries(paths.map(f=>[f,fs.readFileSync(f,'utf8')]));paths.forEach(f=>new vm.Script(src[f],{filename:f}));
 const html=fs.readFileSync('student-success.html','utf8');
 for(const p of paths)assert(html.includes(p));assert(fs.readFileSync('form-3.html','utf8').includes('student-success.html'));
@@ -26,19 +26,19 @@ const document={
 };
 const window={addEventListener(){},URL:{createObjectURL(){return 'blob:test'},revokeObjectURL(){}}};
 const ctx={document,window,Option:class extends E{constructor(text,value){super('option',value);this.textContent=text}},URLSearchParams,location:{search:'',href:''},Date,Math,JSON,Number,String,Array,Object,Set,console,confirm:()=>true,Blob,setInterval:()=>1,clearInterval(){},setTimeout() {},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)}};
-for(const p of paths.slice(0,3))vm.runInNewContext(src[p],ctx,{filename:p});
+for(const p of paths.slice(0,4))vm.runInNewContext(src[p],ctx,{filename:p});
 const B=window.BSS_SUCCESS_BANK,L=window.BSS_SUCCESS_LESSONS,keys=['test','study','time','knowledge','vocab'];
 assert.equal(Object.keys(B.questions).length,5);assert.equal(Object.keys(L).length,5);
-assert.equal(keys.reduce((s,k)=>s+B.questions[k].length,0),85);
+assert.equal(keys.reduce((s,k)=>s+B.questions[k].length,0),85);assert.equal(window.BSS_EXTRA_VOCAB.words.length,80);assert.equal(window.BSS_EXTRA_VOCAB.questions.length,80);
 for(const k of keys){
  assert.equal(L[k].lessons.length,5);
  for(const l of L[k].lessons){assert(l.body.length>70);assert(l.example.length>20)}
  assert(B.questions[k].length>=15);
  for(const q of B.questions[k]){assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert(q.answer>=0&&q.answer<4);assert(q.explanation.length>10)}
 }
-vm.runInNewContext(src[paths[3]],ctx,{filename:paths[3]});
+vm.runInNewContext(src[paths[4]],ctx,{filename:paths[4]});
 const topicCards=document.getElementById('topicCards');assert.equal(topicCards.children.length,5);
-const practice=document.getElementById('practiceCards');assert.equal(practice.children.length,7);
+const practice=document.getElementById('practiceCards');assert.equal(practice.children.length,7);assert.equal(B.questions.vocab.length,100);
 for(let n=0;n<7;n++){
  const launchButton=practice.children[n].children.find(x=>x.tagName==='button');
  assert(launchButton, 'Start practice missing');
@@ -80,4 +80,5 @@ for(const topic of keys){
  buttons[x.check.correct].onclick();
  const completed=JSON.parse(store.get('bss_student_success_v1_videoChecks'));assert.equal(completed[topic],true,'Video checkpoint not saved');
 }
-console.log('PASS: 25 lessons, 85 questions, 5 video tutorial sections, 7 practices, feedback, progress, flashcards and checkpoints.');
+for(let n=0;n<99;n++)document.getElementById('flashNext').onclick();assert.equal(document.getElementById('flashCounter').textContent,'Card 100 of 100');
+console.log('PASS: 25 lessons, 165 questions including 100 vocabulary questions, 100 vocabulary cards, 5 video sections, 7 practices and saved progress.');
