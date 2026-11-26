@@ -25,7 +25,7 @@ const blanks=[
  ['marketing','Efforts to promote the product and reach potential customers'],
  ['sales','Transactions when customers pay for the business products'],
  ['profit','A positive balance after deducting business costs from revenue'],
- ['consumers','People who buy or use the company's finished products']
+ ['consumers','People who buy or use the business finished products']
 ];
 const leaders=[
  ['Autocratic','The leader makes decisions independently, with little group consultation'],
