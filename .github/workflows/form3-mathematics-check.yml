@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'form-3-mathematics.html'
+      - 'form-3-math-practices.html'
       - 'form-3-maths-bank.js'
       - 'form-3-maths-lessons.js'
       - 'form-3-maths-structured.js'
