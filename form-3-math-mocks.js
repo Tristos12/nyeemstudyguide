@@ -69,7 +69,8 @@ function render(){
   const textarea=document.createElement('textarea');textarea.id='writtenAnswer';textarea.maxLength=16000;textarea.value=state.answers[i]||'';
   textarea.oninput=()=>{state.answers[i]=textarea.value;write()};
   const note=document.createElement('p');note.className='small muted';note.textContent='Show calculations, explanations and units. Written solutions will be reviewed by a teacher.';
-  host.append(label,textarea,note)
+  host.append(label,textarea,note);
+  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:'bss-math-mock-'+cfg.id,index:i,readonly:false})
  }
  $('prev').disabled=i===0;$('next').disabled=i===items.length-1
 }
@@ -134,11 +135,17 @@ $('retry').onclick=()=>{
  try{localStorage.removeItem(storageKey(cfg.id))}catch{}
  openMock(key)
 };
-$('download').onclick=()=>{
- const lines=['Babonneau Secondary School','Form 3 Mathematics',cfg.title,'Section A: '+(state.grade??'')+'/20','Sections B and C await teacher marking',''];
- items.forEach((item,i)=>{lines.push('Question '+(i+1)+' - '+item.q.stem,item.type==='objective'?(state.answers[i]===null?'Blank':item.q.options[state.answers[i]]):(state.answers[i]||'Blank'),'')});
- const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
- a.href=url;a.download=cfg.id+'-student-responses.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)
+$('download').onclick=async()=>{
+ const btn=$('download');btn.disabled=true;btn.textContent='Preparing ZIP...';
+ try{
+  await window.BSSAnswerTools.exportBundle({
+   namespace:'bss-math-mock-'+cfg.id,
+   questions:items.map((item,i)=>'Question '+(i+1)+' ('+(item.type==='written'?'Section '+item.part+', '+item.q.marks+' marks':'Section A, 1 mark')+'): '+item.q.stem),
+   answers:items.map((item,i)=>item.type==='objective'?(state.answers[i]===null?'Blank':item.q.options[state.answers[i]]):state.answers[i]),
+   filename:'form3-maths-'+cfg.id
+  })
+ }catch(e){alert('Could not export. '+e.message)}
+ finally{btn.disabled=false;btn.textContent='Download full submission (ZIP)'}
 };
 const ids=Object.keys(mocks),saved=ids.map(k=>{const r=read(mocks[k].id);return mocks[k].title+': '+(r?.status==='submitted'?'Completed':r?.status==='draft'?'In progress':'Not started')});
 $('savedList').textContent=saved.join(' · ');
