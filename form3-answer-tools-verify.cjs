@@ -43,8 +43,8 @@ async function tick(){await new Promise(resolve=>setImmediate(resolve))}
  await tick();
  assert(await tools.hasContent('test-exam',0),'Saved drawing not found');
  // Add an uploaded image using the actual input-change callback.
- const nodes=details.children.flatMap(node=>node.children);
- const input=nodes.find(node=>node.tagName==='input');
+ function descendants(node){return [node,...node.children.flatMap(descendants)]}
+ const input=descendants(details).find(node=>node.tagName==='input');
  assert(input,'File upload control missing');
  const attachment=new Blob(['test-image-data'],{type:'image/png'});attachment.name='working.png';
  input.files=[attachment];await input.listeners.change();await tick();
