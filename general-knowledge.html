@@ -20,7 +20,7 @@ try{sessionStorage.setItem("bss_form1_student",JSON.stringify({name,room,code}))
 };
 window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the current learner has finished. Their progress remains saved in this browser under their own details."))return;try{sessionStorage.removeItem("bss_form1_student")}catch(e){}location.href="./"};
 })();
-</script></head><body><header><a href="./">← Learning Hub</a><h1>🏆 General Knowledge Challenge</h1><p>Learn the facts. Challenge the computer. Celebrate Saint Lucia.</p><p id="studentName"></p></header><main>
+</script><link rel="stylesheet" href="./form-3-school-theme.css?v=2"></head><body><header><a href="./">← Learning Hub</a><h1>🏆 General Knowledge Challenge</h1><p>Learn the facts. Challenge the computer. Celebrate Saint Lucia.</p><p id="studentName"></p></header><main>
 <section class="card" id="challengeProfile" hidden><h2>🎯 You have been challenged!</h2><p>Your friend's invitation is ready. Enter your learner details here to open the same 60-question challenge. You will not be sent back to the Learning Hub.</p>
 <form class="friend-entry-form" id="challengeProfileForm">
 <label for="challengeGuestName">First name or nickname<input id="challengeGuestName" type="text" minlength="2" maxlength="40" autocomplete="off" required placeholder="e.g. BrainStar"></label>
