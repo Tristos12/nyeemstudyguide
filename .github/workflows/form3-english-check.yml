@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'form3-answer-tools.js'
+      - 'form3-answer-tools-verify.cjs'
       - 'form-3-english.html'
       - 'form-3-expanded-a.js'
       - 'form-3-expanded-b.js'
@@ -29,4 +31,4 @@ jobs:
         with:
           node-version: '22'
       - name: Check all Form 3 question banks and 30 practices
-        run: node form-3-verify.cjs && node form-3-paper-verify.cjs && node form-3-assessment-verify.cjs && node form-3-lesson-verify.cjs
+        run: node form-3-verify.cjs && node form-3-paper-verify.cjs && node form-3-assessment-verify.cjs && node form-3-lesson-verify.cjs && node form3-answer-tools-verify.cjs
