@@ -1,0 +1,229 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Form 3 English Assessment Centre | Babonneau Secondary School</title>
+<style>
+:root{--navy:#173c6d;--teal:#16786e;--ink:#223b53;--line:#d1deeb}*{box-sizing:border-box}
+body{font:16px/1.55 system-ui,Arial,sans-serif;margin:0;color:var(--ink);background:#f4f8fd}
+header{background:linear-gradient(115deg,#173e70,#18786e);color:white;padding:23px max(18px,calc((100vw - 1100px)/2))}
+header a{color:white}h1{font-size:clamp(27px,4vw,38px);margin:8px 0}main{max-width:1100px;padding:18px 16px 65px;margin:auto}
+.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:23px;margin:15px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:13px}.tile{border:1px solid #c9dce9;border-radius:13px;padding:19px;background:#f8fbff}
+h2{margin:8px 0 13px}h3{margin:5px 0}p{margin:9px 0}.muted{color:#597086}.small{font-size:13px}
+button,.action{font:inherit;cursor:pointer;border:1px solid #8caeca;border-radius:10px;padding:10px 15px;background:white;color:var(--navy);font-weight:700;text-decoration:none;display:inline-block}
+button.primary,.action.primary{background:var(--navy);border-color:var(--navy);color:white}button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #eab32d;outline-offset:3px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.between{justify-content:space-between}
+textarea{font:inherit;width:100%;border:1px solid #a6bdce;border-radius:10px;padding:12px;min-height:155px;resize:vertical}
+label{font-weight:700;display:block;margin-top:12px}.notice{padding:12px 15px;background:#fff7e7;border-left:5px solid #cc921c;border-radius:9px}.success{padding:12px 15px;background:#e7f7ef;border-left:5px solid #207c57;border-radius:9px}
+.passage{white-space:pre-line;padding:18px;background:#f5faff;border:1px solid #d1e0eb;border-radius:12px;line-height:1.8}
+.status{display:inline-block;background:#ecf4fc;border-radius:25px;padding:4px 11px;font-size:12px;color:#164c75}
+.question{border-top:1px solid var(--line);padding:17px 0}.question h3{font-size:18px}
+.answer{display:block;border:1px solid #c7d8e8;border-radius:10px;padding:13px;margin:7px 0;background:#fff;text-align:left;width:100%;font-weight:500;color:var(--ink)}
+.answer.selected{border:2px solid #2768a4;background:#eaf3ff}.progress{height:12px;background:#e7eff7;border-radius:12px;overflow:hidden;margin:9px 0}.progress div{height:100%;background:#18786e;width:0}
+.metric{border-radius:12px;background:#f0f7ff;padding:16px;text-align:center}.metric strong{font-size:25px;display:block}
+table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid #e2ebf2;text-align:left}
+[hidden]{display:none!important}footer{text-align:center;color:#657b8e;font-size:12px;margin-top:25px}
+@media(max-width:620px){.card{padding:16px}}
+</style></head><body><header><a href="./form-3-english.html">← Form 3 English</a><h1>English Assessment Centre</h1><p>Three complete Paper 2 assessments · Two untimed mock examinations · Two timed mock examinations</p></header>
+<main>
+<section id="home">
+<div class="card"><h2>My progress and grades</h2><p class="muted small">Results are saved locally on this browser. Multiple-choice papers receive an immediate grade only after submission. Written Paper 2 responses remain ungraded until a teacher assesses them.</p>
+<div class="grid"><div class="metric"><strong id="completedMetric">0</strong><span>Assessments submitted</span></div><div class="metric"><strong id="avgMetric">Not yet graded</strong><span>Average automatically marked score</span></div><div class="metric"><strong id="draftMetric">0</strong><span>Written assessments in progress</span></div></div>
+<div id="progressTable"></div><p class="small muted">Completed practice paper scores can also be viewed below. Work completed on another browser or device will not appear here.</p></div>
+<div class="card"><h2>Paper 2: Three full examinations</h2><p>Each paper includes nine comprehension questions (16 marks), a complete formal letter (20 marks), and a notice (15 marks). All sections must be completed for a full Paper 2 submission.</p><div id="paper2Cards" class="grid"></div></div>
+<div class="card"><h2>Mock examinations</h2><p>Four separate mock examinations are provided. Each type has an untimed option and a timed option.</p><div id="mockCards" class="grid"></div></div>
+<div class="card notice"><strong>Assessment and safeguarding</strong><p class="small">Timed papers run against the device clock; an expired paper is automatically submitted with any unanswered questions left blank. Writing is never automatically awarded marks. These are revision activities, not official examination grades or supervised assessments.</p></div>
+</section>
+<section id="active" hidden><div class="card"><div class="row between"><div><h2 id="activeTitle"></h2><span id="activeInfo" class="status"></span></div><div id="clock" role="timer" aria-live="off"></div></div><p id="autosave" class="small muted" role="status">Progress saves automatically.</p><div class="progress"><div id="activeProgress"></div></div><div id="assessmentBody"></div><div class="row"><button id="saveExit">Save and return</button><button id="submit" class="primary">Submit assessment</button></div></div></section>
+<section id="result" hidden><div class="card"><h2 id="resultTitle"></h2><div id="resultSummary"></div><div id="resultDetail"></div><div class="row"><button id="reviewBtn">Review answers</button><button id="resultBack" class="primary">Return to dashboard</button></div></div></section>
+<footer>Babonneau Secondary School · Form 3 English Language Arts · Locally saved assessment progress</footer>
+</main>
+<script src="./form-3-paper2-bank.js"></script><script src="./form-3-expanded-a.js"></script><script src="./form-3-expanded-b.js"></script><script src="./form-3-paper-additions.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),paper2=window.BSS_FORM3_PAPER2;
+const configs=[
+{id:'p2-1',title:'Paper 2 Examination 1',kind:'written',source:0,limit:null},
+{id:'p2-2',title:'Paper 2 Examination 2',kind:'written',source:1,limit:null},
+{id:'p2-3',title:'Paper 2 Examination 3',kind:'written',source:2,limit:null},
+{id:'mock-u1',title:'Untimed Mock 1 · Paper 1',kind:'objective',source:3,limit:null},
+{id:'mock-u2',title:'Untimed Mock 2 · Paper 2',kind:'written',source:3,limit:null},
+{id:'mock-t1',title:'Timed Mock 1 · Paper 1',kind:'objective',source:4,limit:90},
+{id:'mock-t2',title:'Timed Mock 2 · Paper 2',kind:'written',source:4,limit:120}
+];
+const counts=[['spelling',12],['vocabulary',12],['grammar',12],['equivalent',7],['mainidea',7],['reading',10]];
+const labels={spelling:'Spelling',vocabulary:'Vocabulary',grammar:'Grammar',equivalent:'Equivalent Sentences',mainidea:'Main Idea',reading:'Reading Comprehension'};
+const banks={};
+for(const [key,count] of counts){
+ banks[key]=[window.FORM3_EXPANDED_A,window.FORM3_EXPANDED_B,window.FORM3_PAPER_ADDITIONS].flatMap(src=>src?.[key]||[]);
+ if(banks[key].length<5*count)throw Error('Insufficient question bank: '+key);
+}
+function objectiveItems(source){
+ const arr=[];for(const [key,count] of counts){for(let i=source*count;i<(source+1)*count;i++)arr.push({skill:key,q:banks[key][i]})}return arr
+}
+const storageKey=id=>'bss_form3_assessment_2026_'+id;
+function get(id){try{return JSON.parse(localStorage.getItem(storageKey(id))||'null')}catch{return null}}
+function put(id,obj){try{localStorage.setItem(storageKey(id),JSON.stringify(obj));return true}catch{return false}}
+let selected=null,attempt=null,clockInterval=null;
+function escapeText(s){return String(s??'')}
+function show(name){for(const id of ['home','active','result'])$(id).hidden=id!==name;window.scrollTo({top:0,behavior:'smooth'})}
+function storedP1(n){try{return JSON.parse(localStorage.getItem('bss_form3_complete_60_v1_'+n)||'null')}catch{return null}}
+function percentage(n,max){return Math.round(n*100/max)+'%'}
+function renderDashboard(){
+ const all=configs.map(cfg=>({cfg,record:get(cfg.id)})),submitted=all.filter(x=>x.record?.status==='submitted');
+ let objectiveScores=submitted.filter(x=>x.cfg.kind==='objective').map(x=>x.record.grade);
+ const previous=Array.from({length:5},(_,n)=>storedP1(n));
+ objectiveScores.push(...previous.filter(r=>r?.finished&&Number.isFinite(r.score)).map(r=>r.score));
+ $('completedMetric').textContent=submitted.length+previous.filter(r=>r?.finished).length;
+ $('avgMetric').textContent=objectiveScores.length?percentage(objectiveScores.reduce((a,b)=>a+b,0),60*objectiveScores.length):'Not yet graded';
+ $('draftMetric').textContent=all.filter(x=>x.record?.status==='draft').length;
+ const host=$('progressTable');host.replaceChildren();
+ const h=document.createElement('h3');h.textContent='Assessment results';host.append(h);
+ const table=document.createElement('table'),thead=document.createElement('thead'),tr=document.createElement('tr');
+ for(const label of ['Assessment','Progress','Grade / Status']){const th=document.createElement('th');th.textContent=label;tr.append(th)}thead.append(tr);table.append(thead);
+ const tbody=document.createElement('tbody');
+ for(const {cfg,record} of all){
+  const row=document.createElement('tr');
+  const progress=record?.status==='submitted'?'Submitted':record?.status==='draft'?'In progress':'Not started';
+  let grade='Not graded';
+  if(record?.status==='submitted')grade=cfg.kind==='objective'?record.grade+'/60 ('+percentage(record.grade,60)+')':'Awaiting teacher marking /51';
+  for(const value of [cfg.title,progress,grade]){const td=document.createElement('td');td.textContent=value;row.append(td)}tbody.append(row)
+ }
+ for(let i=0;i<5;i++){const row=document.createElement('tr'),p=previous[i];for(const value of ['Full Practice '+(i+1),p?.finished?'Submitted':p?.answers?.some(v=>v!==null)?'In progress':'Not started',p?.finished?p.score+'/60 ('+percentage(p.score,60)+')':'Not graded']){const td=document.createElement('td');td.textContent=value;row.append(td)}tbody.append(row)}
+ table.append(tbody);host.append(table)
+}
+function cards(target,items){
+ const host=$(target);host.replaceChildren();
+ for(const cfg of items){
+  const rec=get(cfg.id),card=document.createElement('article');card.className='tile';
+  const title=document.createElement('h3');title.textContent=cfg.title;
+  const detail=document.createElement('p');detail.textContent=cfg.kind==='written'?'Comprehension 16 · Formal letter 20 · Notice 15':'60 multiple-choice questions';
+  const time=document.createElement('p');time.className='muted small';time.textContent=cfg.limit?'Timed: '+cfg.limit+' minutes':'Untimed';
+  const status=document.createElement('p');status.className='status';status.textContent=rec?.status==='submitted'?(cfg.kind==='objective'?'Grade '+rec.grade+'/60':'Awaiting marking'):rec?.status==='draft'?'Resume saved work':'Not started';
+  const btn=document.createElement('button');btn.className='primary';btn.textContent=rec?.status==='submitted'?'View result / restart':rec?.status==='draft'?'Continue assessment':'Start assessment';
+  btn.onclick=()=>start(cfg.id);
+  card.append(title,detail,time,status,btn);host.append(card);
+ }
+}
+function home(){stopClock();renderDashboard();cards('paper2Cards',configs.slice(0,3));cards('mockCards',configs.slice(3));show('home')}
+function defaultAttempt(cfg){return {status:'draft',startAt:Date.now(),deadline:cfg.limit?Date.now()+cfg.limit*60000:null,values:cfg.kind==='written'?Array(11).fill(''):Array(60).fill(null),position:0}}
+function start(id){
+ const cfg=configs.find(c=>c.id===id);if(!cfg)return;
+ let rec=get(id);
+ if(rec?.status==='submitted'){
+  if(confirm('View your submitted result? Select Cancel to start a new attempt.')){selected=cfg;attempt=rec;showResult();return}
+  if(!confirm('Replace the previous result and start again?'))return;
+  rec=null
+ }
+ selected=cfg;attempt=rec?.status==='draft'?rec:defaultAttempt(cfg);
+ if(!Array.isArray(attempt.values)||attempt.values.length!==(cfg.kind==='written'?11:60))attempt=defaultAttempt(cfg);
+ if(cfg.limit&&attempt.deadline<=Date.now()){submitAttempt(true);return}
+ put(cfg.id,attempt);show('active');$('activeTitle').textContent=cfg.title;
+ $('activeInfo').textContent=cfg.limit?'Timed '+cfg.limit+' minutes':'Untimed · Save and resume';
+ if(cfg.kind==='written')renderWritten();else renderObjective();
+ stopClock();if(cfg.limit){tick();clockInterval=setInterval(tick,1000)}else $('clock').textContent='No time limit';
+}
+function stopClock(){if(clockInterval!==null){clearInterval(clockInterval);clockInterval=null}}
+function tick(){
+ if(!selected?.limit||!attempt||attempt.status!=='draft')return;
+ const remaining=Math.max(0,Math.ceil((attempt.deadline-Date.now())/1000));
+ $('clock').textContent='Remaining '+String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');
+ if(remaining<=0)submitAttempt(true)
+}
+function persist(){if(selected&&attempt?.status==='draft'){$('autosave').textContent=put(selected.id,attempt)?'Saved locally on this device.':'Browser storage unavailable. Export or copy your answers before leaving.'}}
+function renderObjective(){
+ const host=$('assessmentBody');host.replaceChildren();
+ const items=objectiveItems(selected.source),n=Math.min(59,Math.max(0,attempt.position||0));attempt.position=n;
+ const item=items[n],q=item.q;let answered=attempt.values.filter(v=>v!==null).length;
+ $('activeProgress').style.width=percentage(answered,60);
+ const top=document.createElement('h3');top.textContent='Question '+(n+1)+' of 60 · '+labels[item.skill];host.append(top);
+ if(item.skill==='reading'&&q[4]){const passage=document.createElement('div');passage.className='passage';passage.textContent=q[4];host.append(passage)}
+ const stem=document.createElement('p');stem.textContent=q[0];host.append(stem);
+ q[1].forEach((option,i)=>{const b=document.createElement('button');b.type='button';b.className='answer'+(attempt.values[n]===i?' selected':'');b.textContent='ABCD'[i]+'. '+option;b.setAttribute('aria-pressed',String(attempt.values[n]===i));b.onclick=()=>{attempt.values[n]=i;persist();renderObjective()};host.append(b)});
+ const row=document.createElement('div');row.className='row';
+ const prev=document.createElement('button');prev.textContent='Previous';prev.disabled=n===0;prev.onclick=()=>{attempt.position=n-1;persist();renderObjective()};
+ const next=document.createElement('button');next.textContent='Next';next.disabled=n===59;next.onclick=()=>{attempt.position=n+1;persist();renderObjective()};
+ const tally=document.createElement('span');tally.className='muted small';tally.textContent=answered+' / 60 answered';row.append(prev,next,tally);host.append(row)
+}
+function renderWritten(){
+ const host=$('assessmentBody');host.replaceChildren();const paper=paper2[selected.source];
+ $('activeProgress').style.width=percentage(attempt.values.filter(v=>v.trim()).length,11);
+ const reading=document.createElement('h3');reading.textContent='Section A · Reading Comprehension (16 marks)';host.append(reading);
+ const passage=document.createElement('div');passage.className='passage';passage.textContent=paper.passageTitle+'\n\n'+paper.passage;host.append(passage);
+ paper.questions.forEach(([question,marks],i)=>{
+  const wrap=document.createElement('div');wrap.className='question';
+  const lab=document.createElement('label');lab.htmlFor='response-'+i;lab.textContent=(i+1)+'. '+question+' ('+marks+(marks===1?' mark)':' marks)');
+  const area=document.createElement('textarea');area.id='response-'+i;area.rows=3;area.style.minHeight='105px';area.maxLength=4000;area.value=attempt.values[i];
+  area.addEventListener('input',()=>{attempt.values[i]=area.value;persist();$('activeProgress').style.width=percentage(attempt.values.filter(v=>v.trim()).length,11)});
+  wrap.append(lab,area);host.append(wrap)
+ });
+ for(const [idx,title,prompt] of [[9,'Section B · Formal Letter (20 marks)',paper.letter],[10,'Section C · Notice Writing (15 marks)',paper.notice]]){
+  const section=document.createElement('div');section.className='question';const h=document.createElement('h3');h.textContent=title;
+  const inst=document.createElement('p');inst.textContent=prompt;const lab=document.createElement('label');lab.htmlFor='response-'+idx;lab.textContent='Your complete response';
+  const area=document.createElement('textarea');area.id='response-'+idx;area.rows=11;area.maxLength=16000;area.value=attempt.values[idx];
+  area.oninput=()=>{attempt.values[idx]=area.value;persist();$('activeProgress').style.width=percentage(attempt.values.filter(v=>v.trim()).length,11)};
+  section.append(h,inst,lab,area);host.append(section)
+ }
+}
+$('saveExit').onclick=()=>{persist();home()};
+function submitAttempt(expired=false){
+ if(!selected||!attempt||attempt.status!=='draft')return;
+ const missing=selected.kind==='written'?attempt.values.filter(v=>!v.trim()).length:attempt.values.filter(v=>v===null).length;
+ if(!expired){
+  if(missing&&!confirm(missing+' responses are blank. Submit anyway?'))return;
+  if(!confirm('Submit '+selected.title+' now? You cannot edit this attempt after submission.'))return;
+ }
+ if(selected.kind==='objective'){
+  const items=objectiveItems(selected.source);attempt.grade=items.reduce((a,item,i)=>a+(attempt.values[i]===item.q[2]?1:0),0);
+ }else{attempt.grade=null}
+ attempt.status='submitted';attempt.submittedAt=new Date().toISOString();attempt.expired=expired;
+ put(selected.id,attempt);showResult()
+}
+$('submit').onclick=()=>submitAttempt(false);
+function showResult(){
+ stopClock();show('result');$('resultTitle').textContent=selected.title+(attempt.expired?' · Time expired':' · Submitted');
+ const summary=$('resultSummary');summary.replaceChildren();
+ const p=document.createElement('p');p.className=selected.kind==='objective'?'success':'notice';
+ p.textContent=selected.kind==='objective'?'Automatically marked result: '+attempt.grade+'/60 ('+percentage(attempt.grade,60)+').':'Written Paper 2 submitted. Grade pending teacher marking (out of 51). No automatic writing marks have been assigned.';
+ summary.append(p);
+ const detail=$('resultDetail');detail.replaceChildren();
+ if(selected.kind==='objective'){
+  const items=objectiveItems(selected.source);
+  const table=document.createElement('table'),head=document.createElement('tr');
+  for(const key of ['Skill','Correct','Total']){const cell=document.createElement('th');cell.textContent=key;head.append(cell)}table.append(head);
+  for(const [key,count] of counts){
+   const matched=items.map((item,i)=>item.skill===key?i:-1).filter(i=>i>=0);
+   const correct=matched.filter(i=>attempt.values[i]===items[i].q[2]).length;
+   const row=document.createElement('tr');for(const value of [labels[key],String(correct),String(count)]){const td=document.createElement('td');td.textContent=value;row.append(td)}table.append(row)
+  }
+  detail.append(table)
+ }else{
+  const info=document.createElement('p');info.className='muted small';info.textContent='Your writing is stored on this browser. Use Review answers to download or copy the responses for teacher assessment.';detail.append(info)
+ }
+}
+$('reviewBtn').onclick=()=>{
+ const detail=$('resultDetail');detail.replaceChildren();
+ if(selected.kind==='objective'){
+  objectiveItems(selected.source).forEach((item,i)=>{
+   const wrap=document.createElement('div');wrap.className='question',h=document.createElement('h3');h.textContent='Question '+(i+1)+' · '+labels[item.skill];
+   const p=document.createElement('p');p.textContent=item.q[0];
+   const ans=document.createElement('p');ans.textContent='Your answer: '+(attempt.values[i]===null?'Blank':'ABCD'[attempt.values[i]]+'. '+item.q[1][attempt.values[i]]);
+   const correct=document.createElement('p');correct.textContent='Correct answer: '+'ABCD'[item.q[2]]+'. '+item.q[1][item.q[2]];
+   const explanation=document.createElement('p');explanation.className='muted';explanation.textContent=item.q[3];
+   wrap.append(h,p,ans,correct,explanation);detail.append(wrap)
+  })
+ }else{
+  const paper=paper2[selected.source];
+  const lines=[selected.title,paper.passageTitle,''];
+  paper.questions.forEach(([q],i)=>lines.push((i+1)+'. '+q+'\n'+attempt.values[i]+'\n'));
+  lines.push('Formal letter\n'+attempt.values[9]+'\n','Notice\n'+attempt.values[10]);
+  const download=document.createElement('button');download.textContent='Download written responses';download.onclick=()=>{
+   const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download=selected.id+'-responses.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)
+  };detail.append(download);
+  attempt.values.forEach((text,i)=>{const block=document.createElement('div');block.className='question';const h=document.createElement('h3');h.textContent=i<9?((i+1)+'. '+paper.questions[i][0]):i===9?'Formal letter':'Notice';const p=document.createElement('p');p.style.whiteSpace='pre-wrap';p.textContent=text||'(No response)';block.append(h,p);detail.append(block)})
+ }
+};
+$('resultBack').onclick=home;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&selected?.limit&&attempt?.status==='draft')tick()});
+home();
+</script></body></html>
