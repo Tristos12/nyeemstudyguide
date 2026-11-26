@@ -30,7 +30,7 @@ const papers=variants.map((variant,index)=>{
  questions.push({section:'D',topic:'seams',marks:2,stem:'What is the main function of a seam? Give a clear answer based on garment construction.'});
  questions.push({section:'D',topic:'seams',marks:4,stem:'Name TWO seams that are self-neatened and explain briefly how each neaten its raw edges.'});
  questions.push({section:'D',topic:'applications',marks:8,stem:'For EACH garment, name a suitable seam and state ONE reason for your choice: '+variant.garments.map((g,i)=>('('+('abcd'[i])+') '+g)).join('; ')+'. Award 2 marks per garment.'});
- questions.push({section:'D',topic:'machine',marks:8,stem:'State the function of EACH of these four sewing-machine parts: '+variant.parts.map((p,i)=>('('+('iv'[0]||i)+') '+p)).join('; ')+'. Give a clear function for each (2 marks each).'});
+ questions.push({section:'D',topic:'machine',marks:8,stem:'State the function of EACH of these four sewing-machine parts: '+variant.parts.map((p,i)=>('('+['i','ii','iii','iv'][i]+') '+p)).join('; ')+'. Give a clear function for each (2 marks each).'});
  questions.push({section:'D',topic:'applications',marks:1,stem:'Name ONE seam suitable for an outerwear garment, and write its name accurately.'});
  questions.push({section:'D',topic:'procedures',marks:5,stem:'Arrange these five steps in the CORRECT order for making an OPEN SEAM. Write an ordered list of the step numbers 1–5 and the action descriptions: '+orderSteps.map((p,i)=>'['+(i+1)+'] '+p).join('; ')+'.'});
  return {id:'structured-'+(index+1),title:'TCF Structured Paper '+(index+1),questions,actions:selected.map(i=>actions[i])};
