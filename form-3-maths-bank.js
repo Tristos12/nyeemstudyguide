@@ -15,7 +15,7 @@ function make(topic,stem,correct,nearA,nearB,out,explanation,n){
 function item(topic,n){
  const k=n+1;
  if(topic==='fractions'){
-  const whole=2+(n%8),den=3+(n*3%9),num=1+(n*5%(den-1)),top=whole*den+num;
+  const whole=2+n,den=3+(n*3%9),num=1+(n*5%(den-1)),top=whole*den+num;
   return make(topic,'Convert '+whole+' '+num+'/'+den+' to an improper fraction.',top+'/'+den,(whole*den-num)+'/'+den,(top+den)+'/'+den,num+'/'+whole,
    'Multiply the whole number by the denominator and add the numerator: '+whole+' × '+den+' + '+num+' = '+top+'.',n);
  }
