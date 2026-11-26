@@ -77,9 +77,14 @@ function render(){
 $('prev').onclick=()=>{if(state.position>0){state.position--;write();render()}};
 $('next').onclick=()=>{if(state.position<items.length-1){state.position++;write();render()}};
 $('leave').onclick=()=>{write();stopTimer();location.href='./form-3-math-mocks.html'};
-function submit(expired=false){
+async function submit(expired=false){
  if(!cfg||!state||state.status!=='draft')return;
- const unanswered=state.answers.filter((x,i)=>items[i].type==='objective'?x===null:!String(x||'').trim()).length;
+ let unanswered=0;
+ for(let i=0;i<items.length;i++){
+  if(items[i].type==='objective'){if(state.answers[i]===null)unanswered++;continue}
+  if(String(state.answers[i]||'').trim())continue;
+  if(!(await window.BSSAnswerTools.hasContent('bss-math-mock-'+cfg.id,i)))unanswered++;
+ }
  if(!expired&&unanswered&&!confirm(unanswered+' answers are blank. Submit anyway?'))return;
  if(!expired&&!confirm('Submit '+cfg.title+'? You will receive your Section A grade.'))return;
  const grade=items.slice(0,20).reduce((s,item,i)=>s+(state.answers[i]===item.q.answer?1:0),0);
