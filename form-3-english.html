@@ -16,7 +16,7 @@ button,select,input,textarea{font:inherit}button{background:#fff;border:1px soli
 <div class="tile"><h3>✍️ Paper 2</h3><p>Reading comprehension (16 marks), formal-letter writing (20 marks) and notice writing (15 marks). Build responses, use checklists and save drafts.</p><button class="primary" data-go="paper2">Start Paper 2 practice</button></div>
 <div class="tile"><h3>🎯 Recommended method</h3><p>Review an example, practise a few questions, read the explanation, and revisit questions answered incorrectly. For writing, plan, draft and improve.</p><button data-go="review">View my revision record</button></div><div class="tile"><h3>📘 Learn before practising</h3><p>Eight short lessons with clear examples and links to the relevant skill activities.</p><button class="primary" data-go="lessons">Open mini lessons</button></div><div class="tile"><h3>⏱ Mock examinations</h3><p>Paper 1 includes 51 objective items in 90 minutes. Paper 2 includes reading and written tasks for teacher marking.</p><button class="primary" data-go="mock">Open mock exams</button></div>
 </div><p class="notice small">The Paper 2 cover lists notice writing before formal letters, while the paper itself presents formal-letter writing as Section B and notice writing as Section C. The practice area follows the tasks, with their stated marks.</p></div></section>
-<section id="paper1" class="view" hidden><div class="card"><h2>Paper 1: Objective Practice</h2><p>Choose a skill, then select Practice 1, Practice 2, Practice 3, Practice 4 or Practice 5. Each is a separate exercise with its own score. Correct answers and explanations are shown only after the selected practice is finished.</p><div class="controls"><label for="skillSelect">Practice area</label><select id="skillSelect"></select><label for="practiceSelect">Practice set</label><select id="practiceSelect"><option value="0">Practice 1</option><option value="1">Practice 2</option><option value="2">Practice 3</option><option value="3">Practice 4</option><option value="4">Practice 5</option></select><button class="primary" id="startQuiz">Start selected practice</button></div><p class="small muted" id="quizMeta"></p></div>
+<section id="paper1" class="view" hidden><div class="card"><h2>Paper 1: Objective Practice</h2><p>Choose a skill, then select Practice 1, Practice 2, Practice 3, Practice 4 or Practice 5. Each is a separate exercise with its own score. Correct answers and explanations are shown only after the selected practice is finished.</p><div class="controls"><label for="skillSelect">Practice area</label><select id="skillSelect"></select><label for="practiceSelect">Practice set</label><select id="practiceSelect"><option value="0">Practice 1</option><option value="1">Practice 2</option><option value="2">Practice 3</option><option value="3">Practice 4</option><option value="4">Practice 5</option></select><button class="primary" id="startQuiz">Start selected practice</button></div><p class="small muted" id="quizMeta"></p><div id="practiceButtons" class="grid" aria-label="Five separate practice exercises"></div></div>
 <div id="quiz" class="card" hidden><div class="controls"><strong id="questionCounter"></strong><span class="muted" id="questionSkill"></span></div><div class="progress"><div id="quizBar"></div></div><div id="readingText" class="passage" hidden></div><h2 id="questionPrompt"></h2><div id="answers" class="answers"></div><div id="feedback" role="status" aria-live="polite" hidden></div><div class="controls"><button id="nextQuestion" class="primary" hidden>Next question</button><button id="exitQuiz">Choose another skill</button></div></div>
 <div id="quizResults" class="card" hidden><h2>Practice complete</h2><p id="quizSummary"></p><div id="sectionAnswerReview" aria-label="Answer review"></div><button id="quizAgain" class="primary">Retry this practice</button><button id="nextPracticeSet" type="button">Go to next practice</button><button data-go="review">Review my answers</button></div></section>
 <section id="paper2" class="view" hidden>
@@ -293,7 +293,7 @@ function finishSection(){
   const explanation=document.createElement('p');explanation.className='muted small';explanation.textContent=q[3];
   item.append(title,prompt,selected,answer,explanation);host.append(item)
  });
- score=correct;state.practiceResults[practiceResultKey(skill,practiceNumber)]={score,total:order.length,completedAt:new Date().toISOString()};save();updateStats();
+ score=correct;state.practiceResults[practiceResultKey(skill,practiceNumber)]={score,total:order.length,completedAt:new Date().toISOString()};save();updateStats();updatePracticeSelection();
  $('quiz').hidden=true;$('quizResults').hidden=false;
  $('quizSummary').textContent='Practice '+(practiceNumber+1)+': '+score+' of '+order.length+' questions correct ('+Math.round(score/order.length*100)+'%). Review your answers and explanations below.';
  $('quizBar').style.width='100%';
@@ -302,9 +302,22 @@ function finishSection(){
 $('nextQuestion').onclick=()=>{if(!answered)return;index++;if(index>=order.length)finishSection();else renderQuestion()};
 $('startQuiz').onclick=begin;$('quizAgain').onclick=begin;
 $('exitQuiz').onclick=()=>{if(!answered&&index===0||confirm('Leave this section? Unsubmitted answers will not be saved.')){$('quiz').hidden=true;$('quizResults').hidden=true;sectionResponses=[]}};
+function renderPracticeButtons(){
+ const host=$('practiceButtons');host.replaceChildren();
+ for(let i=0;i<5;i++){
+  const btn=document.createElement('button');btn.type='button';
+  const rec=state.practiceResults?.[practiceResultKey(selector.value,i)];
+  btn.textContent='Practice '+(i+1)+' · '+practiceIds(selector.value,i).length+' questions'+(rec?' · '+rec.score+'/'+rec.total:'');
+  btn.setAttribute('aria-pressed',String(Number($('practiceSelect').value)===i));
+  if(Number($('practiceSelect').value)===i)btn.classList.add('primary');
+  btn.onclick=()=>{$('practiceSelect').value=String(i);updatePracticeSelection();begin()};
+  host.append(btn)
+ }
+}
 function updatePracticeSelection(){
  const key=selector.value,num=Number($('practiceSelect').value),count=practiceIds(key,num).length,completed=state.practiceResults?.[practiceResultKey(key,num)];
  $('quizMeta').textContent='Practice '+(num+1)+' · '+count+' questions · '+(completed?'Last result: '+completed.score+'/'+completed.total:'Not completed yet')+'. Answers and explanations appear at the end.';
+ renderPracticeButtons();
 }
 $('skillSelect').onchange=updatePracticeSelection;$('practiceSelect').onchange=updatePracticeSelection;updatePracticeSelection();
 $('nextPracticeSet').onclick=()=>{
