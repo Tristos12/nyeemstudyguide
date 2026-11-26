@@ -106,12 +106,13 @@ function cards(target,items){
 }
 function home(){stopClock();renderDashboard();cards('paper2Cards',configs.slice(0,3));cards('mockCards',configs.slice(3));show('home')}
 function defaultAttempt(cfg){return {status:'draft',startAt:Date.now(),deadline:cfg.limit?Date.now()+cfg.limit*60000:null,values:cfg.kind==='written'?Array(11).fill(''):Array(60).fill(null),position:0}}
-function start(id){
+async function start(id){
  const cfg=configs.find(c=>c.id===id);if(!cfg)return;
  let rec=get(id);
  if(rec?.status==='submitted'){
   if(confirm('View your submitted result? Select Cancel to start a new attempt.')){selected=cfg;attempt=rec;showResult();return}
-  if(!confirm('Replace the previous result and start again?'))return;
+  if(!confirm('Replace the previous result and start again? This also clears saved drawings and uploaded files.'))return;
+  try{await window.BSSAnswerTools.clearNamespace('bss-english-'+id,11)}catch{}
   rec=null
  }
  selected=cfg;attempt=rec?.status==='draft'?rec:defaultAttempt(cfg);
