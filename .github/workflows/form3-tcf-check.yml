@@ -1,0 +1,27 @@
+name: Form 3 Textiles Clothing Fashion validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'form-3-tcf.html'
+      - 'form-3-tcf-bank.js'
+      - 'form-3-tcf-written.js'
+      - 'form-3-tcf-lessons.js'
+      - 'form-3-tcf-diagrams.js'
+      - 'form-3-tcf-app.js'
+      - 'form-3-tcf-verify.cjs'
+      - 'form3-answer-tools.js'
+      - 'form3-answer-tools-verify.cjs'
+      - '.github/workflows/form3-tcf-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node form-3-tcf-verify.cjs && node form3-answer-tools-verify.cjs
