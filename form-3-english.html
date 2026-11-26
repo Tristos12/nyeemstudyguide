@@ -10,7 +10,7 @@ button,select,input,textarea{font:inherit}button{background:#fff;border:1px soli
 <div class="controls"><label for="nickname">Learner nickname</label><input id="nickname" maxlength="24" placeholder="Optional nickname" autocomplete="off"><label for="classRoom">Class</label><input id="classRoom" type="text" maxlength="20" placeholder="Enter your class, e.g. 3R11" autocomplete="off"><button id="saveProfile">Save on this device</button></div><p class="small muted" id="profileNote">No full name or student ID required. Your work stays in this browser. On shared devices, clear your progress before another learner uses the page.</p>
 </section>
 <section class="card"><h2>My learning progress</h2><div class="score-grid"><div class="score-box"><strong id="attempted">0</strong><span>Questions attempted</span></div><div class="score-box"><strong id="accuracy">0%</strong><span>Current accuracy</span></div><div class="score-box"><strong id="draftCount">0</strong><span>Writing drafts saved</span></div></div><div class="progress"><div id="masteryBar"></div></div><p class="small muted">Progress is for practice, not an official grade. Objective-question scores are stored by question so revisions can improve your record.</p></section>
-<nav class="tabs" aria-label="English revision sections"><button class="active" data-view="overview">Overview</button><button data-view="paper1">Paper 1 Practice</button><button data-view="paper2">Paper 2 Writing & Reading</button><button data-view="lessons">Mini Lessons</button><button data-view="mock">Mock Exams</button><button data-view="review">My Review</button></nav>
+<nav class="tabs" aria-label="English revision sections"><button class="active" data-view="overview">Overview</button><button data-view="paper1">Paper 1 Practice</button><button data-view="paper2">Paper 2 Exams & Writing</button><button data-view="lessons">Mini Lessons</button><button data-view="mock">4 Mock Exams</button><button data-view="grades">Progress & Grades</button><button data-view="review">My Review</button></nav>
 <section id="overview" class="view"><div class="card"><h2>Your revision pathway</h2><div class="grid">
 <div class="tile"><h3>📝 Paper 1</h3><p>Five complete 60-question English practice papers with rigorous multiple-choice questions, reading passages and end-of-paper scoring.</p><button class="primary" data-go="paper1">Start Paper 1 practice</button></div>
 <div class="tile"><h3>✍️ Paper 2</h3><p>Reading comprehension (16 marks), formal-letter writing (20 marks) and notice writing (15 marks). Build responses, use checklists and save drafts.</p><button class="primary" data-go="paper2">Start Paper 2 practice</button></div>
@@ -32,7 +32,7 @@ button,select,input,textarea{font:inherit}button{background:#fff;border:1px soli
 <div id="quiz" class="card" hidden><div class="controls"><strong id="questionCounter"></strong><span class="muted" id="questionSkill"></span></div><div class="progress"><div id="quizBar"></div></div><div id="readingText" class="passage" hidden></div><h2 id="questionPrompt"></h2><div id="answers" class="answers"></div><div id="feedback" role="status" aria-live="polite" hidden></div><div class="controls"><button id="nextQuestion" class="primary" hidden>Next question</button><button id="exitQuiz">Choose another skill</button></div></div>
 <div id="quizResults" class="card" hidden><h2>Practice complete</h2><p id="quizSummary"></p><div id="sectionAnswerReview" aria-label="Answer review"></div><button id="quizAgain" class="primary">Retry this practice</button><button id="nextPracticeSet" type="button">Go to next practice</button><button data-go="review">Review my answers</button></div>
 </div></section>
-<section id="paper2" class="view" hidden>
+<section id="paper2" class="view" hidden><div class="card"><h2>Three Complete Paper 2 Examinations</h2><p>Complete each 51-mark paper with reading comprehension (16), a formal letter (20) and notice writing (15). Drafts save on your device. Written work requires teacher marking.</p><div class="grid"><div class="tile"><h3>Paper 2 Exam 1</h3><p>Three written sections · 51 marks</p><a class="btn" style="display:inline-block;background:#183b6a;color:#fff;text-decoration:none;padding:11px 15px;border-radius:9px;font-weight:700" href="./form-3-english-assessments.html?exam=p2-1">Open Exam 1</a></div><div class="tile"><h3>Paper 2 Exam 2</h3><p>Three written sections · 51 marks</p><a class="btn" style="display:inline-block;background:#183b6a;color:#fff;text-decoration:none;padding:11px 15px;border-radius:9px;font-weight:700" href="./form-3-english-assessments.html?exam=p2-2">Open Exam 2</a></div><div class="tile"><h3>Paper 2 Exam 3</h3><p>Three written sections · 51 marks</p><a class="btn" style="display:inline-block;background:#183b6a;color:#fff;text-decoration:none;padding:11px 15px;border-radius:9px;font-weight:700" href="./form-3-english-assessments.html?exam=p2-3">Open Exam 3</a></div></div><p><a href="./form-3-english-assessments.html">Open the full Assessment Centre and grade dashboard</a></p></div>
 <div class="card"><h2>Paper 2: Reading and Writing Skills</h2><p>The uploaded paper assesses comprehension through a factual passage about the octopus, guided formal-letter writing requesting an educational visit to Pigeon Island, and a school club notice. The activities here practise the same skills with new prompts.</p></div>
 <div class="card"><h2>A. Reading comprehension · 16-mark skills</h2><p>Read the new practice passage, then answer the nine questions in complete sentences where appropriate.</p>
 <div class="passage"><strong>Protecting the Hawksbill Turtle</strong>
@@ -51,7 +51,7 @@ A young volunteer named Leila noticed fresh tracks leading from the sea towards 
 <label for="noticeDraft">My club notice</label><textarea id="noticeDraft" data-draft="notice" placeholder="Create your own notice with an attention-grabbing heading."></textarea><p class="small muted" id="noticeWords">0 words</p><button class="primary" data-save="notice">Save notice</button><p class="small" id="noticeSaved" role="status"></p></div></section>
 
 <section id="lessons" class="view" hidden><div class="card"><h2>Form 3 ELA Mini Lessons</h2><p>Read a lesson, study the example, and choose the matching practice area. Lessons follow the skill areas in Paper 1 and Paper 2.</p><div id="lessonCards" class="grid"></div></div></section>
-<section id="mock" class="view" hidden>
+<section id="mock" class="view" hidden><div class="card"><h2>Four Complete Mock Examinations</h2><p>Two untimed mocks and two timed mocks. Paper 1 is automatically marked out of 60; Paper 2 is teacher-marked out of 51.</p><div class="grid"><div class="tile"><h3>Untimed Mock 1</h3><p>Paper 1 · 60 questions</p><a href="./form-3-english-assessments.html?exam=mock-u1" style="display:inline-block;background:#183b6a;color:white;border-radius:9px;padding:10px 16px;text-decoration:none;font-weight:700">Open Mock</a></div><div class="tile"><h3>Untimed Mock 2</h3><p>Paper 2 · Written</p><a href="./form-3-english-assessments.html?exam=mock-u2" style="display:inline-block;background:#183b6a;color:white;border-radius:9px;padding:10px 16px;text-decoration:none;font-weight:700">Open Mock</a></div><div class="tile"><h3>Timed Mock 1</h3><p>Paper 1 · 90 minutes</p><a href="./form-3-english-assessments.html?exam=mock-t1" style="display:inline-block;background:#183b6a;color:white;border-radius:9px;padding:10px 16px;text-decoration:none;font-weight:700">Open Mock</a></div><div class="tile"><h3>Timed Mock 2</h3><p>Paper 2 · 120 minutes</p><a href="./form-3-english-assessments.html?exam=mock-t2" style="display:inline-block;background:#183b6a;color:white;border-radius:9px;padding:10px 16px;text-decoration:none;font-weight:700">Open Mock</a></div></div><a href="./form-3-english-assessments.html">View all assessments, progress and grades</a></div><div hidden>
 <div class="card"><h2>Practice Examination Centre</h2><p>Original mock assessments modelled on the structure and marks of the uploaded school papers. These are for revision, not official examination results.</p>
 <div class="grid">
 <div class="tile"><h3>Paper 1 · 51 marks</h3><p>Spelling 10, vocabulary 10, grammar 10, equivalent sentences 6, main idea 5 and comprehension 10. Time limit: 90 minutes.</p><button class="primary" id="launchMock1">Begin Paper 1 mock</button></div>
@@ -73,7 +73,8 @@ When the library reopened, visitors could locate books more easily. The voluntee
 <section class="writing-task"><h3>Section B · Formal Letter (20 marks)</h3><p>Write a formal letter to your principal requesting permission for your Form 3 class to organise an educational reading event for younger students. Explain the purpose, proposed activities, benefits and arrangements. Include all parts of a formal letter.</p><textarea id="mock2Letter" aria-label="Mock formal letter" placeholder="Write your complete formal letter here."></textarea></section>
 <section class="writing-task"><h3>Section C · Notice Writing (15 marks)</h3><p>Your class is starting an after-school Reading and Debate Club. Prepare an attractive written notice to recruit members, giving the club's purpose, activities, eligibility, meeting date, time, place, what to bring, registration details and a contact person.</p><textarea id="mock2Notice" aria-label="Mock club notice" placeholder="Write a complete club notice here."></textarea></section>
 <div class="controls"><button id="saveMock2" class="primary">Save Paper 2 draft</button><button id="exportMock2">Download my Paper 2 responses</button></div><p id="mock2Status" role="status" class="muted small"></p><p class="notice small">This Paper 2 mock is not automatically graded. A teacher should assess your answers using the section marks and agreed marking criteria.</p></div>
-<section class="card" id="extraWrittenPractice"><h2>More Paper 2 Practice</h2><p>Choose one of five additional activities in each writing area. Your responses are saved on this browser and can be reviewed later. Written answers require teacher assessment.</p><div id="extraReadingPractice"></div><div id="extraLetterPractice"></div><div id="extraNoticePractice"></div></section></section>
+<section class="card" id="extraWrittenPractice"><h2>More Paper 2 Practice</h2><p>Choose one of five additional activities in each writing area. Your responses are saved on this browser and can be reviewed later. Written answers require teacher assessment.</p><div id="extraReadingPractice"></div><div id="extraLetterPractice"></div><div id="extraNoticePractice"></div></section></div></section>
+<section id="grades" class="view" hidden><div class="card"><h2>My English Progress and Grades</h2><p>These are practice results from this browser, not official grades. Paper 1 objective papers are scored automatically. Written Paper 2 submissions are shown as awaiting teacher marking.</p><div class="score-grid"><div class="score-box"><strong id="gradeCompleted">0</strong><span>Submitted assessments</span></div><div class="score-box"><strong id="gradeAverage">0%</strong><span>Average objective score</span></div><div class="score-box"><strong id="gradePending">0</strong><span>Writing awaiting marking</span></div></div><div id="gradeSummary"></div><p><a href="./form-3-english-assessments.html">Open Assessment Centre for full records</a></p></div></section>
 <section id="review" class="view" hidden><div class="card"><h2>My Review</h2><p>Review your current answers and identify topics to practise again.</p><div id="latestMock" class="tile"></div><div id="reviewList"></div><h3>Saved writing</h3><p id="writingStatus" class="muted"></p><div class="controls"><button id="exportProgress">Download my practice summary</button><button id="clearProgress">Clear this learner's saved English work</button></div><p class="small muted">Downloaded summaries contain your nickname, class and practice totals, not your full writing drafts. No scores are sent automatically to teachers.</p></div></section>
 <footer>Babonneau Secondary School · Form Three English Language Arts · Original revision activities aligned to Term 1 examination skills · No public scoreboard</footer></main>
 <script src="./form-3-expanded-a.js"></script>
@@ -269,7 +270,7 @@ function profile(){ $('nickname').value=state.nickname||'';$('classRoom').value=
 $('saveProfile').onclick=()=>{state.nickname=$('nickname').value.trim().slice(0,24).replace(/[<>]/g,'');state.room=$('classRoom').value;save();$('profileNote').textContent='Profile saved on this browser. Do not use full names or identifying details.'};
 function totals(){const entries=Object.values(state.answers).filter(x=>x&&typeof x.correct==='boolean');const count=entries.length,correct=entries.filter(x=>x.correct).length;return {count,correct,total:Object.values(questions).reduce((a,v)=>a+v.length,0)}}
 function updateStats(){const t=totals();$('attempted').textContent=t.count;$('accuracy').textContent=t.count?Math.round(100*t.correct/t.count)+'%':'0%';$('draftCount').textContent=Object.values(state.drafts).filter(x=>typeof x==='string'&&x.trim()).length;$('masteryBar').style.width=Math.round(100*t.count/t.total)+'%'}
-function switchView(view){document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==view);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='review')renderReview();window.scrollTo({top:0,behavior:'smooth'})}
+function switchView(view){document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==view);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='review')renderReview();if(view==='grades')renderGrades();window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>switchView(b.dataset.view));document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>switchView(b.dataset.go));
 const selector=$('skillSelect');Object.entries(skillNames).forEach(([key,label])=>{const o=document.createElement('option');o.value=key;o.textContent=label+' ('+questions[key].length+')';selector.append(o)});
 let skill='spelling',order=[],index=0,score=0,answered=false,sectionResponses=[],practiceNumber=0;
@@ -549,6 +550,39 @@ function addWrittenPractice(kind,target){
 addWrittenPractice('reading','extraReadingPractice');
 addWrittenPractice('formal','extraLetterPractice');
 addWrittenPractice('notice','extraNoticePractice');
+
+
+function getSavedRecord(key){try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}}
+function renderGrades(){
+ const rows=[],percentages=[];
+ for(let i=0;i<5;i++){
+  const v=getSavedRecord('bss_form3_complete_60_v1_'+i);
+  rows.push(['Full Practice '+(i+1),v?.finished?'Completed':v?.answers?.some(x=>x!==null)?'In progress':'Not started',v?.finished?v.score+'/60 ('+Math.round(100*v.score/60)+'%)':'Not graded']);
+  if(v?.finished&&Number.isFinite(v.score))percentages.push(v.score/60*100);
+ }
+ let pending=0,completed=rows.filter(row=>row[1]==='Completed').length;
+ const assessmentNames=[['p2-1','Paper 2 Exam 1'],['p2-2','Paper 2 Exam 2'],['p2-3','Paper 2 Exam 3'],['mock-u1','Untimed Mock 1'],['mock-u2','Untimed Mock 2'],['mock-t1','Timed Mock 1'],['mock-t2','Timed Mock 2']];
+ for(const [id,name] of assessmentNames){
+  const v=getSavedRecord('bss_form3_assessment_2026_'+id),written=id.startsWith('p2-')||id.endsWith('u2')||id.endsWith('t2');
+  const done=v?.status==='submitted';if(done)completed++;
+  if(done&&written)pending++;
+  if(done&&!written&&Number.isFinite(v.grade))percentages.push(v.grade/60*100);
+  rows.push([name,done?'Submitted':v?.status==='draft'?'In progress':'Not started',done?(written?'Awaiting teacher marking /51':v.grade+'/60 ('+Math.round(v.grade*100/60)+'%)'):'Not graded']);
+ }
+ $('gradeCompleted').textContent=completed;
+ $('gradeAverage').textContent=percentages.length?Math.round(percentages.reduce((a,b)=>a+b,0)/percentages.length)+'%':'No grades';
+ $('gradePending').textContent=pending;
+ const host=$('gradeSummary');host.replaceChildren();
+ const table=document.createElement('table');table.style.width='100%';
+ const head=document.createElement('tr');
+ for(const label of ['Assessment','Progress','Grade']){const th=document.createElement('th');th.textContent=label;th.style.textAlign='left';th.style.padding='10px';head.append(th)}table.append(head);
+ for(const values of rows){
+  const tr=document.createElement('tr');
+  for(const val of values){const td=document.createElement('td');td.textContent=val;td.style.padding='10px';td.style.borderBottom='1px solid #d2dfed';tr.append(td)}
+  table.append(tr);
+ }
+ host.append(table);
+}
 
 profile();updateStats();switchView('overview');
 </script></body></html>
