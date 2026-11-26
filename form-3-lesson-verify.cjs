@@ -14,6 +14,8 @@ assert(html.includes('./form-3-lesson-path.js'));
 assert(html.includes("openSuggestedLesson(requestedLesson)"),'Deep-linked lesson navigation missing');
 const practice=fs.readFileSync('form-3-english-practices.html','utf8');
 assert(practice.includes('id="recommendedLessons"'),'Practice results recommendation container missing');
+assert(practice.includes("'Recommended mini lesson'"),'Results table needs visible mini-lesson column');
+assert(practice.includes("link.href='./form-3-english.html?lesson='"),'Results table lesson links missing');
 assert(practice.includes("?lesson='"),'Practice results must link to a skill-specific mini lesson');
 new vm.Script(practice.match(/<script>\s*([\s\S]*?)<\/script>/)?.[1]||'throw Error("Missing practice script")');
 const files=['form-3-expanded-a.js','form-3-expanded-b.js','form-3-paper-additions.js'];
