@@ -75,7 +75,7 @@ function renderQuestion(){
  $('progressBar').style.width=(100*answered/questions.length)+'%';
  $('assessmentStatus').textContent='Question '+(i+1)+' of '+questions.length+' · '+answered+' typed or selected responses entered. Drawings and uploads save separately.';
  const heading=document.createElement('h3');
- heading.textContent=(it.type==='written'?'Section '+it.q.section+' · '+it.q.marks+' marks · '+B.topics[it.q.topic]:'Section '+(cfg.kind==='mixed'?'A':'Practice')+' · '+B.topics[it.q.topic]);
+ heading.textContent=(it.type==='written'?'Section '+it.q.section+' · '+it.q.marks+' marks · '+B.topics[it.q.topic]:'Section '+(cfg.kind==='mixed'?'1':'Practice')+' · '+B.topics[it.q.topic]);
  const prompt=document.createElement('p');prompt.textContent=it.q.stem;
  host.append(heading,prompt);
  if(it.type==='written'&&it.q.section==='3'){
@@ -102,8 +102,8 @@ function renderQuestion(){
    group.append(b)
   });host.append(group)
  }else{
-  const label=document.createElement('label');label.htmlFor='peWritten';label.textContent='Type your full response or show your reasoning';
-  const area=document.createElement('textarea');area.id='peWritten';area.maxLength=18000;area.value=record.answers[i]||'';
+  const label=document.createElement('label');label.htmlFor='socialWritten';label.textContent='Type your full response or show your reasoning';
+  const area=document.createElement('textarea');area.id='socialWritten';area.maxLength=18000;area.value=record.answers[i]||'';
   area.oninput=()=>{record.answers[i]=area.value;persist()};
   const tip=document.createElement('p');tip.className='small muted';tip.textContent='You may type your explanation, draw a budget table or family relationship chart with coloured pens, or upload a photograph, PDF or Word document.';
   host.append(label,area,tip);
