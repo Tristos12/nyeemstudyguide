@@ -66,7 +66,9 @@ function review(){
   const title=document.createElement('h3');title.textContent='Section '+q.section+' · Question '+(i+1)+' ('+q.marks+' marks)';
   const prompt=document.createElement('p');prompt.textContent=q.stem;
   const ans=document.createElement('p');ans.className='response';ans.textContent=record.answers[i]||'[No response]';
-  block.append(title,prompt,ans);host.append(block)
+  block.append(title,prompt,ans);
+  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:block,namespace:'bss-math-structured-'+number,index:i,readonly:true});
+  host.append(block)
  });
  host.hidden=false;host.scrollIntoView({behavior:'smooth'});
 }
