@@ -230,8 +230,36 @@ function renderLessons(){
   b.onclick=()=>openLesson(r.key);p.append(b);recommendations.append(p)
  }
 }
+
+const profileKey='bss_form3_maths_profile_v1';
+function profile(){
+ let value={nickname:'',className:''};
+ try{value=JSON.parse(localStorage.getItem(profileKey)||'null')||value}catch{}
+ $('mathNickname').value=value.nickname||'';
+ $('mathClass').value=value.className||'';
+ return value
+}
+$('saveMathProfile').onclick=()=>{
+ const value={nickname:$('mathNickname').value.trim().slice(0,24).replace(/[<>]/g,''),className:$('mathClass').value.trim().slice(0,20).replace(/[<>]/g,'')};
+ try{localStorage.setItem(profileKey,JSON.stringify(value));$('mathProfileStatus').textContent='Profile saved in this browser.'}
+ catch{$('mathProfileStatus').textContent='Browser storage is unavailable.'}
+};
+$('exportMathAnswers').onclick=()=>{
+ if(!active||!record||record.status!=='submitted')return;
+ const student=profile(),qs=assessmentQuestions(active);
+ const lines=['BABONNEAU SECONDARY SCHOOL','FORM THREE MATHEMATICS',active.title,
+  'Nickname: '+(student.nickname||'Not provided'),'Class: '+(student.className||'Not provided'),'Submitted: '+(record.submittedAt||''),
+  active.kind==='objective'?'Objective grade: '+record.grade+'/60':active.kind==='mixed'?'Section A grade: '+record.grade+'/20; Sections B and C awaiting teacher marking':'Written assessment: awaiting teacher marking','','STUDENT RESPONSES'];
+ qs.forEach((it,i)=>{
+  lines.push('Question '+(i+1)+(it.kind==='written'?' ('+it.q.marks+' marks)':''),it.kind==='objective'?it.q.stem:it.q.stem);
+  lines.push(it.kind==='written'?(record.answers[i]||'[No response]'):record.answers[i]===null?'[No answer]':it.q.options[record.answers[i]],'')
+ });
+ const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download='form3-mathematics-'+active.id+'-responses.txt';link.click();
+ setTimeout(()=>URL.revokeObjectURL(url),2000)
+};
 function boot(){
- refresh();showTab('overview');
+ profile();refresh();showTab('overview');
  const url=new URLSearchParams(location.search),lesson=url.get('lesson'),tab=url.get('tab');
  if(lesson&&categories.includes(lesson))openLesson(lesson);
  else if(['practices','structured','mocks','grades','lessons'].includes(tab))showTab(tab);
