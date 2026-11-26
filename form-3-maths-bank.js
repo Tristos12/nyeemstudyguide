@@ -60,7 +60,7 @@ function item(topic,n){
    pct+'% of '+money(price)+' = '+money(change)+'. '+(kind===0?'This is the discount.':kind===1?'Subtract the discount.':'Add VAT.'),n)
  }
  if(topic==='data'){
-  const unit=4+n%3,A=2+n%5,B=3+(n*2%5),half=n%2===0,goalsA=A*unit,goalsB=B*unit+(half?unit/2:0);
+  const unit=4+2*(n%3),A=2+n%5,B=3+(n*2%5),half=n%2===0,goalsA=A*unit,goalsB=B*unit+(half?unit/2:0);
   const label='A pictogram uses one whole symbol for '+unit+' goals. Alana has '+A+' symbols; Ben has '+B+' symbols'+(half?' and a half-symbol':'')+'. ';
   const answer=n%3===0?goalsB:n%3===1?goalsA+goalsB:goalsA;
   const stem=label+(n%3===0?'How many goals did Ben score?':n%3===1?'How many goals did they score altogether?':'How many goals did Alana score?');
