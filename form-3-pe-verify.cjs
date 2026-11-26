@@ -33,9 +33,12 @@ for(const id of ['practice-1','practice-2','practice-3','practice-4','practice-5
   assert.equal(new Set(p.map(q=>q.stem)).size,60);
   p.forEach(q=>{assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<4);assert(q.explanation.length>15)})
  }
- for(const p of written)assert.equal(p.questions.reduce((sum,q)=>sum+q.marks,0),40);
+ for(const p of written){
+ assert.equal(p.questions.length,9);
+ assert.equal(p.questions.reduce((sum,q)=>sum+q.marks,0),40);
  assert.equal(p.questions.filter(q=>q.section==='B').reduce((sum,q)=>sum+q.marks,0),25);
  assert.equal(p.questions.filter(q=>q.section==='C').reduce((sum,q)=>sum+q.marks,0),15);
+}
  vm.runInNewContext(src['form-3-pe-app.js'],context,{filename:'form-3-pe-app.js'});
  const isPractice=id.startsWith('practice'),isMock=id.startsWith('mock'),host=doc.getElementById('questionHost');
  assert.equal(doc.getElementById('assessment').hidden,false,id+' failed to load');
