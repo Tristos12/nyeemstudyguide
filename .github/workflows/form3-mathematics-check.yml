@@ -1,0 +1,24 @@
+name: Form 3 Mathematics validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'form-3-mathematics.html'
+      - 'form-3-maths-bank.js'
+      - 'form-3-maths-lessons.js'
+      - 'form-3-maths-structured.js'
+      - 'form-3-maths-app.js'
+      - 'form-3-maths-verify.cjs'
+      - '.github/workflows/form3-mathematics-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node form-3-maths-verify.cjs
