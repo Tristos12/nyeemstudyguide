@@ -69,12 +69,12 @@ function topicQuestion(topic,n,p){
     {type:'signature',top,bottom});
   }
   if(n%3===1){
-   const target=[2,3,4][i%3];
+   const target=[2,3,4][(Math.floor(n/3)+p)%3];
    return option('Which simple time signature normally contains '+target+' quarter-note beats in each complete bar?',target+'/4',
     [((target%4)+1)+'/4',((target+1)%4+1)+'/4',target+'/8'],
     'In simple '+target+'/4 time, a complete bar has '+target+' quarter-note beats.',{type:'signature',top:target,bottom:4});
   }
-  const limit=[2,3,4][i%3],used=i%2===0?1:2,remaining=limit-used;
+  const limit=[2,3,4][(Math.floor(n/3)+p)%3],used=i%2===0?1:2,remaining=limit-used;
   return option('A bar is written in '+limit+'/4. It already contains '+used+' quarter-note beat'+(used===1?'':'s')+'. How many quarter-note beats remain?',remaining,
     [remaining+1,remaining+2,remaining+3],
     'A complete '+limit+'/4 bar needs '+limit+' quarter-note beats. Subtract '+used+' to find '+remaining+' remaining.',{type:'signature',top:limit,bottom:4});
@@ -95,7 +95,7 @@ function topicQuestion(topic,n,p){
  }
  if(topic==='ledger'){
   const pitches=['D4','C4','B3','A3','G5','A5','B5','C6','E4','F5'];
-  const note=pitches[i%pitches.length];
+  const note=pitches[(n+3*p)%pitches.length];
   const alternatives=pitches.filter(x=>x!==note);
   const wrong=[alternatives[(i+1)%alternatives.length],alternatives[(i+3)%alternatives.length],alternatives[(i+5)%alternatives.length]];
   return option('Which pitch is shown in treble clef on this staff?',note,wrong,
