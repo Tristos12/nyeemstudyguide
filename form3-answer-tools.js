@@ -33,10 +33,10 @@ const el=(name,attrs={},text)=>{
  if(text!==undefined)n.textContent=text;
  return n
 };
-function mount({container,namespace,index,readonly=false}){
- const root=el('details',{className:'f3-answer-tools'});
+function mount({container,namespace,index,readonly=false,expanded=false}){
+ const root=el('details',{className:'f3-answer-tools'});root.open=!!expanded;
  root.style.cssText='margin:12px 0;padding:12px;border:1px solid #c8dbe8;border-radius:12px;background:#f7fbff';
- const heading=el('summary',{},'Draw or attach a file (optional)');heading.style.cssText='font-weight:700;cursor:pointer;padding:3px 0';root.append(heading);
+ const heading=el('summary',{},expanded?'Drawing and upload workspace (open)':'Draw or attach a file (optional)');heading.style.cssText='font-weight:700;cursor:pointer;padding:3px 0';root.append(heading);
  const intro=el('p',{},'Type above, draw your working, or attach a photo, PDF or Word document. Media stays on this device until you download and share it.');
  intro.style.fontSize='13px';root.append(intro);
  const toolbar=el('div',{role:'toolbar','aria-label':'Drawing tools'});
