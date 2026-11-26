@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const B=window.BSS_SUCCESS_BANK,L=window.BSS_SUCCESS_LESSONS;
+const B=window.BSS_SUCCESS_BANK,L=window.BSS_SUCCESS_LESSONS,V=window.BSS_SUCCESS_VIDEOS;
 const topics=['test','study','time','knowledge','vocab'];
 const labels=B?.names||{};
 const KEY='bss_student_success_v1_';
@@ -41,7 +41,62 @@ function saveAttempt(){
 }
 function hideQuiz(){if(clockId!==null){clearInterval(clockId);clockId=null}cfg=null;attempt=null;questions=[];$('quizView').hidden=true;$('quizResult').hidden=true}
 function renderNav(tab){select('.tab').forEach(x=>x.hidden=x.id!==tab);select('nav button[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
-function tab(name){hideQuiz();const allowed=['overview','lessons','practice','planner','flashcards','progress'];renderNav(allowed.includes(name)?name:'overview');if(name==='overview'||!name)renderOverview();if(name==='practice')renderPracticeCards();if(name==='progress')renderProgress();if(name==='planner')renderPlan()}
+function tab(name){hideQuiz();const allowed=['overview','lessons','videos','practice','planner','flashcards','progress'];renderNav(allowed.includes(name)?name:'overview');if(name==='overview'||!name)renderOverview();if(name==='practice')renderPracticeCards();if(name==='videos')renderVideos();if(name==='progress')renderProgress();if(name==='planner')renderPlan()}
+function videoMarks(){return read('videoChecks',{})}
+function openVideos(topic){
+ if(!V?.[topic])return;
+ hideQuiz();renderNav('videos');$('videoTopic').value=topic;renderVideos();
+}
+function renderVideos(){
+ const topic=$('videoTopic').value||topics[0],target=$('videoTutorials');
+ target.replaceChildren();if(!V?.[topic])return;
+ const lesson=V[topic],progress=videoMarks()[topic];
+ const intro=node('p',lesson.intro);intro.className='muted';target.append(intro);
+ lesson.clips.forEach((clip,index)=>{
+  const section=node('article');section.className='video-card';
+  section.append(node('h3',(index+1)+'. '+clip.title),node('p',clip.publisher+' · '+clip.focus));
+  const player=node('div');player.className='video-frame';
+  // No third-party request until the learner explicitly chooses play.
+  const load=button('▶ Play video lesson',()=>{
+   const iframe=node('iframe');
+   iframe.src='https://www.youtube-nocookie.com/embed/'+clip.id+'?rel=0';
+   iframe.title=clip.title+' educational video';
+   iframe.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+   iframe.setAttribute('allowfullscreen','');
+   iframe.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+   player.replaceChildren(iframe);
+  });
+  player.append(load);section.append(player);
+  const direct=node('a','Open video on YouTube if playback is blocked');
+  direct.href='https://www.youtube.com/watch?v='+clip.id;
+  direct.target='_blank';direct.rel='noopener noreferrer';section.append(direct);
+  section.append(node('p','After watching: '+clip.task));
+  target.append(section);
+ });
+ if(lesson.extra){
+  const extra=node('article');extra.className='video-card';
+  extra.append(node('h3',lesson.extra.title),node('p',lesson.extra.publisher+' · '+lesson.extra.task));
+  const link=node('a','Open the additional learning resource');link.href=lesson.extra.url;link.target='_blank';link.rel='noopener noreferrer';extra.append(link);target.append(extra);
+ }
+ const assessment=node('div');assessment.className='checkpoint';
+ assessment.append(node('h3','Quick check after watching'),node('p',lesson.check.question));
+ const feedback=node('p');feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
+ lesson.check.options.forEach((opt,i)=>{
+  assessment.append(button(String.fromCharCode(65+i)+'. '+opt,()=>{
+   const ok=i===lesson.check.correct;
+   feedback.textContent=(ok?'Correct. ':'Not quite. ')+lesson.check.feedback;
+   if(ok){const completed=videoMarks();completed[topic]=true;write('videoChecks',completed);renderStats()}
+  }));
+ });
+ assessment.append(feedback);
+ const p=node('p',progress?'Checkpoint previously completed.':'Watch the lesson, then select an answer.');
+ p.className='muted';assessment.append(p);target.append(assessment);
+ const nav=node('div');nav.className='row';
+ nav.append(button('Study the written mini lessons',()=>{
+  renderNav('lessons');$('lessonTopic').value=topic;renderLessons();
+ }),button('Try the topic practice',()=>launch('topic-'+topic),'primary'));
+ target.append(nav);
+}
 function openLesson(topic,index){
  if(!L[topic])return tab('lessons');
  hideQuiz();renderNav('lessons');$('lessonTopic').value=topic;renderLessons();
@@ -73,7 +128,7 @@ function renderOverview(){
  const cards=$('topicCards');cards.replaceChildren();
  topics.forEach(t=>{
   const box=node('article');box.className='tile';box.append(node('h3',labels[t]),node('p',L[t].lessons.length+' detailed lessons · '+B.questions[t].length+' practice questions'));
-  const actions=node('div');actions.className='row';actions.append(button('Study lessons',()=>{renderNav('lessons');$('lessonTopic').value=t;renderLessons()}),button('Practise',()=>launch('topic-'+t),'primary'));box.append(actions);cards.append(box);
+  const actions=node('div');actions.className='row';actions.append(button('Study lessons',()=>{renderNav('lessons');$('lessonTopic').value=t;renderLessons()}),button('Watch tutorials',()=>openVideos(t)),button('Practise',()=>launch('topic-'+t),'primary'));box.append(actions);cards.append(box);
  });
  const target=$('quickRecommendations');target.replaceChildren();
  const weak=weakTopics();
@@ -241,12 +296,14 @@ function focusDisplay(){const min=Math.floor(focusLeft/60),secs=focusLeft%60;$('
 function stopFocus(){if(focusId!==null){clearInterval(focusId);focusId=null}}
 function focusTick(){if(focusEnds){focusLeft=Math.max(0,Math.ceil((focusEnds-Date.now())/1000));focusDisplay();if(focusLeft===0){stopFocus();focusEnds=null;$('focusStart').textContent='Start focus';$('focusClock').textContent='Finished!'}}}
 function setup(){
- if(!B||!L||topics.some(t=>!B.questions[t]?.length||L[t].lessons.length!==5)){
+ if(!B||!L||!V||topics.some(t=>!B.questions[t]?.length||L[t].lessons.length!==5||!V[t]?.clips?.length)){
   document.querySelector('main').prepend(node('p','Learning material could not load. Refresh the page.'));return
  }
- topics.forEach(t=>$('lessonTopic').append(new Option(labels[t],t)));
+ topics.forEach(t=>{$('lessonTopic').append(new Option(labels[t],t));$('videoTopic').append(new Option(labels[t],t))});
  select('nav button[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
  $('lessonTopic').onchange=renderLessons;
+ $('videoTopic').onchange=renderVideos;
+ $('lessonVideo').onclick=()=>openVideos($('lessonTopic').value);
  $('quizPrevious').onclick=()=>move(-1);$('quizNext').onclick=()=>move(1);
  $('quizSubmit').onclick=()=>submit(false);$('quizExit').onclick=()=>tab('practice');
  $('resultReview').onclick=()=>{$('resultDetails').hidden=!$('resultDetails').hidden};
@@ -265,9 +322,10 @@ function setup(){
  $('flashNext').onclick=()=>{flashIndex=(flashIndex+1)%cards.length;flashShown=false;renderFlash()};
  $('flashReveal').onclick=()=>{flashShown=!flashShown;renderFlash()};
  $('exportProgress').onclick=downloadProgress;
- renderFlash();renderOverview();renderPracticeCards();renderLessons();renderStats();
+ renderFlash();renderOverview();renderPracticeCards();renderLessons();renderVideos();renderStats();
  const params=new URLSearchParams(location.search),exam=params.get('quiz'),lesson=params.get('lesson'),selected=params.get('tab');
  if(exam){launch(exam);return}
+ if(params.get('video')&&V[params.get('video')]){openVideos(params.get('video'));return}
  if(lesson){const [t,i]=lesson.split('-');if(topics.includes(t)&&Number.isInteger(Number(i)))return openLesson(t,Math.max(0,Math.min(4,Number(i))))}
  tab(selected||'overview');
 }
