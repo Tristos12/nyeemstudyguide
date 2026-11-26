@@ -2,6 +2,10 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const B=window.BSS_SUCCESS_BANK,L=window.BSS_SUCCESS_LESSONS,V=window.BSS_SUCCESS_VIDEOS;
+const extraVocab=window.BSS_EXTRA_VOCAB;
+if(extraVocab?.questions?.length===80){
+ B.questions.vocab=B.questions.vocab.concat(extraVocab.questions);
+}
 const topics=['test','study','time','knowledge','vocab'];
 const labels=B?.names||{};
 const KEY='bss_student_success_v1_';
@@ -281,6 +285,7 @@ const cards=[
  ['Relevant','Closely connected to the question or topic.','Provide two relevant examples.'],
  ['Summarise','Express the main points briefly.','Summarise the article in five sentences.']
 ];
+if(extraVocab?.words?.length===80)cards.push(...extraVocab.words);
 function renderFlash(){
  const [word,meaning,example]=cards[flashIndex];
  $('flashCard').textContent=flashShown?word+'\n\n'+meaning+'\n'+example:word;
