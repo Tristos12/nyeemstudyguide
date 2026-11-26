@@ -1,0 +1,26 @@
+/* Babonneau Secondary School Form 3 identity: burgundy, gold, warm cream.
+   Loaded after existing page styles so subject activities retain their layout. */
+:root{--navy:#67243b;--teal:#a45b26;--ink:#302630;--line:#e4d6cd;--pale:#fff6e9;--muted:#685a60;--primary:#67243b;--accent:#b67a24;color:#302630;background:#fcf8f1;accent-color:#8b3b52}
+html,body{background-color:#fcf8f1;color:#302630}
+header{background:#67243b!important;background-image:linear-gradient(115deg,#542037 0%,#81364b 66%,#a56835 100%)!important;color:#fff}
+header p{color:#fff0db!important}
+header a,header nav a{color:#fff7e6!important}
+a:not(.btn):not(.action):not(.primary){color:#7a3047}
+header a:not(.btn):not(.action):not(.primary){color:#fff7e6}
+.card,.panel,.subject{border-color:#e7d8cb;box-shadow:0 2px 11px rgba(75,35,39,.05)}
+.tile,.step,.next,.metric,.lesson,.tool,.empty,.review{background-color:#fff8ee;border-color:#ead9c7}
+.next{background:#fff4e5!important}
+.metric strong,.eyebrow,.step .number,.subject .meta{color:#81364b}
+.muted,.small.muted{color:#685a60}
+button,.btn,a.action{color:#67243b;border-color:#cbb3a9}
+button.primary,.btn.primary,a.action.primary,button.active,nav button.active,.tabs button.active,.filters button[aria-pressed=true]{background:#67243b!important;color:#fff!important;border-color:#67243b!important}
+button.selected,.answers button.selected,.answers button.chosen{background:#f8e7dd!important;border-color:#a86538!important;color:#542037}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #b77f23!important;outline-offset:3px}
+input,textarea,select{border-color:#cbb7ac}
+.progress,progress{accent-color:#9e5138;background-color:#f0e4d8}
+.progress>div,.progress div{background-color:#9e5138}
+.badge{background:#f9e7d1;color:#67243b}
+th{background:#f8ecde}
+.notice,.note{background:#fff4e2;border-left-color:#b67a24}
+a:hover,button:hover{transition:filter .15s ease}
+@media(prefers-reduced-motion:reduce){a:hover,button:hover{transition:none}}
