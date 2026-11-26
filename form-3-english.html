@@ -175,5 +175,134 @@ const compHost=$('comprehensionTasks');comprehension.forEach(([q,hint],i)=>{cons
 function renderReview(){const host=$('reviewList');host.replaceChildren();Object.keys(questions).forEach(k=>{const items=questions[k].map((q,i)=>({q,record:state.answers[k+':'+i]}));const attempted=items.filter(x=>x.record).length,correct=items.filter(x=>x.record?.correct).length;const card=document.createElement('div');card.className='tile';card.style.margin='10px 0';const h=document.createElement('h3');h.textContent=skillNames[k]+' · '+correct+' / '+attempted+' correct';card.append(h);const wrong=items.filter(x=>x.record&&!x.record.correct);if(wrong.length){const p=document.createElement('p');p.className='small';p.textContent='Review: '+wrong.map(x=>x.q[0]).join(' | ');card.append(p)}else{const p=document.createElement('p');p.className='muted small';p.textContent=attempted?'No incorrect answers in the saved attempt.':'Not yet attempted.';card.append(p)}host.append(card)});$('writingStatus').textContent=Object.values(state.drafts).filter(x=>typeof x==='string'&&x.trim()).length+' draft or comprehension responses saved on this device.'}
 $('exportProgress').onclick=()=>{const t=totals();const lines=['Babonneau Secondary School - Form 3 ELA practice summary','Nickname: '+(state.nickname||'Not entered'),'Class: '+(state.room||'Not entered'),'Date: '+new Date().toLocaleDateString(),'Questions attempted: '+t.count,'Correct: '+t.correct,'Accuracy: '+(t.count?Math.round(100*t.correct/t.count):0)+'%'];Object.keys(questions).forEach(k=>{const rec=questions[k].map((q,i)=>state.answers[k+':'+i]).filter(Boolean);lines.push(skillNames[k]+': '+rec.filter(x=>x.correct).length+'/'+rec.length+' correct')});lines.push('Writing drafts saved: '+Object.values(state.drafts).filter(x=>typeof x==='string'&&x.trim()).length);const blob=new Blob([lines.join('\n')],{type:'text/plain'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='form3-ela-practice-summary.txt';a.click();URL.revokeObjectURL(url)};
 $('clearProgress').onclick=()=>{if(!confirm('Clear all Form 3 English answers and drafts on this browser? This cannot be undone.'))return;localStorage.removeItem(KEY);state=empty();profile();document.querySelectorAll('textarea[data-draft]').forEach(el=>{el.value='';el.dispatchEvent(new Event('input'))});document.querySelectorAll('[id^="comp-"]').forEach(el=>el.value='');updateStats();renderReview()};
+
+const lessons=[
+{title:'Spelling',skill:'spelling',point:'Look for root words, prefixes, suffixes and frequently confused vowel patterns.',example:'responsible → responsibility; achieve → achievement.',task:'Read the whole sentence before choosing a spelling. Check one letter group at a time.'},
+{title:'Synonyms and antonyms',skill:'vocabulary',point:'A synonym has a similar meaning; an antonym has the opposite meaning. Use the surrounding sentence.',example:'exhausted ≈ tired; generous ↔ selfish.',task:'Substitute each choice into the sentence and test the meaning.'},
+{title:'Grammar and sentence agreement',skill:'grammar',point:'The verb must agree with its subject. Comparative forms compare two, while superlatives compare three or more.',example:'She goes every day. More careful; most careful. By then, he had arrived.',task:'Identify the subject and time words before choosing the verb form.'},
+{title:'Equivalent sentences',skill:'equivalent',point:'A paraphrase must keep the original meaning, including conditions, time, cause and contrast.',example:'Although it rained, we continued. = We continued despite the rain.',task:'Reject answers that change whether an action happened.'},
+{title:'Main idea',skill:'mainidea',point:'The main idea tells what the whole paragraph is mostly about, not just one detail.',example:'A paragraph about shade, animal shelter and soil protection → Trees provide important environmental benefits.',task:'Identify the common message connecting the supporting details.'},
+{title:'Reading comprehension',skill:'reading',point:'Locate stated facts, make supported inferences, and explain answers using details from the passage.',example:'Claim + passage detail + explanation makes a strong written response.',task:'For inference questions, point to a clue and say what it suggests.'},
+{title:'Formal letter writing',view:'paper2',point:'Formal letters have addresses, a date, salutation, subject, focused paragraphs and a respectful closing.',example:'Dear Principal, / Subject: Request for an Educational Visit / Yours faithfully,',task:'State your request early, justify it and end politely.'},
+{title:'Notice writing',view:'paper2',point:'A notice gives essential event information quickly using an eye-catching heading and clear details.',example:'Who? What? When? Where? Why? How to register? Contact?',task:'Check that a reader could attend or register using only your notice.'}
+];
+const lessonHost=$('lessonCards');
+lessons.forEach(item=>{
+ const box=document.createElement('article');box.className='tile';
+ const heading=document.createElement('h3');heading.textContent=item.title;
+ const p=document.createElement('p');p.textContent=item.point;
+ const ex=document.createElement('p');ex.className='muted small';ex.textContent='Example: '+item.example;
+ const task=document.createElement('p');task.textContent='Try this: '+item.task;
+ const btn=document.createElement('button');btn.className='primary';btn.textContent=item.skill?'Practise this skill':'Open writing practice';
+ btn.onclick=()=>{if(item.skill){selector.value=item.skill;switchView('paper1');begin()}else switchView(item.view)};
+ box.append(heading,p,ex,task,btn);lessonHost.append(box);
+});
+// Paper 1 mock draws from the revision bank, preserving the uploaded
+// section mark allocation of 10 + 10 + 10 + 11 + 10 = 51.
+const mockPlan=[['spelling',10],['vocabulary',10],['grammar',10],['equivalent',6],['mainidea',5],['reading',10]];
+let mockItems=[],mockResponses=[],mockDeadline=0,mockTicker=null,mockActive=false;
+function stopMockClock(){if(mockTicker!==null){clearInterval(mockTicker);mockTicker=null}}
+function mockKey(){return 'bss_form3_mock_p1_last_v1'}
+function clockTick(){
+ if(!mockActive)return;
+ const remaining=Math.max(0,Math.ceil((mockDeadline-Date.now())/1000));
+ const mins=String(Math.floor(remaining/60)).padStart(2,'0'),secs=String(remaining%60).padStart(2,'0');
+ $('mockClock').textContent=mins+':'+secs;
+ if(remaining===0)submitPaper1(true);
+}
+function startMock1(){
+ if(mockActive&&!confirm('Restart the current mock? Unsaved answers will be lost.'))return;
+ stopMockClock();mockItems=[];mockResponses=[];
+ mockPlan.forEach(([key,count])=>{
+  // Rotate each bank by a random offset to vary repeated attempts.
+  const ids=questions[key].map((_,i)=>i);
+  for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}
+  ids.slice(0,count).forEach(i=>mockItems.push({key,id:i,q:questions[key][i]}));
+ });
+ mockResponses=Array(mockItems.length).fill(null);mockDeadline=Date.now()+90*60*1000;mockActive=true;
+ $('mock1Panel').hidden=false;$('mock1Outcome').hidden=true;
+ const host=$('mock1Questions');host.replaceChildren();
+ mockItems.forEach((item,i)=>{
+  const box=document.createElement('section');box.className='writing-task';
+  const title=document.createElement('h3');title.textContent=(i+1)+'. '+skillNames[item.key];
+  const prompt=document.createElement('p');prompt.textContent=item.q[0];box.append(title);
+  if(item.key==='reading'&&(i===41||mockItems[i-1]?.key!=='reading')){
+   const passageBox=document.createElement('div');passageBox.className='passage';passageBox.textContent=passage;box.append(passageBox);
+  }
+  box.append(prompt);
+  const answers=document.createElement('div');answers.className='answers';answers.setAttribute('role','group');answers.setAttribute('aria-label','Question '+(i+1));
+  item.q[1].forEach((option,j)=>{
+   const label=document.createElement('label');label.className='tile';label.style.cursor='pointer';
+   const input=document.createElement('input');input.type='radio';input.name='mock-q-'+i;input.value=String(j);
+   input.onchange=()=>{mockResponses[i]=j;$('mockAnswerCount').textContent=mockResponses.filter(v=>v!==null).length+' / 51 answered'};
+   const text=document.createElement('span');text.textContent=' '+String.fromCharCode(65+j)+'. '+option;
+   label.append(input,text);answers.append(label)
+  });box.append(answers);host.append(box)
+ });
+ $('mockAnswerCount').textContent='0 / 51 answered';mockTicker=setInterval(clockTick,500);clockTick();
+ $('mock1Panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function submitPaper1(expired=false){
+ if(!mockActive)return;
+ const unanswered=mockResponses.filter(v=>v===null).length;
+ if(!expired&&unanswered&&!confirm(unanswered+' unanswered questions will score zero. Submit now?'))return;
+ mockActive=false;stopMockClock();
+ let correct=0;const breakdown={};
+ mockItems.forEach((item,i)=>{
+  if(!breakdown[item.key])breakdown[item.key]={correct:0,total:0};
+  breakdown[item.key].total++;
+  if(mockResponses[i]===item.q[2]){correct++;breakdown[item.key].correct++}
+ });
+ const report={score:correct,total:51,at:new Date().toISOString(),breakdown};
+ try{localStorage.setItem(mockKey(),JSON.stringify(report))}catch{}
+ $('mock1Panel').hidden=true;$('mock1Outcome').hidden=false;
+ $('mockScore').textContent=correct+' / 51 ('+Math.round(correct/51*100)+'%)'+(expired?' · Time ended':'');
+ const resultHost=$('mockBreakdown');resultHost.replaceChildren();
+ Object.entries(breakdown).forEach(([key,value])=>{
+  const row=document.createElement('p');row.textContent=skillNames[key]+': '+value.correct+' / '+value.total;resultHost.append(row)
+ });
+ $('mock1Outcome').scrollIntoView({behavior:'smooth'});
+}
+$('launchMock1').onclick=startMock1;$('restartMock1').onclick=startMock1;$('submitMock1').onclick=()=>submitPaper1(false);
+$('cancelMock1').onclick=()=>{if(!mockActive||confirm('Exit this mock and discard unanswered work?')){mockActive=false;stopMockClock();$('mock1Panel').hidden=true}};
+const writtenQuestions=[
+['1. State the main idea of the passage.',2],
+['2. Give two details that support the main idea.',2],
+['3. Identify two actions the volunteers took to improve the library.',2],
+['4. What does the word “reference” mean in this passage?',1],
+['5. Why did the volunteers seek the librarian’s guidance?',1],
+['6. Compare the condition of the library before and after the project. Give two differences.',2],
+['7. What can you infer about the value of clear shelf labels?',2],
+['8. What does the volunteers’ behaviour suggest about their attitude?',2],
+['9. Do you think teamwork was essential to the project? Give a reason.',2]
+];
+const writtenHost=$('mock2ReadingQuestions');writtenQuestions.forEach(([q,marks],i)=>{
+ const wrap=document.createElement('div');wrap.className='writing-task';
+ const title=document.createElement('label');title.textContent=q+' ('+marks+(marks===1?' mark)':' marks)');title.htmlFor='written-'+i;
+ const area=document.createElement('textarea');area.id='written-'+i;area.rows=3;area.style.minHeight='85px';
+ wrap.append(title,area);writtenHost.append(wrap)
+});
+function mock2Fields(){return [...Array.from({length:9},(_,i)=>$('written-'+i)),$('mock2Letter'),$('mock2Notice')]}
+function savePaper2(){
+ const values=mock2Fields().map(el=>el.value.slice(0,12000));
+ state.drafts.mock2={answers:values.slice(0,9),letter:values[9],notice:values[10],savedAt:new Date().toISOString()};
+ const ok=save();$('mock2Status').textContent=ok?'Paper 2 draft saved on this device. A teacher must mark the written responses.':'Unable to save. Check browser storage permissions.';
+}
+function loadPaper2(){
+ const doc=state.drafts.mock2;if(!doc||typeof doc!=='object')return;
+ const fields=mock2Fields(),values=[...(Array.isArray(doc.answers)?doc.answers:[]),doc.letter||'',doc.notice||''];
+ fields.forEach((el,i)=>el.value=typeof values[i]==='string'?values[i]:'')
+}
+$('launchMock2').onclick=()=>{$('mock2Panel').hidden=false;loadPaper2();$('mock2Panel').scrollIntoView({behavior:'smooth'})};
+$('saveMock2').onclick=savePaper2;
+$('exportMock2').onclick=()=>{
+ const fields=mock2Fields();const lines=['BABONNEAU SECONDARY SCHOOL | FORM 3 ELA | PAPER 2 MOCK',
+ 'Reading comprehension (16 marks)'];
+ writtenQuestions.forEach(([q],i)=>{lines.push(q,fields[i].value,'')});
+ lines.push('Formal Letter (20 marks)',fields[9].value,'','Notice Writing (15 marks)',fields[10].value);
+ const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='form3-ela-paper2-mock.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)
+};
+
 profile();updateStats();switchView('overview');
 </script></body></html>
