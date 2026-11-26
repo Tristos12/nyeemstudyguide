@@ -60,7 +60,7 @@ When the library reopened, visitors could locate books more easily. The voluntee
 <section class="writing-task"><h3>Section B · Formal Letter (20 marks)</h3><p>Write a formal letter to your principal requesting permission for your Form 3 class to organise an educational reading event for younger students. Explain the purpose, proposed activities, benefits and arrangements. Include all parts of a formal letter.</p><textarea id="mock2Letter" aria-label="Mock formal letter" placeholder="Write your complete formal letter here."></textarea></section>
 <section class="writing-task"><h3>Section C · Notice Writing (15 marks)</h3><p>Your class is starting an after-school Reading and Debate Club. Prepare an attractive written notice to recruit members, giving the club's purpose, activities, eligibility, meeting date, time, place, what to bring, registration details and a contact person.</p><textarea id="mock2Notice" aria-label="Mock club notice" placeholder="Write a complete club notice here."></textarea></section>
 <div class="controls"><button id="saveMock2" class="primary">Save Paper 2 draft</button><button id="exportMock2">Download my Paper 2 responses</button></div><p id="mock2Status" role="status" class="muted small"></p><p class="notice small">This Paper 2 mock is not automatically graded. A teacher should assess your answers using the section marks and agreed marking criteria.</p></div>
-</section>
+<section class="card" id="extraWrittenPractice"><h2>More Paper 2 Practice</h2><p>Choose one of five additional activities in each writing area. Your responses are saved on this browser and can be reviewed later. Written answers require teacher assessment.</p><div id="extraReadingPractice"></div><div id="extraLetterPractice"></div><div id="extraNoticePractice"></div></section></section>
 <section id="review" class="view" hidden><div class="card"><h2>My Review</h2><p>Review your current answers and identify topics to practise again.</p><div id="latestMock" class="tile"></div><div id="reviewList"></div><h3>Saved writing</h3><p id="writingStatus" class="muted"></p><div class="controls"><button id="exportProgress">Download my practice summary</button><button id="clearProgress">Clear this learner's saved English work</button></div><p class="small muted">Downloaded summaries contain your nickname, class and practice totals, not your full writing drafts. No scores are sent automatically to teachers.</p></div></section>
 <footer>Babonneau Secondary School · Form Three English Language Arts · Original revision activities aligned to Term 1 examination skills · No public scoreboard</footer></main>
 <script>
@@ -436,6 +436,57 @@ $('exportMock2').onclick=()=>{
  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='form3-ela-paper2-mock.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)
 };
+
+
+const extraWritten={
+reading:[
+ {title:'Practice 1: Main idea and supporting details',text:'At a community sports day, volunteers organised games for children of different ages. Each group had an adult supervisor, and activities included seated games so that participants with different mobility needs could join in. Organisers said the main aim was participation and friendship, not winning prizes.',prompt:'State the main idea and give TWO details that support it.'},
+ {title:'Practice 2: Vocabulary in context',text:'During the dry season, residents conserved water by fixing leaks and collecting rainwater where possible. The community leader reminded everyone that careful use of supplies could reduce waste.',prompt:'Explain the meaning of “conserved” as used in the passage and give one action that shows conservation.'},
+ {title:'Practice 3: Inference',text:'Maya noticed that the new student ate lunch alone each day. She invited him to join her group and introduced him to classmates. By the end of the week, he began greeting students confidently.',prompt:'What can you infer about Maya’s character? Support your inference with TWO details.'},
+ {title:'Practice 4: Cause and effect',text:'Heavy rain blocked a road near the school. Several buses had to use an alternative route, which took longer. The school adjusted its morning assembly to allow the delayed students to settle.',prompt:'Explain TWO effects of the blocked road and identify the cause.'},
+ {title:'Practice 5: Fact and opinion',text:'A reading club meets every Wednesday at the school library. Last week, sixteen students attended. Some members believe it is the most enjoyable club at the school because they can discuss new stories.',prompt:'Identify TWO facts and ONE opinion in the passage. Explain what makes the opinion different.'}
+],
+formal:[
+ {title:'Practice 1: Request for a school garden',prompt:'Write a formal letter to your principal requesting permission for Form 3 students to develop a small school garden. State its educational benefits and proposed responsibilities.'},
+ {title:'Practice 2: Library improvements',prompt:'Write a formal letter to the school principal suggesting two realistic improvements to the school library. Explain how these changes would help students.'},
+ {title:'Practice 3: Educational speaker',prompt:'Write a formal letter to a local professional inviting them to speak to your Form 3 class about careers and education. Include the purpose, suggested date and appreciation.'},
+ {title:'Practice 4: Community clean-up',prompt:'Write a formal letter to the principal requesting approval for a supervised community clean-up. Explain the proposed location, learning benefits and safety arrangements.'},
+ {title:'Practice 5: Museum visit',prompt:'Write a formal letter requesting permission for a supervised visit to a museum or heritage site in Saint Lucia. Explain the learning objectives, planned activities and follow-up project.'}
+],
+notice:[
+ {title:'Practice 1: Debate Club',prompt:'Write a notice inviting students to the first meeting of a new Debate Club. Include a heading, purpose, eligibility, date, time, place, items to bring and contact details.'},
+ {title:'Practice 2: Reading Challenge',prompt:'Write a notice advertising a four-week school reading challenge. Include registration information, dates, where to participate, what students must do and a contact person.'},
+ {title:'Practice 3: Environmental Club',prompt:'Write a notice recruiting members for an Environmental Club. Explain its purpose, activities, first meeting and how interested learners can join.'},
+ {title:'Practice 4: Talent Showcase',prompt:'Write a notice announcing auditions for a student talent showcase. Include eligible participants, date, time, venue, performance requirements and how to register.'},
+ {title:'Practice 5: Homework Support Group',prompt:'Write a notice inviting Form 3 students to a supervised homework support group. Include its purpose, meeting arrangements, materials needed and contact person.'}
+]};
+function addWrittenPractice(kind,target){
+ const wrapper=$(target);
+ const head=document.createElement('h3');
+ head.textContent=(kind==='reading'?'Additional Comprehension':kind==='formal'?'Additional Formal Letters':'Additional Notices')+' · 5 activities';
+ wrapper.append(head);
+ extraWritten[kind].forEach((task,i)=>{
+  const section=document.createElement('details');section.className='writing-task';
+  const summary=document.createElement('summary');summary.textContent=task.title;section.append(summary);
+  if(task.text){const passage=document.createElement('div');passage.className='passage';passage.textContent=task.text;section.append(passage)}
+  const instructions=document.createElement('p');instructions.textContent=task.prompt;section.append(instructions);
+  const label=document.createElement('label');const id='extra-'+kind+'-'+i;label.htmlFor=id;label.textContent='Your response';section.append(label);
+  const area=document.createElement('textarea');area.id=id;area.maxLength=12000;area.rows=5;area.placeholder='Write your response here...';
+  const key='extra_'+kind+'_'+i;area.value=typeof state.drafts[key]==='string'?state.drafts[key]:'';
+  const status=document.createElement('p');status.className='small muted';status.setAttribute('role','status');
+  area.addEventListener('input',()=>status.textContent='Unsaved changes');
+  const saveButton=document.createElement('button');saveButton.type='button';saveButton.textContent='Save this response';
+  saveButton.onclick=()=>{
+    state.drafts[key]=area.value.slice(0,12000);
+    status.textContent=save()?'Saved on this browser.':'Unable to save. Check browser storage permissions.';
+    updateStats();
+  };
+  section.append(area,saveButton,status);wrapper.append(section)
+ });
+}
+addWrittenPractice('reading','extraReadingPractice');
+addWrittenPractice('formal','extraLetterPractice');
+addWrittenPractice('notice','extraNoticePractice');
 
 profile();updateStats();switchView('overview');
 </script></body></html>
