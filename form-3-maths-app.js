@@ -141,7 +141,8 @@ function renderQuestion(){
   const lab=document.createElement('label');lab.htmlFor='mathResponse';lab.textContent='Show all working and give your answer';
   const area=document.createElement('textarea');area.id='mathResponse';area.rows=9;area.maxLength=12000;area.value=record.answers[pos]||'';
   area.oninput=()=>{record.answers[pos]=area.value;persist()};host.append(lab,area);
-  const note=document.createElement('p');note.className='muted small';note.textContent='Type steps, symbols and explanations. For diagrams, describe the pattern clearly or draw it separately for your teacher.';host.append(note)
+  const note=document.createElement('p');note.className='muted small';note.textContent='You can type, draw your working with coloured pens, or attach a photo or document for this question.';host.append(note);
+  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:'bss-math-main-'+active.id,index:pos,readonly:false,expanded:true})
  }
  $('back').disabled=pos===0;$('forward').disabled=pos===qs.length-1
 }
@@ -244,19 +245,19 @@ $('saveMathProfile').onclick=()=>{
  try{localStorage.setItem(profileKey,JSON.stringify(value));$('mathProfileStatus').textContent='Profile saved in this browser.'}
  catch{$('mathProfileStatus').textContent='Browser storage is unavailable.'}
 };
-$('exportMathAnswers').onclick=()=>{
+$('exportMathAnswers').onclick=async()=>{
  if(!active||!record||record.status!=='submitted')return;
- const student=profile(),qs=assessmentQuestions(active);
- const lines=['BABONNEAU SECONDARY SCHOOL','FORM THREE MATHEMATICS',active.title,
-  'Nickname: '+(student.nickname||'Not provided'),'Class: '+(student.className||'Not provided'),'Submitted: '+(record.submittedAt||''),
-  active.kind==='objective'?'Objective grade: '+record.grade+'/60':active.kind==='mixed'?'Section A grade: '+record.grade+'/20; Sections B and C awaiting teacher marking':'Written assessment: awaiting teacher marking','','STUDENT RESPONSES'];
- qs.forEach((it,i)=>{
-  lines.push('Question '+(i+1)+(it.kind==='written'?' ('+it.q.marks+' marks)':''),it.kind==='objective'?it.q.stem:it.q.stem);
-  lines.push(it.kind==='written'?(record.answers[i]||'[No response]'):record.answers[i]===null?'[No answer]':it.q.options[record.answers[i]],'')
- });
- const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
- link.href=url;link.download='form3-mathematics-'+active.id+'-responses.txt';link.click();
- setTimeout(()=>URL.revokeObjectURL(url),2000)
+ const btn=$('exportMathAnswers');btn.disabled=true;btn.textContent='Preparing full submission...';
+ try{
+  const student=profile(),qs=assessmentQuestions(active);
+  await window.BSSAnswerTools.exportBundle({
+   namespace:'bss-math-main-'+active.id,
+   questions:qs.map((it,i)=>'Question '+(i+1)+(it.kind==='written'?' ('+it.q.marks+' marks)':'')+': '+it.q.stem),
+   answers:qs.map((it,i)=>it.kind==='objective'?(record.answers[i]===null?'Blank':it.q.options[record.answers[i]]):record.answers[i]),
+   filename:'form3-mathematics-'+active.id+'-'+(student.className||'class')
+  })
+ }catch(e){alert('Could not export the submission: '+e.message)}
+ finally{btn.disabled=false;btn.textContent='Download full written work (ZIP)'}
 };
 function boot(){
  profile();refresh();showTab('overview');
