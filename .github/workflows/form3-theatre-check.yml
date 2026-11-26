@@ -1,0 +1,27 @@
+name: Form 3 Theatre Arts validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'form-3-theatre.html'
+      - 'form-3-theatre-bank.js'
+      - 'form-3-theatre-written.js'
+      - 'form-3-theatre-lessons.js'
+      - 'form-3-theatre-diagrams.js'
+      - 'form-3-theatre-app.js'
+      - 'form-3-theatre-verify.cjs'
+      - 'form3-answer-tools.js'
+      - 'form3-answer-tools-verify.cjs'
+      - '.github/workflows/form3-theatre-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node form-3-theatre-verify.cjs && node form3-answer-tools-verify.cjs
