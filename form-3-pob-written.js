@@ -23,7 +23,7 @@ const blanks=[
  ['enterprise','An organised business undertaking that produces or sells goods or services'],
  ['manufacturing','The activity of transforming raw materials into a finished product'],
  ['marketing','Efforts to promote the product and reach potential customers'],
- ['sales','Transactions when customers pay for the company's products'],
+ ['sales','Transactions when customers pay for the business products'],
  ['profit','A positive balance after deducting business costs from revenue'],
  ['consumers','People who buy or use the company's finished products']
 ];
