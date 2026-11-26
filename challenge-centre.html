@@ -39,7 +39,7 @@ try{sessionStorage.setItem("bss_form1_student",JSON.stringify({name,room,code}))
 window.bssSwitchStudent=function(){if(!confirm("Switch learner? Make sure the current learner has finished. Their progress remains saved in this browser under their own details."))return;try{sessionStorage.removeItem("bss_form1_student")}catch(e){}location.href="./"};
 })();
 </script>
-<script src="./challenge-centre-client.js"></script><script src="./challenge-history.js"></script></head><body>
+<script src="./challenge-centre-client.js"></script><script src="./challenge-history.js"></script><link rel="stylesheet" href="./form-3-school-theme.css?v=2"></head><body>
 <header><a href="./">← Learning Hub</a><h1>🔔 My Challenge Centre</h1><p>Your private invitation inbox and current competitions</p></header>
 <main>
 <section id="noProfile" class="card" hidden><h2>Choose your learner profile</h2><p>Open the Learning Hub and enter your learner details to use a private challenge inbox on this browser.</p><a class="button-link" href="./">Go to Learning Hub</a></section>
