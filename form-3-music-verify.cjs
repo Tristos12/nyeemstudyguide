@@ -28,6 +28,7 @@ for(const id of cases){
  for(const [p,paper] of bank.papers.entries()){
   assert.equal(paper.length,60,'Paper '+p+' must have 60 questions');
   const count={};
+  assert.equal(new Set(paper.map(q=>q.stem)).size,60,'Each full paper must contain 60 distinct question stems');
   paper.forEach(q=>{
    count[q.topic]=(count[q.topic]||0)+1;
    assert.equal(q.options.length,4);
@@ -49,6 +50,14 @@ for(const id of cases){
  assert.equal(document.getElementById('problem').hidden,true,id+' entered error screen: '+document.getElementById('problemText').textContent);
  assert(host.children.some(e=>e.tagName==='h3'),id+' missing heading');
  assert(host.children.some(e=>e.tagName==='svg'),id+' missing SVG music notation');
+ if(id.startsWith('mock')){
+  const savedData=JSON.parse(storage.get('bss_form3_music_2026_'+id));
+  assert.equal(savedData.answers.length,40,'Mock must have 40 answer slots');
+  // Six exam sections retain the official marks A10, B5, C10, D4, E6 and F15.
+  const app=source['form-3-music-app.js'];
+  assert(app.includes("...objective25.filter(item=>item.section==='A')")&&app.includes("...bySection('F')"));
+ }
+
  if(id.startsWith('practice')){
   assert(document.getElementById('assessmentStatus').textContent.includes('of 60'));
   const answers=host.children.find(e=>e.className==='answers');
