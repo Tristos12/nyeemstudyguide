@@ -254,7 +254,9 @@ $('reviewBtn').onclick=()=>{
    const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
    a.href=url;a.download=selected.id+'-responses.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)
   };detail.append(download);
-  attempt.values.forEach((text,i)=>{const block=document.createElement('div');block.className='question';const h=document.createElement('h3');h.textContent=i<9?((i+1)+'. '+paper.questions[i][0]):i===9?'Formal letter':'Notice';const p=document.createElement('p');p.style.whiteSpace='pre-wrap';p.textContent=text||'(No response)';block.append(h,p);detail.append(block)})
+  attempt.values.forEach((text,i)=>{const block=document.createElement('div');block.className='question';const h=document.createElement('h3');h.textContent=i<9?((i+1)+'. '+paper.questions[i][0]):i===9?'Formal letter':'Notice';const p=document.createElement('p');p.style.whiteSpace='pre-wrap';p.textContent=text||'(No response)';block.append(h,p);
+   if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:block,namespace:'bss-english-'+selected.id,index:i,readonly:true});
+   detail.append(block)})
  }
 };
 $('downloadFull').onclick=async()=>{
