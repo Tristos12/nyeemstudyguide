@@ -124,7 +124,7 @@ function renderQuestion(){
 $('previous').onclick=()=>{if(record.position>0){record.position--;persist();renderQuestion()}};
 $('next').onclick=()=>{if(record.position<questions.length-1){record.position++;persist();renderQuestion()}};
 $('saveExit').onclick=()=>{persist();stopTimer();location.href='./form-3-pob.html?tab='+ (cfg.kind==='objective'?'practices':cfg.kind==='written'?'written':'mocks')};
-async async function submit(expired=false){
+async function submit(expired=false){
  if(!cfg||record?.status!=='draft')return;
  let blanks=0;
  if(!expired){
