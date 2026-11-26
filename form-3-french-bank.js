@@ -92,7 +92,7 @@ function create(topic,index,practice){
  const row=rows[topic][index];
  const opts=[row[1],row[2],row[3],row[4]],shift=(index*3+practice*2+sections.indexOf(topic))%4;
  const choices=opts.slice(shift).concat(opts.slice(0,shift));
- return {topic,stem:prefixes[practice]+row[0],options:choices,answer:choices.indexOf(row[1]),explanation:row[5]}
+ return {topic,stem:prefixes[practice]+row[0],options:choices,answer:choices.indexOf(row[1]),explanation:row[5]+' Read the full situation and compare the meaning of each option before choosing.'}
 }
 const papers=Array.from({length:5},(_,p)=>sections.flatMap(topic=>rows[topic].map((_,i)=>create(topic,i,p))));
 window.BSS_FRENCH={topics,sections,papers};
