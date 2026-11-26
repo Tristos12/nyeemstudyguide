@@ -286,7 +286,7 @@ function renderQuestion(){
  $('questionPrompt').textContent=q[0];
  $('quizBar').style.width=Math.round(100*index/order.length)+'%';
  $('readingText').hidden=skill!=='reading';
- if(skill==='reading')$('readingText').textContent=passage;
+ if(skill==='reading')$('readingText').textContent=q[4]||passage;
  const host=$('answers');host.replaceChildren();
  q[1].forEach((option,i)=>{
   const b=document.createElement('button');b.type='button';
@@ -408,8 +408,8 @@ function startMock1(){
   const box=document.createElement('section');box.className='writing-task';
   const title=document.createElement('h3');title.textContent=(i+1)+'. '+skillNames[item.key];
   const prompt=document.createElement('p');prompt.textContent=item.q[0];box.append(title);
-  if(item.key==='reading'&&(i===41||mockItems[i-1]?.key!=='reading')){
-   const passageBox=document.createElement('div');passageBox.className='passage';passageBox.textContent=passage;box.append(passageBox);
+  if(item.key==='reading'){
+   const passageBox=document.createElement('div');passageBox.className='passage';passageBox.textContent=item.q[4]||passage;box.append(passageBox);
   }
   box.append(prompt);
   const answers=document.createElement('div');answers.className='answers';answers.setAttribute('role','group');answers.setAttribute('aria-label','Question '+(i+1));
