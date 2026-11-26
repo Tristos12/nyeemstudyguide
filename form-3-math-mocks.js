@@ -135,8 +135,9 @@ $('review').onclick=()=>{
  });
  host.hidden=false;host.scrollIntoView({behavior:'smooth'})
 };
-$('retry').onclick=()=>{
- if(!confirm('Restart this mock? The saved score and written answers will be replaced.'))return;
+$('retry').onclick=async()=>{
+ if(!confirm('Restart this mock? Saved scores, written answers, drawings and uploads will be replaced.'))return;
+ try{await window.BSSAnswerTools.clearNamespace('bss-math-mock-'+cfg.id,30)}catch{}
  try{localStorage.removeItem(storageKey(cfg.id))}catch{}
  openMock(key)
 };
