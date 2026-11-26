@@ -10,6 +10,7 @@ on:
       - 'form-3-maths-structured.js'
       - 'form-3-maths-app.js'
       - 'form-3-maths-verify.cjs'
+      - 'form-3-maths-browser-smoke.cjs'
       - '.github/workflows/form3-mathematics-check.yml'
   workflow_dispatch:
 permissions:
@@ -22,4 +23,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node form-3-maths-verify.cjs
+      - run: node form-3-maths-verify.cjs && node form-3-maths-browser-smoke.cjs
