@@ -16,9 +16,9 @@ button,select,input,textarea{font:inherit}button{background:#fff;border:1px soli
 <div class="tile"><h3>✍️ Paper 2</h3><p>Reading comprehension (16 marks), formal-letter writing (20 marks) and notice writing (15 marks). Build responses, use checklists and save drafts.</p><button class="primary" data-go="paper2">Start Paper 2 practice</button></div>
 <div class="tile"><h3>🎯 Recommended method</h3><p>Review an example, practise a few questions, read the explanation, and revisit questions answered incorrectly. For writing, plan, draft and improve.</p><button data-go="review">View my revision record</button></div><div class="tile"><h3>📘 Learn before practising</h3><p>Eight short lessons with clear examples and links to the relevant skill activities.</p><button class="primary" data-go="lessons">Open mini lessons</button></div><div class="tile"><h3>⏱ Mock examinations</h3><p>Paper 1 includes 51 objective items in 90 minutes. Paper 2 includes reading and written tasks for teacher marking.</p><button class="primary" data-go="mock">Open mock exams</button></div>
 </div><p class="notice small">The Paper 2 cover lists notice writing before formal letters, while the paper itself presents formal-letter writing as Section B and notice writing as Section C. The practice area follows the tasks, with their stated marks.</p></div></section>
-<section id="paper1" class="view" hidden><div class="card"><h2>Paper 1: Objective Practice</h2><p>Choose a skill. Each question has four options. Feedback explains the answer before you move on.</p><div class="controls"><label for="skillSelect">Practice area</label><select id="skillSelect"></select><button class="primary" id="startQuiz">Start / restart practice</button></div><p class="small muted" id="quizMeta"></p></div>
+<section id="paper1" class="view" hidden><div class="card"><h2>Paper 1: Objective Practice</h2><p>Choose a skill and answer every question. Your score, correct answers and explanations will appear only after the section is completed.</p><div class="controls"><label for="skillSelect">Practice area</label><select id="skillSelect"></select><button class="primary" id="startQuiz">Start / restart practice</button></div><p class="small muted" id="quizMeta"></p></div>
 <div id="quiz" class="card" hidden><div class="controls"><strong id="questionCounter"></strong><span class="muted" id="questionSkill"></span></div><div class="progress"><div id="quizBar"></div></div><div id="readingText" class="passage" hidden></div><h2 id="questionPrompt"></h2><div id="answers" class="answers"></div><div id="feedback" role="status" aria-live="polite" hidden></div><div class="controls"><button id="nextQuestion" class="primary" hidden>Next question</button><button id="exitQuiz">Choose another skill</button></div></div>
-<div id="quizResults" class="card" hidden><h2>Practice complete</h2><p id="quizSummary"></p><button id="quizAgain" class="primary">Practise this skill again</button><button data-go="review">Review my answers</button></div></section>
+<div id="quizResults" class="card" hidden><h2>Practice complete</h2><p id="quizSummary"></p><div id="sectionAnswerReview" aria-label="Answer review"></div><button id="quizAgain" class="primary">Practise this skill again</button><button data-go="review">Review my answers</button></div></section>
 <section id="paper2" class="view" hidden>
 <div class="card"><h2>Paper 2: Reading and Writing Skills</h2><p>The uploaded paper assesses comprehension through a factual passage about the octopus, guided formal-letter writing requesting an educational visit to Pigeon Island, and a school club notice. The activities here practise the same skills with new prompts.</p></div>
 <div class="card"><h2>A. Reading comprehension · 16-mark skills</h2><p>Read the new practice passage, then answer the nine questions in complete sentences where appropriate.</p>
@@ -196,13 +196,64 @@ function updateStats(){const t=totals();$('attempted').textContent=t.count;$('ac
 function switchView(view){document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==view);document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='review')renderReview();window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>switchView(b.dataset.view));document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>switchView(b.dataset.go));
 const selector=$('skillSelect');Object.entries(skillNames).forEach(([key,label])=>{const o=document.createElement('option');o.value=key;o.textContent=label+' ('+questions[key].length+')';selector.append(o)});
-let skill='spelling',order=[],index=0,score=0,answered=false;
-function begin(){skill=selector.value;order=questions[skill].map((_,i)=>i);index=0;score=0;answered=false;$('quizResults').hidden=true;$('quiz').hidden=false;renderQuestion()}
-function renderQuestion(){const q=questions[skill][order[index]];answered=false;$('feedback').hidden=true;$('nextQuestion').hidden=true;$('questionCounter').textContent='Question '+(index+1)+' of '+order.length;$('questionSkill').textContent=skillNames[skill];$('questionPrompt').textContent=q[0];$('quizBar').style.width=Math.round(100*index/order.length)+'%';$('readingText').hidden=skill!=='reading';if(skill==='reading')$('readingText').textContent=passage;const host=$('answers');host.replaceChildren();q[1].forEach((option,i)=>{const b=document.createElement('button');b.type='button';b.textContent=String.fromCharCode(65+i)+'. '+option;b.onclick=()=>choose(i);host.append(b)})}
-function choose(choice){if(answered)return;answered=true;const q=questions[skill][order[index]],ok=choice===q[2];if(ok)score++;state.answers[skill+':'+order[index]]={choice,correct:ok};save();updateStats();[...$('answers').children].forEach((b,i)=>{b.disabled=true;if(i===q[2])b.classList.add('correct');else if(i===choice)b.classList.add('wrong')});const f=$('feedback');f.className=ok?'success':'notice';f.hidden=false;f.textContent=(ok?'Correct. ':'Not quite. ')+q[3];$('nextQuestion').hidden=false;$('nextQuestion').textContent=index===order.length-1?'Finish practice':'Next question'}
-$('nextQuestion').onclick=()=>{index++;if(index>=order.length){$('quiz').hidden=true;$('quizResults').hidden=false;$('quizSummary').textContent='You answered '+score+' of '+order.length+' questions correctly ('+Math.round(score/order.length*100)+'%). Visit My Review to revisit skills.'}else renderQuestion()};
-$('startQuiz').onclick=begin;$('quizAgain').onclick=begin;$('exitQuiz').onclick=()=>{$('quiz').hidden=true;$('quizResults').hidden=true};
-$('skillSelect').onchange=()=>{$('quizMeta').textContent='This set has '+questions[selector.value].length+' questions with explanations.'};$('skillSelect').dispatchEvent(new Event('change'));
+let skill='spelling',order=[],index=0,score=0,answered=false,sectionResponses=[];
+function begin(){
+ skill=selector.value;order=questions[skill].map((_,i)=>i);index=0;score=0;answered=false;
+ sectionResponses=Array(order.length).fill(null);
+ $('sectionAnswerReview').replaceChildren();
+ $('quizResults').hidden=true;$('quiz').hidden=false;renderQuestion()
+}
+function renderQuestion(){
+ const q=questions[skill][order[index]];
+ answered=false;$('feedback').hidden=true;$('nextQuestion').hidden=true;
+ $('questionCounter').textContent='Question '+(index+1)+' of '+order.length;
+ $('questionSkill').textContent=skillNames[skill];
+ $('questionPrompt').textContent=q[0];
+ $('quizBar').style.width=Math.round(100*index/order.length)+'%';
+ $('readingText').hidden=skill!=='reading';
+ if(skill==='reading')$('readingText').textContent=passage;
+ const host=$('answers');host.replaceChildren();
+ q[1].forEach((option,i)=>{
+  const b=document.createElement('button');b.type='button';
+  b.textContent=String.fromCharCode(65+i)+'. '+option;
+  b.onclick=()=>choose(i);host.append(b)
+ });
+}
+function choose(choice){
+ if(answered)return;
+ answered=true;
+ sectionResponses[index]=choice;
+ [...$('answers').children].forEach(b=>b.disabled=true);
+ // Do not reveal correctness, explanations or scores until the section ends.
+ $('nextQuestion').hidden=false;
+ $('nextQuestion').textContent=index===order.length-1?'Finish section and view results':'Next question';
+}
+function finishSection(){
+ let correct=0;
+ const host=$('sectionAnswerReview');host.replaceChildren();
+ const heading=document.createElement('h3');heading.textContent='Answers and explanations';host.append(heading);
+ order.forEach((questionId,i)=>{
+  const q=questions[skill][questionId],choice=sectionResponses[i];
+  const ok=choice===q[2];if(ok)correct++;
+  state.answers[skill+':'+questionId]={choice,correct:ok};
+  const item=document.createElement('div');item.className='tile';item.style.margin='10px 0';
+  const title=document.createElement('strong');title.textContent='Question '+(i+1)+' · '+(ok?'Correct':'Incorrect');
+  const prompt=document.createElement('p');prompt.textContent=q[0];
+  const selected=document.createElement('p');selected.textContent='Your answer: '+(choice===null?'No answer':String.fromCharCode(65+choice)+'. '+q[1][choice]);
+  const answer=document.createElement('p');answer.textContent='Correct answer: '+String.fromCharCode(65+q[2])+'. '+q[1][q[2]];
+  const explanation=document.createElement('p');explanation.className='muted small';explanation.textContent=q[3];
+  item.append(title,prompt,selected,answer,explanation);host.append(item)
+ });
+ score=correct;save();updateStats();
+ $('quiz').hidden=true;$('quizResults').hidden=false;
+ $('quizSummary').textContent='You answered '+score+' of '+order.length+' questions correctly ('+Math.round(score/order.length*100)+'%). Review the answers and explanations below.';
+ $('quizBar').style.width='100%';
+ $('quizResults').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('nextQuestion').onclick=()=>{if(!answered)return;index++;if(index>=order.length)finishSection();else renderQuestion()};
+$('startQuiz').onclick=begin;$('quizAgain').onclick=begin;
+$('exitQuiz').onclick=()=>{if(!answered&&index===0||confirm('Leave this section? Unsubmitted answers will not be saved.')){$('quiz').hidden=true;$('quizResults').hidden=true;sectionResponses=[]}};
+$('skillSelect').onchange=()=>{$('quizMeta').textContent='This set has '+questions[selector.value].length+' questions. Results and explanations appear at the end.'};$('skillSelect').dispatchEvent(new Event('change'));
 function countWords(text){return (text.trim().match(/\S+/g)||[]).length}
 for(const kind of ['formal','notice']){const area=$(kind+'Draft');area.value=state.drafts[kind]||'';area.oninput=()=>{$(kind+'Words').textContent=countWords(area.value)+' words';$(kind+'Saved').textContent='Unsaved changes'};area.dispatchEvent(new Event('input'))}
 document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>{const kind=b.dataset.save;state.drafts[kind]=$(kind+'Draft').value.slice(0,12000);$(kind+'Saved').textContent=save()?'Draft saved on this device.':'Browser storage is unavailable.';updateStats()});
