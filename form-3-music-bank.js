@@ -36,7 +36,7 @@ function topicQuestion(topic,n,p){
   const next=(k+2)%5,count=durations[k]/durations[next];
   if(count>=1&&Number.isInteger(count)){
    const distract=[count+1,Math.max(1,count-1),count*2].map(numeral);
-   const unique=distr.filter((x,j)=>x!==numeral(count)&&distr.indexOf(x)===j);
+   const unique=distract.filter((x,j)=>x!==numeral(count)&&distract.indexOf(x)===j);
    while(unique.length<3)unique.push(String(count+unique.length+3));
    return option('How many '+noteNames[next]+' notes have the same total duration as one '+name+' note?',count,unique.slice(0,3),
     'Divide the '+name+'-note duration ('+durations[k]+' beats) by '+noteNames[next]+'-note duration ('+durations[next]+' beats).',{type:'note',value:name});
