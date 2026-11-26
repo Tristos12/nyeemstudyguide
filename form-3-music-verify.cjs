@@ -28,7 +28,8 @@ for(const id of cases){
  for(const [p,paper] of bank.papers.entries()){
   assert.equal(paper.length,60,'Paper '+p+' must have 60 questions');
   const count={};
-  assert.equal(new Set(paper.map(q=>q.stem)).size,60,'Each full paper must contain 60 distinct question stems');
+  const stems=new Set();for(const q of paper){if(stems.has(q.stem))console.log('DUPLICATE '+q.topic+': '+q.stem);stems.add(q.stem)}
+  assert.equal(stems.size,60,'Each full paper must contain 60 distinct question stems');
   paper.forEach(q=>{
    count[q.topic]=(count[q.topic]||0)+1;
    assert.equal(q.options.length,4);
