@@ -56,6 +56,13 @@ for(const id of ['practice-1','practice-2','practice-3','practice-4','practice-5
  }
  document.getElementById('next').onclick();
  assert(document.getElementById('assessmentStatus').textContent.includes('Question 2 of'),id+' cannot go to question 2');
+ if(id.startsWith('mock')){
+  for(let j=2;j<=16;j++)document.getElementById('next').onclick();
+  assert(document.getElementById('assessmentStatus').textContent.includes('Question 16 of 22'),id+' cannot reach reading section');
+  assert.equal(document.getElementById('readingPassage').hidden,false,id+' missing French dialogue on question 16');
+  assert(document.getElementById('questionHost').children.some(node=>node.tagName==='textarea'),id+' missing reading input');
+  assert(document.getElementById('questionHost').children.some(node=>node.tagName==='drawing'),id+' missing drawing / upload workspace');
+ }
  console.log('PASS '+id+' opens questions, navigation, saving and written input where applicable');
 }
 console.log('PASS: five 60-question French practices, three 15-mark reading papers and four 30-mark 45-minute/untimed mocks');
