@@ -78,6 +78,7 @@ When the library reopened, visitors could locate books more easily. The voluntee
 <section id="grades" class="view" hidden><div class="card"><h2>My English Progress and Grades</h2><p>These are practice results from this browser, not official grades. Paper 1 objective papers are scored automatically. Written Paper 2 submissions are shown as awaiting teacher marking.</p><div class="score-grid"><div class="score-box"><strong id="gradeCompleted">0</strong><span>Submitted assessments</span></div><div class="score-box"><strong id="gradeAverage">0%</strong><span>Average objective score</span></div><div class="score-box"><strong id="gradePending">0</strong><span>Writing awaiting marking</span></div></div><div id="gradeSummary"></div><p><a href="./form-3-english-assessments.html">Open Assessment Centre for full records</a></p></div></section>
 <section id="review" class="view" hidden><div class="card"><h2>My Review</h2><p>Review your current answers and identify topics to practise again.</p><div id="latestMock" class="tile"></div><div id="reviewList"></div><h3>Saved writing</h3><p id="writingStatus" class="muted"></p><div class="controls"><button id="exportProgress">Download my practice summary</button><button id="clearProgress">Clear this learner's saved English work</button></div><p class="small muted">Downloaded summaries contain your nickname, class and practice totals, not your full writing drafts. No scores are sent automatically to teachers.</p></div></section>
 <footer>Babonneau Secondary School · Form Three English Language Arts · Original revision activities aligned to Term 1 examination skills · No public scoreboard</footer></main>
+<script src="./form3-answer-tools.js"></script>
 <script src="./form-3-detailed-lessons.js"></script><script src="./form-3-lesson-path.js"></script>
 <script src="./form-3-expanded-a.js"></script>
 <script src="./form-3-expanded-b.js"></script>
@@ -592,6 +593,32 @@ function renderGrades(){
  }
  host.append(table);
 }
+
+
+// Optional drawing and file attachments for additional Paper 2 practice fields.
+// Each response has its own local media record. No student work is uploaded.
+const openPaper2Inputs=Array.from(document.querySelectorAll('#paper2 textarea'));
+openPaper2Inputs.forEach((area,index)=>{
+ const host=document.createElement('div');area.insertAdjacentElement('afterend',host);
+ window.BSSAnswerTools.mount({container:host,namespace:'bss-english-free-writing',index});
+});
+const paper2Export=document.createElement('button');
+paper2Export.type='button';paper2Export.className='primary';
+paper2Export.textContent='Download Paper 2 practice work (ZIP)';
+paper2Export.onclick=async()=>{
+ paper2Export.disabled=true;paper2Export.textContent='Preparing ZIP...';
+ try{
+  await window.BSSAnswerTools.exportBundle({
+   namespace:'bss-english-free-writing',
+   questions:openPaper2Inputs.map(area=>area.closest('.writing-task')?.querySelector('p')?.textContent||area.getAttribute('aria-label')||area.id),
+   answers:openPaper2Inputs.map(area=>area.value),
+   filename:'form3-english-paper2-practice'
+  })
+ }catch(e){alert('Could not export. '+e.message)}
+ finally{paper2Export.disabled=false;paper2Export.textContent='Download Paper 2 practice work (ZIP)'}
+};
+const paper2Host=document.querySelector('#paper2 .card');
+if(paper2Host)paper2Host.append(paper2Export);
 
 profile();updateStats();renderGrades();renderLearningPath();switchView('overview');
 const requestedLesson=new URLSearchParams(location.search).get('lesson');
