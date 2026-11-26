@@ -124,6 +124,6 @@ function topicQuestion(topic,n,p){
  }
  throw Error('Unknown music topic '+topic)
 }
-const papers=Array.from({length:5},(_,p)=>sections.flatMap(topic=>Array.from({length:10},(_,i)=>topicQuestion(topic,i,p))));
+const papers=Array.from({length:5},(_,p)=>sections.flatMap(topic=>Array.from({length:10},(_,i)=>({...topicQuestion(topic,i,p),topic}))));
 window.BSS_MUSIC={topics,sections,noteNames,durations,restNames,pitchNames,melody,papers};
 })();
