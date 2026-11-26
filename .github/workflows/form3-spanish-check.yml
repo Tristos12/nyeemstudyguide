@@ -1,0 +1,26 @@
+name: Form 3 Spanish validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'form-3-spanish.html'
+      - 'form-3-spanish-bank.js'
+      - 'form-3-spanish-written.js'
+      - 'form-3-spanish-lessons.js'
+      - 'form-3-spanish-app.js'
+      - 'form-3-spanish-verify.cjs'
+      - 'form3-answer-tools.js'
+      - 'form3-answer-tools-verify.cjs'
+      - '.github/workflows/form3-spanish-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node form-3-spanish-verify.cjs && node form3-answer-tools-verify.cjs
