@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'form3-answer-tools.js'
+      - 'form3-answer-tools-verify.cjs'
       - 'form-3-mathematics.html'
       - 'form-3-math-practices.html'
       - 'form-3-maths-bank.js'
@@ -29,4 +31,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node form-3-maths-verify.cjs && node form-3-maths-browser-smoke.cjs && node form-3-maths-mocks-smoke.cjs && node form-3-maths-structured-smoke.cjs
+      - run: node form-3-maths-verify.cjs && node form-3-maths-browser-smoke.cjs && node form-3-maths-mocks-smoke.cjs && node form-3-maths-structured-smoke.cjs && node form3-answer-tools-verify.cjs
