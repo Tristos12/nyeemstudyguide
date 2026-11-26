@@ -36,7 +36,7 @@ function render(){
  $('bar').style.width=(100*record.answers.filter(x=>typeof x==='string'&&x.trim()).length/10)+'%';
  let host=$('writtenInputTools');if(!host){host=document.createElement('div');host.id='writtenInputTools';$('response').insertAdjacentElement('afterend',host)}
  host.replaceChildren();
- if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:'bss-math-structured-'+number,index,readonly:false});
+ if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:'bss-math-structured-'+number,index,readonly:false,expanded:true});
  $('previous').disabled=index===0;$('next').disabled=index===9;
 }
 $('response').oninput=()=>{record.answers[record.position]=$('response').value;persist()};
