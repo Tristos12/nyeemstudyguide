@@ -38,6 +38,12 @@ for(const s of structured){
 }
 assert(text['form-3-mathematics.html'].includes('form-3-maths-app.js'));
 assert(text['form-3.html'].includes('href="./form-3-mathematics.html"'));
+for(let i=1;i<=5;i++){
+ const url='href="./form-3-mathematics.html?exam=practice-'+i+'"';
+ assert(text['form-3-mathematics.html'].includes(url),'Missing direct practice link '+i);
+}
+assert(text['form-3-maths-app.js'].includes("const id=url.get('exam')"),'Direct practice URL is not handled by assessment engine');
+
 const app=text['form-3-maths-app.js'];
 assert(app.includes("id:'mock-u1'")&&app.includes("id:'mock-u2'"));
 assert(app.includes("id:'mock-t1'")&&app.includes("id:'mock-t2'")&&app.includes('minutes:75'));
