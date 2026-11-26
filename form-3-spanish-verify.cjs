@@ -29,7 +29,7 @@ for(const id of cases){
  assert.equal(B.papers.length,5);assert.equal(W.length,3);assert.equal(L.length,8);
  for(const p of B.papers){
   assert.equal(p.length,60);
-  assert.equal(new Set(p.map(x=>x.stem)).size,60,'Repeated question text');
+  assert.equal(new Set(p.map(x=>x.stem+'|'+(x.audio||''))).size,60,'Repeated question-and-audio combination');
   const count=Object.fromEntries(B.sections.map(x=>[x,0]));
   for(const x of p){count[x.topic]++;assert.equal(x.options.length,4);assert.equal(new Set(x.options).size,4,'duplicate answer options '+x.stem);assert(x.answer>=0&&x.answer<4);assert(x.explanation.length>25)}
   assert.equal(Object.values(count).reduce((sum,x)=>sum+x,0),60)
