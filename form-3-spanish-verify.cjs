@@ -47,7 +47,7 @@ for(const id of cases){
  assert(host.children.some(x=>x.tagName==='h3'),'Missing question title');
  if(id.startsWith('practice')){
   assert(status.textContent.includes('of 60'));
-  assert(host.children.some(x=>x.textContent==='▶ Listen to Spanish sentence'),'Missing listening playback');
+  assert(descendants(host).some(x=>x.textContent==='▶ Listen to Spanish sentence'),'Missing listening playback');
   const group=host.children.find(x=>x.className==='answers');assert.equal(group.children.length,4);
   group.children[0].onclick();
   assert.equal(JSON.parse(storage.get('bss_form3_spanish_2026_'+id)).answers[0],0);
@@ -63,7 +63,7 @@ for(const id of cases){
   assert(host.children.some(x=>x.tagName==='drawing'),'Missing illustration tools');
  }else{
   assert(status.textContent.includes('of 45'),'Mock must have 45 questions');
-  assert(host.children.some(x=>x.textContent==='▶ Listen to Spanish sentence'),'Listening mock audio missing');
+  assert(descendants(host).some(x=>x.textContent==='▶ Listen to Spanish sentence'),'Listening mock audio missing');
   if(id.includes('-t'))assert(document.getElementById('timer').textContent.includes('Time left'),'Timed mock clock missing');
   for(let i=0;i<8;i++)document.getElementById('next').onclick();
   assert(status.textContent.includes('Question 9 of 45'),'Did not reach reading section');
