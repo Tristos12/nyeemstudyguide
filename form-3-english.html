@@ -171,6 +171,53 @@ mainidea:[
 };
 Object.entries(extraQuestions).forEach(([key,items])=>questions[key].push(...items));
 
+
+const moreQuestions={
+spelling:[
+['The library organised a special _____ to encourage reading.',['exhibision','exhebition','exhibition','exibition'],2,'Exhibition ends with -ition and begins with exhi-.'],
+['Students showed great _____ during the difficult task.',['patience','patients','patiance','patiense'],0,'Patience means the ability to wait or persevere calmly.'],
+['The speaker gave a clear _____ of the proposal.',['summery','summary','sumary','summarry'],1,'Summary contains double m and ends in -ary.'],
+['The coach stressed the _____ of regular exercise.',['importence','importanse','importans','importance'],3,'Importance is formed from important and ends in -ance.'],
+['The experiment produced an _____ result.',['unexpected','unexspected','unexpectid','unexpexted'],0,'Unexpected combines un- with expected.']
+],
+vocabulary:[
+['The team had to modify its original plan. Closest meaning of modify?',['repeat','change','discard','hide'],1,'Modify means to make a change.'],
+['The committee considered the proposal beneficial. Closest meaning of beneficial?',['harmful','uncertain','helpful','ordinary'],2,'Beneficial means producing a good effect.'],
+['The class was eager to begin the project. Closest meaning of eager?',['reluctant','unaware','doubtful','enthusiastic'],3,'Eager means keen or enthusiastic.'],
+['Choose the opposite of expand.',['contract','increase','extend','enlarge'],0,'Contract means to become smaller.'],
+['Choose the opposite of fragile.',['delicate','sturdy','breakable','weak'],1,'Sturdy means strong and less likely to break.']
+],
+grammar:[
+['If she _____ carefully, she will understand the instructions.',['listen','listens','listened','listening'],1,'The first conditional uses the present simple after if.'],
+['The children _____ their homework before the lights went out.',['complete','have completed','completing','had completed'],3,'Past perfect shows completion before another past event.'],
+['Of all the runners, Shanice ran the _____.',['fastest','faster','most fast','more faster'],0,'Fastest is the superlative form of fast.'],
+['The information in these reports _____ useful.',['are','were','is','have'],2,'Information is an uncountable singular noun and takes is.'],
+['The students spoke _____ during the presentation.',['confident','confidence','more confident','confidently'],3,'The adverb confidently describes how they spoke.']
+],
+equivalent:[
+['Only students who register may join the trip.',['Every student must join the trip.','Registration is required to join the trip.','Students can join without registering.','The trip has been cancelled.'],1,'Only those who register are eligible.'],
+['The play was cancelled because the lead actor was absent.',['The actor arrived early.','The play went ahead as scheduled.','The lead actor’s absence caused the cancellation.','The actors cancelled every rehearsal.'],2,'The revised sentence preserves the cause of cancellation.'],
+['Although she was nervous, Alana delivered her speech.',['Alana delivered her speech despite feeling nervous.','Alana refused to speak because she was nervous.','Alana was calm and said nothing.','Alana spoke only after everyone left.'],0,'Despite expresses the same contrast.'],
+['The students were instructed to finish before leaving.',['Students could leave immediately.','Students were told to complete the work after going home.','Students did not receive instructions.','Students had to complete their work before departure.'],3,'The requirement and order of events are unchanged.'],
+['The storm was so severe that the ferry could not sail.',['The ferry sailed despite the storm.','The storm prevented the ferry from sailing.','The ferry caused the storm.','The storm began after the ferry returned.'],1,'Both sentences describe the storm preventing the voyage.']
+],
+mainidea:[
+['Some students travel far to reach school. A reliable transport system reduces lateness and allows students to attend more regularly. What is the main idea?',['Long journeys are always enjoyable.','All students live near school.','Reliable transport supports school attendance.','Lateness is never related to transport.'],2,'The details connect transport reliability to attendance.'],
+['Volunteers planted trees near the riverbank. The roots will help hold the soil, while the trees can provide shade and habitats for birds. What is the main idea?',['Planting trees brings several environmental benefits.','All riverbanks have trees.','Only birds benefit from trees.','Soil cannot be protected.'],0,'The passage lists several benefits of tree planting.'],
+['Students who plan their study time can spread difficult tasks across several days. Taking short breaks also helps them stay focused. What is the main idea?',['Studying is only useful before exams.','Breaks should replace studying.','Every learner needs the same schedule.','Planning and breaks can support effective studying.'],3,'The passage explains useful study habits.'],
+['Local businesses sell handmade products and employ residents. Buying locally can help circulate money within the community. What is the main idea?',['Handmade goods are always expensive.','Supporting local businesses benefits the community.','All businesses sell the same products.','Employment has no connection to shops.'],1,'The economic benefits of local businesses link the details.'],
+['Before a hurricane, families can secure their homes, prepare supplies and follow official weather information. These actions help reduce risks. What is the main idea?',['Preparation helps families stay safer during hurricanes.','Storms can always be prevented.','Only weather forecasts matter.','Families should ignore emergency advice.'],0,'The passage emphasises the value of hurricane preparation.']
+],
+reading:[
+['What was the main purpose of sorting the collected waste?',['To hide the rubbish','To make the project longer','To avoid teamwork','To learn which types were most common'],3,'Sorting and recording allowed the groups to compare waste types.'],
+['Why were suitable shoes recommended?',['To make the students taller','To help students work safely during the clean-up','To identify team leaders','To keep bottles from breaking'],1,'Suitable shoes help protect volunteers on a beach clean-up.'],
+['What can be inferred about the school presentation?',['It replaced the clean-up','It was unrelated to the project','It would share what students learned','It was only for visiting tourists'],2,'The presentation was based on the findings from the clean-up.'],
+['Which phrase best describes the teacher’s approach?',['Encouraging continued action and community learning','Ignoring environmental problems','Stopping students from sharing their findings','Discouraging future visits'],0,'The teacher encouraged future monitoring and information sharing.'],
+['What is the best meaning of “compared their findings” in the passage?',['Disposed of all records','Copied another group’s work','Avoided discussing results','Examined similarities and differences in their observations'],3,'To compare findings is to consider how observations are alike and different.']
+]
+};
+Object.entries(moreQuestions).forEach(([key,items])=>questions[key].push(...items));
+
 const passage='THE BEACH CARE PROJECT\n\nOn Saturday morning, a group of Form 3 students joined a supervised beach-care project. Before beginning, a volunteer explained why plastic waste can damage marine life. The organisers asked students to bring reusable water bottles and wear suitable shoes.\n\nWorking in teams, the students collected litter and recorded the types of waste they found. They noticed that food wrappers and plastic bottles were common near the entrance. After the clean-up, the groups compared their findings and prepared a short presentation for their school assembly.\n\nTheir teacher encouraged them to monitor the site during future visits and share useful information with the community. The students learned that small actions can make a difference when people work together.';
 const skillNames={spelling:'Spelling',vocabulary:'Vocabulary: Synonyms & Antonyms',grammar:'Grammar',equivalent:'Equivalent Sentences',mainidea:'Main Idea',reading:'Reading Comprehension'};
 const comprehension=[
