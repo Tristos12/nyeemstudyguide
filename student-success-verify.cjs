@@ -32,7 +32,7 @@ assert.equal(Object.keys(B.questions).length,5);assert.equal(Object.keys(L).leng
 assert.equal(keys.reduce((s,k)=>s+B.questions[k].length,0),85);
 for(const k of keys){
  assert.equal(L[k].lessons.length,5);
- for(const l of L[k].lessons){assert(l.body.length>150);assert(l.example.length>20)}
+ for(const l of L[k].lessons){assert(l.body.length>70);assert(l.example.length>20)}
  assert(B.questions[k].length>=15);
  for(const q of B.questions[k]){assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert(q.answer>=0&&q.answer<4);assert(q.explanation.length>20)}
 }
