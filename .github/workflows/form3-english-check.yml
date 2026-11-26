@@ -10,6 +10,9 @@ on:
       - 'form-3-english-practices.html'
       - 'form-3-paper-additions.js'
       - 'form-3-paper-verify.cjs'
+      - 'form-3-english-assessments.html'
+      - 'form-3-paper2-bank.js'
+      - 'form-3-assessment-verify.cjs'
       - '.github/workflows/form3-english-check.yml'
   workflow_dispatch:
 permissions:
@@ -23,4 +26,4 @@ jobs:
         with:
           node-version: '22'
       - name: Check all Form 3 question banks and 30 practices
-        run: node form-3-verify.cjs && node form-3-paper-verify.cjs
+        run: node form-3-verify.cjs && node form-3-paper-verify.cjs && node form-3-assessment-verify.cjs
