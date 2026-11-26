@@ -136,7 +136,7 @@ function renderOverview(){
  weak.slice(0,4).forEach(({topic,pct})=>{
   const row=node('div');row.className='target';row.append(node('strong',labels[topic]+' · '+Math.round(pct)+'%'));
   row.append(node('span',pct<70?' · Priority revision':pct<85?' · Keep practising':' · Current strength'));
-  const lessonIndex=topic==='vocab'?0:0;row.append(linkLesson(topic,lessonIndex));target.append(row)
+  const lessonIndex=topic==='vocab'?0:0;row.append(linkLesson(topic,lessonIndex),button('Watch video',()=>openVideos(topic)));target.append(row)
  });
 }
 function renderLessons(){
@@ -230,7 +230,7 @@ function submit(expired=false){
  sorted.slice(0,3).forEach(({t,accuracy})=>{
   const box=node('div');box.className='target';box.append(node('strong',labels[t]+' · '+Math.round(accuracy*100)+'%'));
   box.append(node('p',accuracy<.7?'Revise this topic before trying another practice.':accuracy<.85?'Review and practise this topic again.':'Maintain your skills with occasional practice.'));
-  const lessonIndexes=accuracy<.85?[0,1]:[0];lessonIndexes.forEach(i=>box.append(linkLesson(t,i)));suggest.append(box);
+  const lessonIndexes=accuracy<.85?[0,1]:[0];lessonIndexes.forEach(i=>box.append(linkLesson(t,i)));box.append(button('Watch recommended video',()=>openVideos(t)));suggest.append(box);
  });
  const details=$('resultDetails');details.hidden=true;details.replaceChildren();
  attempt.items.forEach((q,i)=>{
