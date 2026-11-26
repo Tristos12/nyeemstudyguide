@@ -85,7 +85,11 @@ function renderQuestion(){
  }
  if(it.type==='written'&&it.q.section==='VI'){
   const title=document.createElement('h4');title.textContent='Cultural sport study: la lucha canaria';
-  const passage=document.createElement('p');passage.textContent=it.cultureDescription;passage.style.whiteSpace='pre-wrap';host.append(title,passage);
+  const picture=document.createElement('img');picture.src='./form-3-spanish-lucha-illustration.svg';
+  picture.alt='Original schematic illustrations of two Canarian wrestlers using a balanced grip and a controlled wrestling movement.';
+  picture.style.maxWidth='100%';picture.style.borderRadius='9px';picture.style.margin='10px 0';
+  const passage=document.createElement('p');passage.textContent=it.cultureDescription;passage.style.whiteSpace='pre-wrap';
+  host.append(title,picture,passage);
  }
  if(it.type==='objective'&&it.q.audio){
   const row=document.createElement('div');row.className='row';
