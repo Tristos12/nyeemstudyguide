@@ -119,7 +119,7 @@ function renderQuestion(){
   area.oninput=()=>{record.answers[position]=area.value;persist()};
   const tip=document.createElement('p');tip.className='small muted';tip.textContent='You may type, handwrite with different pen colours and thicknesses, draw notes on the canvas, erase, or upload an image, PDF or Word file.';
   host.append(label,area,tip);
-  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:media(),index:position,expanded:true,readonly:false})
+  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:media(),index:position,expanded:true,readonly:false,staffTemplate:true})
  }
  $('previous').disabled=position===0;$('next').disabled=position===items.length-1
 }
@@ -193,7 +193,7 @@ $('reviewAnswers').onclick=()=>{
   answer.textContent=item.kind==='objective'?'Your answer: '+(record.answers[i]===null?'Blank':item.q.options[record.answers[i]])+'\nCorrect answer: '+item.q.options[item.q.answer]+'\nExplanation: '+item.q.explanation:
    'Your written answer:\n'+(record.answers[i]||'[No typed answer]')+'\nTeacher marking required.';
   block.append(answer);
-  if(item.kind==='written'&&window.BSSAnswerTools)window.BSSAnswerTools.mount({container:block,namespace:media(),index:i,readonly:true});
+  if(item.kind==='written'&&window.BSSAnswerTools)window.BSSAnswerTools.mount({container:block,namespace:media(),index:i,readonly:true,staffTemplate:true});
   host.append(block)
  });host.hidden=false;host.scrollIntoView({behavior:'smooth'})
 };
