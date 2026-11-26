@@ -81,10 +81,18 @@ function renderQuestion(){
  if(it.type==='written'&&it.q.section==='3'){
   const title=document.createElement('h4');title.textContent='Household monthly budget';
   const table=document.createElement('table');const header=document.createElement('tr');
-  ['Expenses','Amount ($)'].forEach(v=>{const th=document.createElement('th');th.textContent=v;header.append(th)});table.append(header);
+  ['Expense','Amount ($)'].forEach(label=>{const th=document.createElement('th');th.textContent=label;header.append(th)});table.append(header);
   it.costs.forEach(([name,amount])=>{const tr=document.createElement('tr');
-   [name,amount].forEach(x=>{const td=document.createElement('td');td.textContent=String(x);tr.append(td)});table.append(tr)});
-  const footer=document.createElement('p');footer.textContent='Monthly household income: 
+    [name,amount].forEach(value=>{const td=document.createElement('td');td.textContent=String(value);tr.append(td)});table.append(tr)});
+  const footer=document.createElement('p');footer.textContent='Monthly household income: '+String(it.income);
+  host.append(title,footer,table);
+ }
+ if(it.type==='written'&&it.q.visual==='roles'){
+  const note=document.createElement('p');note.className='note';
+  note.textContent='Illustrated scenarios: one adult works outside the home while another cares for a child. In another household, two caregivers share childcare and housework. Compare traditional expectations with changing family roles.';
+  host.append(note);
+ }
+ if(it.type==='objective'){
   const group=document.createElement('div');group.className='answers';
   it.q.options.forEach((choice,j)=>{
    const b=document.createElement('button');b.type='button';b.textContent='ABCD'[j]+'. '+choice;
