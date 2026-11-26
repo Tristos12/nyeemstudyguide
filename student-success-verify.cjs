@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const paths=['student-success-lessons.js','student-success-bank.js','student-success-app.js'];
+const paths=['student-success-lessons.js','student-success-bank.js','student-success-videos.js','student-success-app.js'];
 const src=Object.fromEntries(paths.map(f=>[f,fs.readFileSync(f,'utf8')]));paths.forEach(f=>new vm.Script(src[f],{filename:f}));
 const html=fs.readFileSync('student-success.html','utf8');
 for(const p of paths)assert(html.includes(p));assert(fs.readFileSync('form-3.html','utf8').includes('student-success.html'));
@@ -26,7 +26,7 @@ const document={
 };
 const window={addEventListener(){},URL:{createObjectURL(){return 'blob:test'},revokeObjectURL(){}}};
 const ctx={document,window,Option:class extends E{constructor(text,value){super('option',value);this.textContent=text}},URLSearchParams,location:{search:'',href:''},Date,Math,JSON,Number,String,Array,Object,Set,console,confirm:()=>true,Blob,setInterval:()=>1,clearInterval(){},setTimeout() {},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)}};
-vm.runInNewContext(src[paths[0]],ctx,{filename:paths[0]});vm.runInNewContext(src[paths[1]],ctx,{filename:paths[1]});
+for(const p of paths.slice(0,3))vm.runInNewContext(src[p],ctx,{filename:p});
 const B=window.BSS_SUCCESS_BANK,L=window.BSS_SUCCESS_LESSONS,keys=['test','study','time','knowledge','vocab'];
 assert.equal(Object.keys(B.questions).length,5);assert.equal(Object.keys(L).length,5);
 assert.equal(keys.reduce((s,k)=>s+B.questions[k].length,0),85);
@@ -36,7 +36,7 @@ for(const k of keys){
  assert(B.questions[k].length>=15);
  for(const q of B.questions[k]){assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert(q.answer>=0&&q.answer<4);assert(q.explanation.length>10)}
 }
-vm.runInNewContext(src[paths[2]],ctx,{filename:paths[2]});
+vm.runInNewContext(src[paths[3]],ctx,{filename:paths[3]});
 const topicCards=document.getElementById('topicCards');assert.equal(topicCards.children.length,5);
 const practice=document.getElementById('practiceCards');assert.equal(practice.children.length,7);
 for(let n=0;n<7;n++){
@@ -58,4 +58,26 @@ for(let n=0;n<7;n++){
 const entries=JSON.parse(store.get('bss_student_success_v1_assessments'));assert.equal(Object.values(entries).filter(a=>a.status==='submitted').length,7);
 assert.equal(document.getElementById('completed').textContent,'7');
 const flash=document.getElementById('flashCard');assert(flash.textContent.includes('Resilient'));document.getElementById('flashReveal').onclick();assert(flash.textContent.includes('recover'));
-console.log('PASS: 25 lessons, 85 verified questions, five topic practices, mixed challenge, timed challenge, scoring, recommendations, progress and flashcards.');
+const V=window.BSS_SUCCESS_VIDEOS;assert.equal(Object.keys(V).length,5);
+for(const topic of keys){
+ const x=V[topic];assert(x.clips.length>=1);
+ for(const clip of x.clips){assert(/^[a-zA-Z0-9_-]{11}$/.test(clip.id));assert(clip.task.length>20)}
+ assert(x.check.options.length>=3);
+ assert(x.check.correct>=0&&x.check.correct<x.check.options.length);
+ document.getElementById('videoTopic').value=topic;
+ const onChange=document.getElementById('videoTopic').onchange;onChange();
+ const cards=document.getElementById('videoTutorials').children;
+ assert(cards.length>=x.clips.length+2,topic+' tutorial videos or checkpoint missing');
+ const videoCard=cards[1];
+ assert(videoCard.children.some(ch=>ch.className==='video-frame'),topic+' video player missing');
+ const frame=videoCard.children.find(ch=>ch.className==='video-frame');
+ assert(!frame.children.some(ch=>ch.tagName==='iframe'),'Video must not load automatically');
+ frame.children[0].onclick();
+ assert(frame.children.some(ch=>ch.tagName==='iframe'),'Play button failed to load embedded video');
+ const checkpoint=cards.find(ch=>ch.className==='checkpoint');
+ assert(checkpoint,'Checkpoint missing');
+ const buttons=checkpoint.children.filter(ch=>ch.tagName==='button');
+ buttons[x.check.correct].onclick();
+ const completed=JSON.parse(store.get('bss_student_success_v1_videoChecks'));assert.equal(completed[topic],true,'Video checkpoint not saved');
+}
+console.log('PASS: 25 lessons, 85 questions, 5 video tutorial sections, 7 practices, feedback, progress, flashcards and checkpoints.');
