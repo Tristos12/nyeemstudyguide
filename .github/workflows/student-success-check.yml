@@ -1,0 +1,23 @@
+name: Student Success Centre validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'student-success.html'
+      - 'student-success-lessons.js'
+      - 'student-success-bank.js'
+      - 'student-success-app.js'
+      - 'student-success-verify.cjs'
+      - '.github/workflows/student-success-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node student-success-verify.cjs
