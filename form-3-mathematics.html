@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Form 3 Mathematics | Babonneau Secondary School</title>
+<style>
+:root{--blue:#163d6d;--teal:#15776b;--ink:#1c3752;--edge:#cbddec}*{box-sizing:border-box}
+body{font:16px/1.58 system-ui,Arial,sans-serif;color:var(--ink);background:#f3f7fc;margin:0}
+header{color:#fff;background:linear-gradient(110deg,#193e71,#14766f);padding:25px max(16px,calc((100vw - 1080px)/2))}header a{color:white}h1{margin:8px 0;font-size:clamp(27px,4vw,38px)}
+main{max-width:1080px;padding:20px 16px 65px;margin:auto}.card{background:#fff;border:1px solid var(--edge);padding:22px;border-radius:16px;margin:15px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tile{padding:16px;background:#f8fbff;border:1px solid #d3e0eb;border-radius:13px}.tile h3{margin:3px 0}.muted{color:#58718a}.small{font-size:13px}
+button,.action{font:inherit;font-weight:700;border:1px solid #95afc7;color:var(--blue);background:#fff;cursor:pointer;padding:10px 15px;border-radius:9px;text-decoration:none;display:inline-block}
+button.primary,.action.primary{background:var(--blue);color:white;border-color:var(--blue)}button:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid #ecb02e;outline-offset:2px}
+nav{display:flex;flex-wrap:wrap;gap:8px}nav button{border-radius:30px}nav button.active{background:var(--blue);color:white}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.space{justify-content:space-between}.note{border-left:5px solid #cd9c35;background:#fff8e7;border-radius:8px;padding:13px 16px;margin:12px 0}
+.score{font-size:30px;font-weight:800}.metric{background:#edf6ff;text-align:center;border-radius:11px;padding:15px}.metric strong{display:block;font-size:27px}
+.answer{display:block;width:100%;text-align:left;margin:8px 0;padding:14px;border:1px solid #bacede;border-radius:10px;color:var(--ink);font-weight:500}.answer.chosen{border:2px solid #24669e;background:#e9f2ff}
+.progress{height:12px;background:#e1ebf4;overflow:hidden;border-radius:16px;margin:12px 0}.progress div{height:100%;background:var(--teal);width:0}
+textarea{font:inherit;width:100%;padding:12px;border:1px solid #a6c0d2;border-radius:10px;min-height:170px;resize:vertical}label{display:block;font-weight:700;margin-top:10px}
+table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid #deebf2;padding:9px;text-align:left}th{background:#f2f7fd}
+.lesson{border:1px solid #cbddec;padding:18px;border-radius:13px;margin:13px 0;background:#f8fbff}.lesson details{margin:9px 0}.lesson details>section{border-top:1px solid #deebf2;padding:8px 0}
+.review{border-top:1px solid #dbe5ee;padding:13px 0;white-space:pre-wrap}.badge{font-size:12px;border-radius:15px;padding:4px 10px;background:#e2edf7;color:var(--blue)}
+[hidden]{display:none!important}footer{text-align:center;color:#617a90;font-size:13px;padding:20px}
+</style></head><body><header><a href="./form-3.html">← Form 3 Learning Hub</a><h1>📐 Form 3 Mathematics</h1><p>Five complete practices · Three structured examinations · Four mocks · Detailed lessons and progress tracking</p></header>
+<main>
+<section class="card"><h2>Welcome to Mathematics</h2><p>These original Form 3 revision activities follow the skills assessed in Babonneau Secondary School's Term 1 Mathematics examination. The structured exam and mocks reflect the school's Section A (20 marks), Section B (20 marks) and Section C (10 marks), while the separate objective practices contain 60 questions.</p><p class="small muted">Answers and progress are saved in this browser only. These results are practice grades, not school records. Calculators may be used.</p></section>
+<section class="card" id="summary"><h2>My Mathematics Progress and Grades</h2><div class="grid">
+<div class="metric"><strong id="done">0</strong>Completed assessments</div>
+<div class="metric"><strong id="average">No grades</strong>Average objective grade</div>
+<div class="metric"><strong id="pending">0</strong>Written papers awaiting marking</div></div><div id="quickLesson" class="row" style="margin-top:13px"></div></section>
+<nav aria-label="Mathematics learning areas">
+<button data-tab="overview" class="active">Overview</button><button data-tab="practices">5 Full Practices</button><button data-tab="structured">Structured Papers</button><button data-tab="mocks">4 Mock Exams</button><button data-tab="lessons">Detailed Mini Lessons</button><button data-tab="grades">Progress & Grades</button>
+</nav>
+<section id="overview" class="tab"><div class="card"><h2>My learning pathway</h2><div class="grid">
+<div class="tile"><h3>📝 Full Practices</h3><p>Five distinct 60-question objective papers. Four choices per question, one correct answer, and feedback only after submission.</p><button class="primary" data-go="practices">Open five practices</button></div>
+<div class="tile"><h3>✏️ Structured Response</h3><p>Three original 30-mark written papers with calculations, fractions, financial mathematics and investigative patterns.</p><button data-go="structured">Open written papers</button></div>
+<div class="tile"><h3>⏱ Mock Exams</h3><p>Two untimed and two timed school-style 50-mark mocks. Timed mocks allow 75 minutes.</p><button data-go="mocks">Open mocks</button></div>
+<div class="tile"><h3>📚 Mini Lessons</h3><p>Ten detailed lessons with explanations, worked examples and guided questions. Weakest skills are recommended after each objective paper.</p><button data-go="lessons">Study lessons</button></div>
+</div></div></section>
+<section id="practices" class="tab" hidden><div class="card"><h2>Five Complete 60-Question Practices</h2><p>Each paper covers ten Mathematics topics, with six questions per topic. Each practice has its own saved grade and can be resumed on the same device.</p><div id="practiceCards" class="grid"></div></div></section>
+<section id="structured" class="tab" hidden><div class="card"><h2>Section B and C Examination Practice</h2><p>Three complete 30-mark written assessments. Show all working. Written answers require teacher marking.</p><div id="structuredCards" class="grid"></div></div></section>
+<section id="mocks" class="tab" hidden><div class="card"><h2>Four School-Style Mock Examinations</h2><p>Section A: 20 objective marks. Section B: 20 written marks. Section C: 10 investigative marks. The timed mocks use the school's 75-minute duration. Only Section A is automatically scored.</p><div id="mockCards" class="grid"></div></div></section>
+<section id="lessons" class="tab" hidden><div class="card"><h2>Personalised Mathematics Lessons</h2><p>Your completed 60-question practices identify topics requiring review. Each topic has worked teaching examples and self-check questions.</p><div id="recommendations"></div></div><div class="card"><h2>All Mini Lessons</h2><div id="lessonCards"></div></div></section>
+<section id="grades" class="tab" hidden><div class="card"><h2>Grades and Progress</h2><div id="gradeTable"></div><p class="small muted">An unmarked constructed response does not receive an invented score. Only automatically graded objective marks are shown in the average.</p></div></section>
+<section id="workArea" hidden><div class="card"><div class="row space"><h2 id="workTitle"></h2><strong id="timer" role="timer"></strong></div><p id="workStatus" class="muted small"></p><div class="progress"><div id="workBar"></div></div><div id="questionArea"></div><div class="row"><button id="back">Previous</button><button id="forward" class="primary">Next</button><button id="submit" class="primary">Submit assessment</button><button id="saveExit">Save and exit</button></div></div></section>
+<section id="results" hidden><div class="card"><h2 id="resultHeading"></h2><div id="resultInfo"></div><div id="resultTable"></div><div class="note" id="suggestedLessons"></div><div class="row"><button id="answerReviewBtn">Review answers and explanations</button><button id="returnHome" class="primary">Back to Mathematics Dashboard</button><button id="retake">Try again</button></div><div id="answerReview" hidden></div></div></section>
+<footer>Babonneau Secondary School · Form Three Mathematics · Original revision material informed by school assessment skills</footer>
+</main>
+<script src="./form-3-maths-bank.js"></script><script src="./form-3-maths-lessons.js"></script><script src="./form-3-maths-structured.js"></script><script src="./form-3-maths-app.js"></script>
+</body></html>
