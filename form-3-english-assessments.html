@@ -169,9 +169,15 @@ function renderWritten(){
  }
 }
 $('saveExit').onclick=()=>{persist();home()};
-function submitAttempt(expired=false){
+async function submitAttempt(expired=false){
  if(!selected||!attempt||attempt.status!=='draft')return;
- const missing=selected.kind==='written'?attempt.values.filter(v=>!v.trim()).length:attempt.values.filter(v=>v===null).length;
+ let missing=0;
+ if(selected.kind==='written'){
+  for(let i=0;i<attempt.values.length;i++){
+   if(String(attempt.values[i]||'').trim())continue;
+   if(!(await window.BSSAnswerTools.hasContent('bss-english-'+selected.id,i)))missing++;
+  }
+ }else missing=attempt.values.filter(v=>v===null).length;
  if(!expired){
   if(missing&&!confirm(missing+' responses are blank. Submit anyway?'))return;
   if(!confirm('Submit '+selected.title+' now? You cannot edit this attempt after submission.'))return;
