@@ -32,10 +32,11 @@ assert.equal(typeof tools.mount,'function');assert.equal(typeof tools.exportBund
 async function tick(){await new Promise(resolve=>setImmediate(resolve))}
 (async()=>{
  const host=new Element('section');
- tools.mount({container:host,namespace:'test-exam',index:0});
+ tools.mount({container:host,namespace:'test-exam',index:0,expanded:true});
  await tick();
  const details=host.children[0];
  assert.equal(details.tagName,'details');
+ assert.equal(details.open,true,'Expanded mathematics input workspace must show the drawing and upload tools without extra clicks');
  const canvas=details.children.find(node=>node.tagName==='canvas');
  assert(canvas,'Drawing canvas missing');
  canvas.listeners.pointerdown({preventDefault(){},pointerId:1,clientX:12,clientY:12});
