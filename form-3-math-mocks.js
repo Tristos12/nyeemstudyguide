@@ -70,7 +70,7 @@ function render(){
   textarea.oninput=()=>{state.answers[i]=textarea.value;write()};
   const note=document.createElement('p');note.className='small muted';note.textContent='Show calculations, explanations and units. Written solutions will be reviewed by a teacher.';
   host.append(label,textarea,note);
-  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:'bss-math-mock-'+cfg.id,index:i,readonly:false})
+  if(window.BSSAnswerTools)window.BSSAnswerTools.mount({container:host,namespace:'bss-math-mock-'+cfg.id,index:i,readonly:false,expanded:true})
  }
  $('prev').disabled=i===0;$('next').disabled=i===items.length-1
 }
