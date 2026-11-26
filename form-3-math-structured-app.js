@@ -43,8 +43,12 @@ $('response').oninput=()=>{record.answers[record.position]=$('response').value;p
 $('previous').onclick=()=>{if(record.position>0){record.position--;persist();render()}};
 $('next').onclick=()=>{if(record.position<9){record.position++;persist();render()}};
 $('saveExit').onclick=()=>{persist();location.href='./form-3-mathematics.html?tab=structured'};
-function submit(){
- const missing=record.answers.filter(x=>!String(x||'').trim()).length;
+async function submit(){
+ let missing=0;
+ for(let i=0;i<record.answers.length;i++){
+  if(String(record.answers[i]||'').trim())continue;
+  if(!(await window.BSSAnswerTools.hasContent('bss-math-structured-'+number,i)))missing++;
+ }
  if(missing&&!confirm(missing+' written responses are blank. Submit anyway?'))return;
  if(!confirm('Submit Structured Paper '+number+' for teacher marking?'))return;
  record.status='submitted';record.submittedAt=new Date().toISOString();record.grade=null;persist();result()
