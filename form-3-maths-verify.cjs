@@ -1,5 +1,5 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const sources=['form-3-maths-bank.js','form-3-maths-lessons.js','form-3-maths-structured.js','form-3-maths-app.js','form-3-mathematics.html','form-3.html'];
+const sources=['form-3-maths-bank.js','form-3-maths-lessons.js','form-3-maths-structured.js','form-3-maths-app.js','form-3-mathematics.html','form-3-math-practices.html','form-3.html'];
 const text=Object.fromEntries(sources.map(p=>[p,fs.readFileSync(p,'utf8')]));
 const context={window:{},console};
 for(const p of sources.slice(0,3)){new vm.Script(text[p]);vm.runInNewContext(text[p],context)}
@@ -39,10 +39,16 @@ for(const s of structured){
 assert(text['form-3-mathematics.html'].includes('form-3-maths-app.js'));
 assert(text['form-3.html'].includes('href="./form-3-mathematics.html"'));
 for(let i=1;i<=5;i++){
- const url='href="./form-3-mathematics.html?exam=practice-'+i+'"';
+ const url='href="./form-3-math-practices.html?practice='+i+'"';
  assert(text['form-3-mathematics.html'].includes(url),'Missing direct practice link '+i);
 }
-assert(text['form-3-maths-app.js'].includes("const id=url.get('exam')"),'Direct practice URL is not handled by assessment engine');
+const standalone=text['form-3-math-practices.html'];
+assert(standalone.includes('src="./form-3-maths-bank.js"'),'Standalone practice must load question bank');
+assert(standalone.includes("params.get('practice')"),'Standalone practice must accept direct practice URLs');
+assert(standalone.includes('id="quiz"')&&standalone.includes('id="results"'),'Standalone question and results screens missing');
+const quizScript=standalone.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert(quizScript,'Standalone practice script missing');new vm.Script(quizScript);
+assert(quizScript.includes('questions.length!==60'),'Standalone question count safety check missing');
 
 const app=text['form-3-maths-app.js'];
 assert(app.includes("id:'mock-u1'")&&app.includes("id:'mock-u2'"));
