@@ -82,8 +82,9 @@ $('download').onclick=async()=>{
  }catch(e){alert('Could not export the submission. '+e.message)}
  finally{btn.disabled=false;btn.textContent='Download full submission (ZIP)'}
 };
-$('retry').onclick=()=>{
- if(!confirm('Start a new attempt? Your previous submitted answers will be replaced.'))return;
+$('retry').onclick=async()=>{
+ if(!confirm('Start a new attempt? Your previous submitted answers, drawings and uploads will be replaced.'))return;
+ try{await window.BSSAnswerTools.clearNamespace('bss-math-structured-'+number,10)}catch{}
  try{localStorage.removeItem(prefix+number)}catch{}
  open(number)
 };
