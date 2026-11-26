@@ -6,6 +6,7 @@ on:
       - 'student-success.html'
       - 'student-success-lessons.js'
       - 'student-success-bank.js'
+      - 'student-success-videos.js'
       - 'student-success-app.js'
       - 'student-success-verify.cjs'
       - '.github/workflows/student-success-check.yml'
