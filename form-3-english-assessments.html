@@ -34,7 +34,7 @@ table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px s
 <div class="card notice"><strong>Assessment and safeguarding</strong><p class="small">Timed papers run against the device clock; an expired paper is automatically submitted with any unanswered questions left blank. Writing is never automatically awarded marks. These are revision activities, not official examination grades or supervised assessments.</p></div>
 </section>
 <section id="active" hidden><div class="card"><div class="row between"><div><h2 id="activeTitle"></h2><span id="activeInfo" class="status"></span></div><div id="clock" role="timer" aria-live="off"></div></div><p id="autosave" class="small muted" role="status">Progress saves automatically.</p><div class="progress"><div id="activeProgress"></div></div><div id="assessmentBody"></div><div class="row"><button id="saveExit">Save and return</button><button id="submit" class="primary">Submit assessment</button></div></div></section>
-<section id="result" hidden><div class="card"><h2 id="resultTitle"></h2><div id="resultSummary"></div><div id="resultDetail"></div><div class="row"><button id="reviewBtn">Review answers</button><button id="resultBack" class="primary">Return to dashboard</button></div></div></section>
+<section id="result" hidden><div class="card"><h2 id="resultTitle"></h2><div id="resultSummary"></div><div id="lessonNextSteps" class="notice" style="margin:14px 0" aria-label="Recommended mini lessons" hidden></div><div id="resultDetail"></div><div class="row"><button id="reviewBtn">Review answers</button><button id="resultBack" class="primary">Return to dashboard</button></div></div></section>
 <footer>Babonneau Secondary School · Form 3 English Language Arts · Locally saved assessment progress</footer>
 </main>
 <script src="./form-3-paper2-bank.js"></script><script src="./form-3-expanded-a.js"></script><script src="./form-3-expanded-b.js"></script><script src="./form-3-paper-additions.js"></script>
@@ -185,6 +185,28 @@ function showResult(){
  const p=document.createElement('p');p.className=selected.kind==='objective'?'success':'notice';
  p.textContent=selected.kind==='objective'?'Automatically marked result: '+attempt.grade+'/60 ('+percentage(attempt.grade,60)+').':'Written Paper 2 submitted. Grade pending teacher marking (out of 51). No automatic writing marks have been assigned.';
  summary.append(p);
+ const suggestedHost=$('lessonNextSteps');suggestedHost.replaceChildren();
+ suggestedHost.hidden=selected.kind!=='objective';
+ if(selected.kind==='objective'){
+  const groups=[];
+  const all=objectiveItems(selected.source);
+  for(const [key,count] of counts){
+   const matching=all.map((item,i)=>item.skill===key?i:-1).filter(i=>i>=0);
+   const correct=matching.filter(i=>attempt.values[i]===all[i].q[2]).length;
+   const percent=Math.round(correct/count*100);
+   if(percent<85)groups.push({key,label:labels[key],percent});
+  }
+  groups.sort((a,b)=>a.percent-b.percent);
+  const heading=document.createElement('h3');heading.textContent='Your next step: Recommended Mini Lessons';suggestedHost.append(heading);
+  const guidance=document.createElement('p');guidance.textContent=groups.length?'Based on the sections where you lost marks, study these lessons before attempting another paper.':'Every skill area scored at least 85%. You may still review any lesson.';suggestedHost.append(guidance);
+  for(const [i,item] of groups.entries()){
+   const link=document.createElement('a');link.className='action';link.style.margin='4px';
+   link.href='./form-3-english.html?lesson='+encodeURIComponent(item.key);
+   link.textContent=(i===0?'Start here: ':'Study ')+item.label+' ('+item.percent+'%)';
+   suggestedHost.append(link);
+  }
+  if(!groups.length){const link=document.createElement('a');link.className='action';link.href='./form-3-english.html?tab=lessons';link.textContent='Browse mini lessons';suggestedHost.append(link)}
+ }
  const detail=$('resultDetail');detail.replaceChildren();
  if(selected.kind==='objective'){
   const items=objectiveItems(selected.source);
