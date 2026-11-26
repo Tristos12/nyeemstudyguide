@@ -131,7 +131,9 @@ $('review').onclick=()=>{
   const response=document.createElement('p');
   if(item.type==='objective')response.textContent='Your answer: '+(state.answers[i]===null?'Blank':item.q.options[state.answers[i]])+'\nCorrect answer: '+item.q.options[item.q.answer]+'\nExplanation: '+item.q.explanation;
   else response.textContent='Your answer:\n'+(state.answers[i]||'[No response]')+'\nTeacher marking required.';
-  div.append(h,stem,response);host.append(div)
+  div.append(h,stem,response);
+  if(item.type==='written'&&window.BSSAnswerTools)window.BSSAnswerTools.mount({container:div,namespace:'bss-math-mock-'+cfg.id,index:i,readonly:true});
+  host.append(div)
  });
  host.hidden=false;host.scrollIntoView({behavior:'smooth'})
 };
