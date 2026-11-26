@@ -594,5 +594,8 @@ function renderGrades(){
 }
 
 profile();updateStats();renderGrades();renderLearningPath();switchView('overview');
+const requestedLesson=new URLSearchParams(location.search).get('lesson');
+if(requestedLesson&&window.BSS_FORM3_LESSONS.some(l=>l.key===requestedLesson))openSuggestedLesson(requestedLesson);
+else if(new URLSearchParams(location.search).get('tab')==='lessons')switchView('lessons');
 window.addEventListener('pageshow',()=>{renderGrades();renderLearningPath()});
 </script></body></html>
