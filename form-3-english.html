@@ -136,6 +136,41 @@ reading:[
 ['What would be a sensible next step?',['Stop sharing information.','Organise another supervised clean-up and compare results.','Throw the records away.','Avoid speaking to local residents.'],1,'Repeating and comparing allows monitoring of progress.']
 ]
 };
+
+const extraQuestions={
+spelling:[
+['The principal congratulated students on their _____.',['determination','determinasion','determenation','determenation'],0,'Determination is formed from determine and ends in -ation.'],
+['The student gave a convincing _____ for her choice.',['explanasion','explanation','explaination','explination'],1,'Explanation is the correct noun.'],
+['The class made a valuable _____ to the library.',['contribusion','contributtion','contribution','contrabution'],2,'Contribution ends in -tion.'],
+['The school welcomed the visiting _____.',['representitive','represantative','representetive','representative'],3,'Representative is the correct spelling.']
+],
+vocabulary:[
+['The teacher described the solution as practical. Closest meaning of practical?',['useful','impossible','costly','unusual'],0,'Practical means workable or useful.'],
+['The decision was unanimous. Closest meaning of unanimous?',['delayed','agreed by everyone','unexpected','temporary'],1,'Unanimous means all agreed.'],
+['Choose the opposite of permanent.',['lasting','stable','temporary','fixed'],2,'Temporary is opposite in duration to permanent.'],
+['Choose the opposite of ancient.',['old','historic','traditional','modern'],3,'Modern is opposite to ancient in this context.']
+],
+grammar:[
+['Neither the coach nor the players _____ satisfied.',['were','was','is','has'],0,'The nearby plural subject players takes were.'],
+['The poem was read _____ by the student.',['confident','confidently','confidence','more confident'],1,'Confidently modifies the verb read.'],
+['If I _____ earlier, I would have caught the bus.',['leave','left','had left','have leave'],2,'The third conditional uses had + past participle.'],
+['One of the students _____ absent yesterday.',['were','are','have','was'],3,'The subject one takes the singular verb was.']
+],
+equivalent:[
+['In spite of the delay, the event began.',['The event began despite being delayed.','The event was cancelled.','The event began before any delay.','The delay caused a new event.'],0,'In spite of and despite express the same contrast.'],
+['The instructions must be followed before the experiment begins.',['Instructions are unnecessary.','Start the experiment only after following the instructions.','Follow instructions after finishing.','The experiment has already ended.'],1,'The correct paraphrase preserves the required order.'],
+['Unless the lights return, the rehearsal will be postponed.',['The rehearsal has already ended.','The rehearsal will always continue.','The rehearsal will be postponed if the lights do not return.','The rehearsal causes the lights to fail.'],2,'Unless introduces the condition if not.'],
+['The learners had barely settled when the bell rang.',['They settled hours before the bell.','The bell was broken.','The bell rang before anyone entered.','The bell rang almost immediately after they settled.'],3,'Barely...when expresses a very short interval.']
+],
+mainidea:[
+['Young writers often improve by planning, drafting and revising. Feedback from peers can also help them notice unclear ideas. What is the main idea?',['Writing improves through practice and revision.','Writers should never seek feedback.','Planning makes writing impossible.','Peer review replaces writing.'],0,'All details describe ways to improve writing.'],
+['Coral reefs shelter marine animals and attract visitors, but pollution and rising temperatures can damage them. Protection is needed to preserve these benefits. What is the main idea?',['Tourists cause every problem.','Coral reefs are valuable but threatened.','Reefs are found only in deep water.','Reefs do not support animals.'],1,'The passage weighs the value of reefs against threats.'],
+['Learning a musical instrument requires regular practice. Musicians improve timing, listening and coordination while developing patience. What is the main idea?',['Music is too difficult for students.','Only professional musicians benefit.','Practising music helps develop several skills.','Every musician plays the same instrument.'],2,'The details list varied benefits of musical learning.'],
+['School clubs help learners explore interests, make friends and practise leadership. Their success depends on members participating responsibly. What is the main idea?',['Clubs should replace all lessons.','Clubs are useful only for older students.','Membership never requires commitment.','Clubs provide benefits when members contribute.'],3,'The passage connects opportunities with responsibility.']
+]
+};
+Object.entries(extraQuestions).forEach(([key,items])=>questions[key].push(...items));
+
 const passage='THE BEACH CARE PROJECT\n\nOn Saturday morning, a group of Form 3 students joined a supervised beach-care project. Before beginning, a volunteer explained why plastic waste can damage marine life. The organisers asked students to bring reusable water bottles and wear suitable shoes.\n\nWorking in teams, the students collected litter and recorded the types of waste they found. They noticed that food wrappers and plastic bottles were common near the entrance. After the clean-up, the groups compared their findings and prepared a short presentation for their school assembly.\n\nTheir teacher encouraged them to monitor the site during future visits and share useful information with the community. The students learned that small actions can make a difference when people work together.';
 const skillNames={spelling:'Spelling',vocabulary:'Vocabulary: Synonyms & Antonyms',grammar:'Grammar',equivalent:'Equivalent Sentences',mainidea:'Main Idea',reading:'Reading Comprehension'};
 const comprehension=[
