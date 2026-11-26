@@ -1,0 +1,25 @@
+name: Form 3 Biology validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'form-3-biology.html'
+      - 'form-3-biology-bank.js'
+      - 'form-3-biology-written.js'
+      - 'form-3-biology-lessons.js'
+      - 'form-3-biology-app.js'
+      - 'form-3-biology-verify.cjs'
+      - 'form3-answer-tools.js'
+      - '.github/workflows/form3-biology-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node form-3-biology-verify.cjs && node form3-answer-tools-verify.cjs
