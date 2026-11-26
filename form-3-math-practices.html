@@ -1,0 +1,114 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Form 3 Mathematics: Full Practice</title>
+<style>
+:root{font:16px/1.55 system-ui,Arial,sans-serif;color:#173a5a;background:#f3f7fc}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(115deg,#183e70,#19756c);color:#fff;padding:22px max(16px,calc((100vw - 1000px)/2))}header a{color:white}h1{margin:8px 0}
+main{max-width:1000px;margin:auto;padding:18px 16px 70px}.card{background:white;border:1px solid #cdddec;border-radius:16px;padding:22px;margin:15px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.tile{background:#f7fbff;border:1px solid #cbddeb;border-radius:12px;padding:16px}
+button,.action{font:inherit;font-weight:700;color:#164674;background:white;border:1px solid #98afc8;border-radius:10px;padding:11px 15px;cursor:pointer;text-decoration:none;display:inline-block}button.primary{background:#183f70;border-color:#183f70;color:white}button.selected{border:2px solid #286daf;background:#e7f2ff;color:#163f6d}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,a:focus-visible{outline:3px solid #edb742;outline-offset:3px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.between{justify-content:space-between}.answers{display:grid;gap:10px;margin:18px 0}.answers button{text-align:left;white-space:normal;font-weight:500;color:#213d57}.muted{color:#5d7489}.small{font-size:13px}.progress{background:#e5edf5;border-radius:10px;overflow:hidden;height:11px;margin:14px 0}.progress>div{height:100%;width:0;background:#19796d}
+table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #dbe7ef;padding:11px;text-align:left}th{background:#f0f6fc}.notice{border-left:5px solid #c79125;background:#fff8e8;padding:14px;border-radius:9px}.review{border:1px solid #d6e4ed;background:#fafcff;padding:13px;border-radius:9px;margin:10px 0}.review p{margin:8px 0}[hidden]{display:none!important}footer{text-align:center;color:#5b748a;padding:15px}
+</style></head><body>
+<header><a href="./form-3-mathematics.html">← Mathematics Dashboard</a><h1>Form 3 Mathematics: Full Practice</h1><p>Five complete papers · 60 questions each · Results and recommended lessons at the end</p></header><main>
+<section class="card" id="selection"><h2>Choose a practice</h2><p>Each paper has 60 questions spanning ten Mathematics skills. Answers are saved as you work. You will not see corrections until you submit the complete paper.</p><div class="grid">
+<a class="action" href="?practice=1">Practice 1 · 60 questions</a><a class="action" href="?practice=2">Practice 2 · 60 questions</a><a class="action" href="?practice=3">Practice 3 · 60 questions</a><a class="action" href="?practice=4">Practice 4 · 60 questions</a><a class="action" href="?practice=5">Practice 5 · 60 questions</a></div><div id="savedStatus" class="muted small" style="margin-top:14px"></div></section>
+<section class="card" id="quiz" hidden><div class="row between"><strong id="practiceTitle"></strong><span id="answered">0 of 60 answered</span></div><div class="progress"><div id="bar"></div></div><div class="row between"><h2 id="counter"></h2><strong id="skill"></strong></div><h3 id="prompt"></h3><div id="options" class="answers" role="group" aria-label="Select your answer"></div><div class="row"><button id="previous">Previous</button><button id="next" class="primary">Next question</button><button id="submit" class="primary">Submit all 60 answers</button><button id="exit">Save and return</button></div><p class="small muted" id="saveInfo" role="status"></p></section>
+<section class="card" id="results" hidden><h2 id="resultsTitle"></h2><p id="score"></p><div id="breakdown"></div><div class="notice" id="recommendations"></div><div class="row" style="margin-top:14px"><button id="reviewButton">Review answers and explanations</button><button id="retry" class="primary">Retry this paper</button><a class="action" href="./form-3-math-practices.html">Choose another practice</a></div><div id="answerReview" hidden></div></section>
+<section class="card" id="problem" hidden><h2>Unable to load this practice</h2><p id="errorMessage"></p><a class="action" href="./form-3-math-practices.html">Return to practice list</a></section>
+<footer>Babonneau Secondary School · Form 3 Mathematics</footer>
+</main><script src="./form-3-maths-bank.js"></script><script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),bank=window.BSS_MATH,params=new URLSearchParams(location.search);
+const key=n=>'bss_f3_maths_2026_v1_practice-'+n;
+const load=n=>{try{return JSON.parse(localStorage.getItem(key(n))||'null')}catch{return null}};
+const save=(n,value)=>{try{localStorage.setItem(key(n),JSON.stringify(value));return true}catch{return false}};
+let num=0,questions=[],answers=[],position=0,finished=false;
+function show(which){for(const id of ['selection','quiz','results','problem'])$(id).hidden=id!==which;window.scrollTo(0,0)}
+function fail(reason){$('errorMessage').textContent=reason;show('problem')}
+function start(n){
+ if(!bank||!Array.isArray(bank.papers)||bank.papers.length!==5){fail('Question bank was not loaded. Refresh the page and try again.');return}
+ if(!Number.isInteger(n)||n<1||n>5){show('selection');return}
+ num=n;questions=bank.papers[n-1];
+ if(questions.length!==60||questions.some(q=>!Array.isArray(q.options)||q.options.length!==4)){fail('Practice '+n+' is unavailable because the question data is incomplete.');return}
+ const stored=load(n);
+ if(stored?.status==='submitted'&&Array.isArray(stored.answers)&&stored.answers.length===60){answers=stored.answers;finished=true;results();return}
+ answers=Array.isArray(stored?.answers)&&stored.answers.length===60?stored.answers.map(x=>Number.isInteger(x)&&x>=0&&x<4?x:null):Array(60).fill(null);
+ position=Math.min(59,Math.max(0,Number.isInteger(stored?.position)?stored.position:0));finished=false;
+ render();show('quiz')
+}
+function persist(){if(!finished){const ok=save(num,{status:'draft',answers,position});$('saveInfo').textContent=ok?'Answers saved on this device.':'Browser storage is unavailable. Answers may be lost if you leave.'}}
+function render(){
+ const q=questions[position];
+ $('practiceTitle').textContent='Practice '+num;$('counter').textContent='Question '+(position+1)+' of 60';
+ $('skill').textContent=bank.topicNames[q.topic];$('prompt').textContent=q.stem;
+ const area=$('options');area.replaceChildren();
+ q.options.forEach((option,i)=>{
+  const b=document.createElement('button');b.type='button';b.className=answers[position]===i?'selected':'';
+  b.textContent='ABCD'[i]+'. '+option;b.setAttribute('aria-pressed',String(answers[position]===i));
+  b.onclick=()=>{answers[position]=i;persist();render()};area.append(b)
+ });
+ const count=answers.filter(x=>x!==null).length;$('answered').textContent=count+' of 60 answered';$('bar').style.width=(count/60*100)+'%';
+ $('previous').disabled=position===0;$('next').disabled=position===59;
+}
+$('previous').onclick=()=>{if(position>0){position--;persist();render()}};
+$('next').onclick=()=>{if(position<59){position++;persist();render()}};
+$('exit').onclick=()=>{persist();location.href='./form-3-mathematics.html?tab=practices'};
+function submit(){
+ const blank=answers.filter(x=>x===null).length;
+ if(blank&&!confirm(blank+' unanswered questions will be marked incorrect. Submit anyway?'))return;
+ if(!confirm('Submit Practice '+num+' and view your results?'))return;
+ finished=true;
+ const grade=questions.reduce((sum,q,i)=>sum+(answers[i]===q.answer?1:0),0);
+ save(num,{status:'submitted',answers,position,grade,submittedAt:new Date().toISOString()});
+ results()
+}
+$('submit').onclick=submit;
+function results(){
+ show('results');
+ const marks=questions.reduce((sum,q,i)=>sum+(answers[i]===q.answer?1:0),0);
+ $('resultsTitle').textContent='Practice '+num+' completed';$('score').textContent='Score: '+marks+' / 60 ('+Math.round(marks/60*100)+'%)';
+ const group={};questions.forEach((q,i)=>{group[q.topic]??={right:0,total:0};group[q.topic].total++;if(answers[i]===q.answer)group[q.topic].right++});
+ const table=document.createElement('table'),head=document.createElement('tr');
+ for(const label of ['Mathematics topic','Correct','Total','Recommended mini lesson']){const th=document.createElement('th');th.textContent=label;head.append(th)}table.append(head);
+ const priorities=[];
+ for(const topic of bank.sections){
+  const row=document.createElement('tr'),s=group[topic],pct=Math.round(s.right/s.total*100);
+  for(const value of [bank.topicNames[topic],s.right,s.total]){const td=document.createElement('td');td.textContent=String(value);row.append(td)}
+  const cell=document.createElement('td');
+  if(pct<85){priorities.push({topic,pct});const a=document.createElement('a');a.href='./form-3-mathematics.html?lesson='+encodeURIComponent(topic);a.textContent='Study lesson ('+pct+'%)';cell.append(a)}
+  else cell.textContent='On track ('+pct+'%)';
+  row.append(cell);table.append(row)
+ }
+ $('breakdown').replaceChildren(table);
+ const rec=$('recommendations');rec.replaceChildren();
+ const h=document.createElement('h3');h.textContent='Your next step: Recommended Mini Lessons';rec.append(h);
+ priorities.sort((a,b)=>a.pct-b.pct);
+ const note=document.createElement('p');note.textContent=priorities.length?'Start with the lowest-scoring topic, study the lesson, then try another paper.':'All ten topics are at 85% or higher. You can review any lesson to strengthen your understanding.';rec.append(note);
+ for(const [i,r] of priorities.entries()){
+  const a=document.createElement('a');a.className='action';a.style.margin='4px';a.href='./form-3-mathematics.html?lesson='+encodeURIComponent(r.topic);a.textContent=(i===0?'Start here: ':'Study ')+bank.topicNames[r.topic]+' ('+r.pct+'%)';rec.append(a)
+ }
+ if(!priorities.length){const a=document.createElement('a');a.className='action';a.href='./form-3-mathematics.html?tab=lessons';a.textContent='Browse all lessons';rec.append(a)}
+ $('answerReview').hidden=true;$('answerReview').replaceChildren()
+}
+$('reviewButton').onclick=()=>{
+ const host=$('answerReview');host.replaceChildren();
+ questions.forEach((q,i)=>{
+  const div=document.createElement('div');div.className='review';
+  const title=document.createElement('strong');title.textContent='Question '+(i+1)+' · '+bank.topicNames[q.topic];
+  const p=document.createElement('p');p.textContent=q.stem;
+  const given=document.createElement('p');given.textContent='Your answer: '+(answers[i]===null?'Not answered':q.options[answers[i]]);
+  const correct=document.createElement('p');correct.textContent='Correct answer: '+q.options[q.answer];
+  const why=document.createElement('p');why.className='muted';why.textContent=q.explanation;
+  div.append(title,p,given,correct,why);host.append(div)
+ });
+ host.hidden=false;host.scrollIntoView({behavior:'smooth'})
+};
+$('retry').onclick=()=>{if(!confirm('Restart this practice? The previous saved grade will be replaced.'))return;localStorage.removeItem(key(num));start(num)};
+function menu(){
+ const host=$('savedStatus');host.replaceChildren();
+ for(let i=1;i<=5;i++){
+  const r=load(i),p=document.createElement('p');p.textContent='Practice '+i+': '+(r?.status==='submitted'?'Completed, '+r.grade+'/60':r?.status==='draft'?'In progress':'Not started');host.append(p)
+ }
+}
+try{menu();const n=Number(params.get('practice'));if(params.has('practice'))start(n);else show('selection')}
+catch(err){fail('There was a problem loading the questions: '+(err?.message||'Unknown error'))}
+})();
+</script></body></html>
