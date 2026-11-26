@@ -1,0 +1,20 @@
+name: Form 3 Hub validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'form-3.html'
+      - 'form-3-hub-verify.cjs'
+      - '.github/workflows/form3-hub-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node form-3-hub-verify.cjs
