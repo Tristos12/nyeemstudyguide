@@ -26,19 +26,31 @@ async function verifyTurnstile(token,ip){
   const data=await r.json();
   return data.success===true && typeof data.hostname==="string" && data.hostname==="tristos12.github.io";
 }
-async function rateLimit(hash){
+async function rateLimit(hash,isPilot=false){
   // Upstash fixed 1-hour window: pipeline keeps the counter in Redis across serverless instances.
   const prefix=process.env.KV_REST_API_URL,secret=process.env.KV_REST_API_TOKEN;
   const key="bss:writing:v1:"+hash+":"+Math.floor(Date.now()/3600000);
+  const commands=[["INCR",key],["EXPIRE",key,3700]];
+  if(isPilot){
+    // One shared cap across all networks: 20 fictional teacher requests per UTC day.
+    const day=new Date().toISOString().slice(0,10);
+    const globalKey="bss:writing:pilot:global:"+day;
+    commands.push(["INCR",globalKey],["EXPIRE",globalKey,90000]);
+  }
   const r=await fetch(prefix+"/pipeline",{
     method:"POST",headers:{"Authorization":"Bearer "+secret,"Content-Type":"application/json"},
-    body:JSON.stringify([["INCR",key],["EXPIRE",key,3700]]),signal:AbortSignal.timeout(8000)
+    body:JSON.stringify(commands),signal:AbortSignal.timeout(8000)
   });
   if(!r.ok)throw new Error("rate-limit-unavailable");
   const out=await r.json();
-  if(!Array.isArray(out)||out[0]?.error||out[1]?.error)throw new Error("rate-limit-unavailable");
+  if(!Array.isArray(out)||out.length!==commands.length||out.some(x=>x?.error))throw new Error("rate-limit-unavailable");
   const count=Number(out[0]?.result);
   if(!Number.isInteger(count)||count<1)throw new Error("rate-limit-invalid");
+  if(isPilot){
+    const globalCount=Number(out[2]?.result);
+    if(!Number.isInteger(globalCount)||globalCount<1)throw new Error("rate-limit-invalid");
+    return count<=10&&globalCount<=20;
+  }
   return count<=10;
 }
 async function sourceHash(v){
@@ -113,7 +125,7 @@ module.exports=async function handler(req,res){
     const ip=(req.headers["x-forwarded-for"]||"").split(",")[0].trim();
     if(!(await verifyTurnstile(turnstileToken,ip)))return json(res,403,{error:"human_check_failed"},req.headers.origin);
     const key=await sourceHash(ip||"unknown");
-    if(!(await rateLimit(key)))return json(res,429,{error:"try_again_later"},req.headers.origin);
+    if(!(await rateLimit(key,req.pilotMode===true)))return json(res,429,{error:"try_again_later"},req.headers.origin);
     const schema={
       type:"object",additionalProperties:false,required:["overview","strengths","improvements","revisionPrompt"],
       properties:{
