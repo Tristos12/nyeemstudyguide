@@ -52,6 +52,8 @@ footer{text-align:center;color:#695b60;font-size:13px;padding:18px}
 <section class="notice" aria-label="Protected pilot assessment">
 <h3>Protected AI pilot with fictional responses</h3>
 <p>This test will be available only after the administrator activates <code>PILOT_ENABLED</code> and sets a private access key in Vercel. <strong>Student AI submissions remain off.</strong> The access key is kept only in the browser input and is not saved in the report.</p>
+<p class="small">To prepare your private key, click Generate, copy it directly into the protected Vercel variable <code>PILOT_ACCESS_TOKEN</code>, then return here. Never share this key in chat or screenshots.</p>
+<div class="actions"><button type="button" class="alt" id="generatePilotKey">Generate a strong private pilot key</button><button type="button" class="alt" id="copyPilotKey">Copy private key</button></div>
 <label for="pilotPassword">Private pilot access key</label>
 <input type="password" id="pilotPassword" autocomplete="off" placeholder="Enter the private Vercel pilot key" maxlength="256">
 <div id="pilotVerification"></div>
@@ -123,6 +125,18 @@ third.append(s);tr.append(first,second,third);$("ratingRows").append(tr);
 });
 const controls=[...document.querySelectorAll("#ratingRows select")];
 
+$("generatePilotKey").addEventListener("click",()=>{
+ const random=new Uint8Array(32);crypto.getRandomValues(random);
+ const key=Array.from(random,b=>b.toString(16).padStart(2,"0")).join("");
+ $("pilotPassword").value=key;
+ $("pilotStatus").textContent="Generated a new private key in this browser. Copy it and save it as PILOT_ACCESS_TOKEN in Vercel (Sensitive, Production). It will not be stored here.";
+});
+$("copyPilotKey").addEventListener("click",async()=>{
+ const key=$("pilotPassword").value;
+ if(!key){$("pilotStatus").textContent="Generate or enter a private key first.";return}
+ try{await navigator.clipboard.writeText(key);$("pilotStatus").textContent="Private key copied. Paste it directly into the Vercel environment variable field, and clear your clipboard when finished."}
+ catch(e){$("status").textContent="Clipboard unavailable. Select and manually copy the key field."}
+});
 let turnstileLoader;
 function loadPilotTurnstile(){
  if(window.turnstile)return Promise.resolve();
