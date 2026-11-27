@@ -24,3 +24,15 @@ th{background:#f8ecde}
 .notice,.note{background:#fff4e2;border-left-color:#b67a24}
 a:hover,button:hover{transition:filter .15s ease}
 @media(prefers-reduced-motion:reduce){a:hover,button:hover{transition:none}}
+
+/* Form 1 dashboard and other school-hub controls */
+:root{--blue:#9d503b}
+.dashboard-summary>div,.dashboard-subject{background:#fff8ee;border-color:#ead9c7}
+.dashboard-subject .subject-link{background:#67243b;color:#fff}
+.subject:not(:disabled){border-color:#9d503b}
+.option:has(input:checked){background:#f9e8da;border-color:#9d503b}
+input{accent-color:#9d503b}
+.story{background:#fff4e4}
+.track{background:#f1e5db}
+.track>div{background:#a15a38}
+.tabs button.active{background:#67243b!important;color:white!important}
