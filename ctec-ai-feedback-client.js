@@ -59,7 +59,7 @@ async function getToken(target){
    const token=await getToken(verification);
    const response=await fetch(cfg.endpoint,{
     method:"POST",mode:"cors",credentials:"omit",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({task:instructions.slice(0,2000),rubric:rubric.slice(0,1600),answer:ta.value.slice(0,6000),turnstileToken:token}),
+    body:JSON.stringify({task:instructions.slice(0,2000),rubric:rubric.slice(0,1600),answer:ta.value.slice(0,6000),turnstileToken:token,consent:true}),
     signal:AbortSignal.timeout(25000)
    });
    const data=await response.json();
