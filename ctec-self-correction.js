@@ -48,12 +48,57 @@ groups.forEach((group,i)=>{
  text.value=saved["e"+i+"r"]||"";
  text.addEventListener("input",()=>{saved["e"+i+"r"]=text.value.slice(0,3000);save()});
  if(input){input.value=saved["e"+i+"d"]||"";input.addEventListener("input",()=>{saved["e"+i+"d"]=input.value.slice(0,12000);save()})}
+
+ const saveButton=document.createElement("button");
+ saveButton.type="button";saveButton.className="secondary";
+ saveButton.textContent="Download my work and feedback";
+ root.querySelector(".review-btn").after(saveButton);
+ function reviewDraft(){
+   const draft=(input?.value||"").trim();
+   const words=draft?draft.split(/\s+/).length:0;
+   const sentences=(draft.match(/[.!?]+(?:\s|$)/g)||[]).length;
+   const paragraphs=draft.split(/\n\s*\n/).filter(x=>x.trim()).length;
+   const count=[...root.querySelectorAll(".self-item:checked")].length;
+   const instructions=container.querySelector("ol")?.innerText||"Complete the weekly writing task";
+   const target=instructions.match(/(\d{2,3})\s*[–-]\s*(\d{2,3})\s*words?/i);
+   const single=instructions.match(/(\d{2,3})[\s-]*word/i);
+   const min=target?Number(target[1]):single?Math.floor(Number(single[1])*.85):null;
+   const max=target?Number(target[2]):single?Math.ceil(Number(single[1])*1.15):null;
+   const feedback=[];
+   if(!words)feedback.push("No writing entered. Complete the writing activity first.");
+   else {
+     if(min!==null&&words<min)feedback.push("Your writing is shorter than the task's approximate target. Add relevant detail, examples or explanation.");
+     else if(max!==null&&words>max)feedback.push("Your writing exceeds the task's approximate target. Edit for clarity and focus.");
+     else feedback.push("Length check: "+words+" words"+(min!==null?", within the approximate target":"")+".");
+     if(sentences<2)feedback.push("Check sentence boundaries and punctuation; the tool detected fewer than two complete sentence endings.");
+     if(words>=100&&paragraphs<2)feedback.push("Consider separating ideas into paragraphs where the task format requires it.");
+     if(/\b(i think|in my opinion)\b/i.test(draft)&&/summar|informative|report/i.test(instructions))feedback.push("If this is a factual summary or report, remove personal opinions unless the question asks for them.");
+     if(/\b(because|for example|for instance|such as|therefore)\b/i.test(draft))feedback.push("You have used at least one explanation or example signal. Check whether the explanation is relevant and sufficiently developed.");
+     else if(words>50)feedback.push("Look for opportunities to explain a point or give an appropriate example rather than simply listing ideas.");
+     if(/\b(i|my)\b/i.test(draft)&&/formal|notice|report/i.test(instructions))feedback.push("Review whether a first-person style is suitable for the required format and audience.");
+     if(/\b(they is|he have|she have|it have|it help|it make)\b/i.test(draft))feedback.push("Check subject–verb agreement, particularly after singular subjects.");
+   }
+   feedback.push("Self-review: "+count+" of 5 checks completed.");
+   feedback.push("Teacher's marking criteria: "+criteria);
+   feedback.push("This is an automated structure and language-pattern check, NOT a judgement of factual accuracy, meaning, creativity or an official mark.");
+   return {draft,words,instructions,feedback};
+ }
+ root.querySelector(".review-btn").textContent="Review my draft";
  root.querySelector(".review-btn").addEventListener("click",()=>{
- const count=[...root.querySelectorAll(".self-item:checked")].length;
- const words=(input?.value||"").trim().split(/\s+/).filter(Boolean).length;
- const result=root.querySelector(".result");result.hidden=false;
- result.textContent=(words<25?"Your draft is quite short ("+words+" words). Check the task's expected length and develop your ideas. ":"Your draft contains "+words+" words. ")+count+" of 5 self-review checks completed. "+(count===5?"You have completed the review steps. Ask your teacher to check whether the content meets the rubric.":"Finish the remaining checklist items, revise and check again.")+" Rubric: "+criteria;
+  const r=reviewDraft(),result=root.querySelector(".result");
+  result.hidden=false;result.textContent=r.feedback.join("\n• ");
+  result.style.whiteSpace="pre-line";
  });
+ saveButton.addEventListener("click",()=>{
+  const r=reviewDraft();
+  const report=["BABONNEAU SECONDARY SCHOOL","CTEC English A - Weekly Written Practice","Activity "+(i+1),"",r.instructions,"","STUDENT RESPONSE",r.draft||"(No response)","","SELF-REVIEW FEEDBACK",...r.feedback,"","STUDENT IMPROVEMENT PLAN",text.value||"(Not entered)","","Teacher review needed for final judgement"].join("\n");
+  const blob=new Blob([report],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="CTEC-English-Activity-"+(i+1)+"-Review.txt";
+  document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+ });
+
  }else{
  const problems=[...container.querySelectorAll(".ctec-problem")];
  root.innerHTML='<strong>Check my Mathematics answers</strong><p class="hint">Write your final answer, ideally on its own line. Working is saved privately on this device. Auto-checking uses exact answers and simple numerical equivalence; it cannot evaluate every valid method or expression.</p><button type="button" class="review-btn">Check my answers</button><button type="button" class="secondary retry-btn">Try again</button><div class="result" role="status" aria-live="polite" hidden></div>';
