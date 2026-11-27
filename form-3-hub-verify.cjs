@@ -17,6 +17,25 @@ for(const s of subjects){
   assert(fs.existsSync(href),s.name+' '+key+' link missing: '+href);
  }
 }
+// Every Start practice shortcut must open a specific numbered assessment.
+for(const s of subjects){
+ const query=s.primary.split('?')[1]||'';
+ const params=new URLSearchParams(query);
+ const expected=s.name==='English Language Arts'?'practice':'exam';
+ assert.equal(params.get(expected),'practice-1'.replace(/^practice-/,'') && expected==='practice'?'1':'practice-1',s.name+' does not deep-link to Practice 1');
+ const destination=s.primary.split('?')[0];
+ const destinationText=fs.readFileSync(destination,'utf8');
+ if(expected==='practice'){
+  assert(destinationText.includes("new URLSearchParams(location.search).get('practice')"),'English practice page must read its practice number');
+  assert(destinationText.includes('start(practiceParam-1)'),'English Practice 1 must auto-launch');
+ }else{
+  const scriptMatch=destinationText.match(/<script src="\.\/(form-3-[^"]+-app\.js)"><\/script>/);
+  assert(scriptMatch,s.name+' assessment app file missing');
+  const app=fs.readFileSync(scriptMatch[1],'utf8');
+  assert(app.includes("get('exam')"),s.name+' assessment app must read exam=practice-1');
+ }
+}
+assert(fs.readFileSync('form-3-english.html','utf8').includes('href="./form-3-english-practices.html?practice=1"'),'English overview Start button must open practice');
 assert(html.includes('student-success.html?tab=planner'));
 assert(html.includes('student-success.html?tab=videos'));
 assert(html.includes('student-success.html?tab=flashcards'));
