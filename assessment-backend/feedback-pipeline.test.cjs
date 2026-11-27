@@ -2,6 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { Readable } = require("node:stream");
 const assess = require("./api/assess.js");
+const pilot = require("./api/pilot.js");
 
 // All content in these tests is fictional. No production keys, student responses or HTTP requests.
 const origin="https://tristos12.github.io";
@@ -146,5 +147,52 @@ test("contact details are blocked before external processing",async()=>{
     assert.equal(res.json.error,"remove_contact_details");
   }
   assert.equal(seen.length,0);
+ });
+});
+
+test("Vercel pre-parsed request body is accepted",async()=>{
+ await withFakeService("success",async()=>{
+  const res=makeRes();
+  await assess({method:"POST",headers:{origin,referer:ref,"x-forwarded-for":"192.0.2.10"},body:example},res);
+  assert.equal(res.status,200);
+  assert.equal(res.json.feedback.grade,null);
+ });
+});
+test("pilot refuses requests when switched off, even with a submitted key",async()=>{
+ const prevEnabled=process.env.PILOT_ENABLED,prevToken=process.env.PILOT_ACCESS_TOKEN;
+ process.env.PILOT_ENABLED="false";process.env.PILOT_ACCESS_TOKEN="p".repeat(40);
+ try{
+  const res=makeRes();await pilot(makeReq(example,{"x-bss-pilot-key":"p".repeat(40)}),res);
+  assert.equal(res.status,503);assert.equal(res.json.error,"pilot_not_enabled");
+ }finally{
+  if(prevEnabled===undefined)delete process.env.PILOT_ENABLED;else process.env.PILOT_ENABLED=prevEnabled;
+  if(prevToken===undefined)delete process.env.PILOT_ACCESS_TOKEN;else process.env.PILOT_ACCESS_TOKEN=prevToken;
+ }
+});
+test("pilot refuses invalid access key before processing",async()=>{
+ const prevEnabled=process.env.PILOT_ENABLED,prevToken=process.env.PILOT_ACCESS_TOKEN;
+ process.env.PILOT_ENABLED="true";process.env.PILOT_ACCESS_TOKEN="p".repeat(40);
+ try{
+  const res=makeRes();await pilot(makeReq(example,{"x-bss-pilot-key":"q".repeat(40)}),res);
+  assert.equal(res.status,403);assert.equal(res.json.error,"pilot_access_denied");
+ }finally{
+  if(prevEnabled===undefined)delete process.env.PILOT_ENABLED;else process.env.PILOT_ENABLED=prevEnabled;
+  if(prevToken===undefined)delete process.env.PILOT_ACCESS_TOKEN;else process.env.PILOT_ACCESS_TOKEN=prevToken;
+ }
+});
+test("pilot can use fictional feedback while student endpoint stays disabled",async()=>{
+ await withFakeService("success",async()=>{
+  const prevEnabled=process.env.PILOT_ENABLED,prevToken=process.env.PILOT_ACCESS_TOKEN,prevAssessment=process.env.ASSESSMENT_ENABLED;
+  process.env.PILOT_ENABLED="true";process.env.PILOT_ACCESS_TOKEN="p".repeat(40);process.env.ASSESSMENT_ENABLED="false";
+  try{
+   const teacher=makeRes();await pilot(makeReq(example,{"x-bss-pilot-key":"p".repeat(40)}),teacher);
+   assert.equal(teacher.status,200);assert.equal(teacher.json.feedback.grade,null);
+   const student=makeRes();await assess(makeReq(example),student);
+   assert.equal(student.status,503);assert.equal(student.json.error,"assessment_not_enabled");
+  }finally{
+   if(prevEnabled===undefined)delete process.env.PILOT_ENABLED;else process.env.PILOT_ENABLED=prevEnabled;
+   if(prevToken===undefined)delete process.env.PILOT_ACCESS_TOKEN;else process.env.PILOT_ACCESS_TOKEN=prevToken;
+   if(prevAssessment===undefined)delete process.env.ASSESSMENT_ENABLED;else process.env.ASSESSMENT_ENABLED=prevAssessment;
+  }
  });
 });
