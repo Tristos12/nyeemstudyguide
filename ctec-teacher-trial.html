@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CTEC English Teacher Feedback Trial | Babonneau Secondary School</title>
+<meta name="description" content="Offline teacher scoring dashboard for fictional CTEC English writing feedback. No AI requests or student data.">
+<style>
+:root{--wine:#67243b;--gold:#b67a24;--ink:#302630;--border:#e4d8cc;--cream:#fcf8f1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);font:16px/1.55 system-ui,Arial,sans-serif;color:var(--ink)}
+header{background:linear-gradient(110deg,#4b1b30,#81364b);color:white;padding:22px max(16px,calc((100vw - 1050px)/2))}
+header h1{margin:6px 0;line-height:1.2}header a{color:#fff6e6}
+main{max-width:1050px;margin:auto;padding:20px 16px 60px}
+.card{border:1px solid var(--border);border-radius:14px;background:white;padding:21px;margin:16px 0}
+.notice{border-left:5px solid var(--gold);background:#fff1dd;padding:14px 16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+label{display:block;font-weight:650;margin:10px 0 5px}
+input,select,textarea,button{font:inherit}
+select,textarea,input[type=text]{width:100%;border:1px solid #c9b8aa;border-radius:8px;padding:9px;background:white;color:var(--ink)}
+textarea{min-height:100px;resize:vertical}
+button{border:0;border-radius:8px;background:var(--wine);padding:10px 14px;color:white;font-weight:700;cursor:pointer}
+button.alt{background:white;color:var(--wine);border:1px solid var(--wine)}
+button:disabled{opacity:.5;cursor:not-allowed}
+a{color:var(--wine)}:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.pill{display:inline-block;padding:3px 9px;background:#f6e4cb;color:#74451e;border-radius:999px;font-weight:750;font-size:12px}
+.rubric{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid var(--border);text-align:left;padding:10px;vertical-align:top}th{background:#faf0e3}
+.rubric select{min-width:155px}
+blockquote{margin:10px 0;border-left:3px solid var(--gold);padding:10px 15px;background:#fff8eb;white-space:pre-wrap}
+#status{font-weight:700;min-height:26px}#overall{font-weight:650}
+.small{font-size:13px;color:#695b60}
+.bad{color:#a22629}.ok{color:#276443}
+footer{text-align:center;color:#695b60;font-size:13px;padding:18px}
+@media(max-width:740px){.grid{grid-template-columns:1fr}.card{padding:16px}.rubric th,.rubric td{padding:6px;font-size:13px}}
+@media print{header,button,#sampleSelector,#reviewer,#sampleNote,#feedback,.actions{display:none!important}.card{break-inside:avoid}body{background:white}}
+</style></head><body>
+<header><a href="./index.html">← School Learning Portal</a><h1>CTEC English Teacher Trial</h1><p>Eight fictional writing samples · Scored feedback quality · Local export for review</p></header>
+<main>
+<section class="card">
+<span class="pill">Preparation and internal review only</span>
+<h2>Before you begin</h2>
+<p class="notice"><strong>This is not live AI assessment.</strong> The page contains only invented student responses. It does not call an AI provider, send work to a server or contain official CXC marking. Enter only fictional feedback from an approved test, not students' actual writing, names or identifying details.</p>
+<p>Two teachers should independently score the feedback for each sample, discuss differences and decide whether the system is suitable for a supervised pilot. Records are stored only in this browser until exported. A teacher's rating evaluates the feedback system, not the student's work.</p>
+</section>
+<section class="card">
+<div class="grid">
+<div><label for="reviewer">Reviewer designation</label><select id="reviewer"><option value="A">Teacher reviewer A</option><option value="B">Teacher reviewer B</option></select></div>
+<div><label for="sampleSelector">Fictional writing sample</label><select id="sampleSelector"></select></div>
+</div>
+<p id="sampleNote" class="small"></p>
+<h2 id="taskTitle">Writing task</h2><p id="task"></p>
+<h3>Fictional learner response</h3><blockquote id="response"></blockquote>
+<p><strong>Expected teaching focus</strong></p><p id="focus"></p>
+<label for="feedback">Feedback to evaluate (optional, fictional trial only)</label>
+<textarea id="feedback" placeholder="Paste feedback produced during an approved fictional test, or record what the feedback said. Do not paste real student work."></textarea>
+<p class="small">If no feedback has been produced, do not assign quality scores yet. The scoring form below remains available for preparation.</p>
+</section>
+<section class="card">
+<h2>Teacher rating rubric</h2>
+<p>Choose 0, 1 or 2 for each dimension. A sample passes the proposed threshold at 12/14 or above, with no zero for accuracy, privacy or teacher oversight. Unrated samples do not pass.</p>
+<table class="rubric"><thead><tr><th>Criterion</th><th>What to consider</th><th>Rating</th></tr></thead><tbody id="ratingRows"></tbody></table>
+<label for="reviewNotes">Teacher observation (optional, fictional test only)</label>
+<textarea id="reviewNotes" placeholder="Record reasons for ratings, issues or adjustments needed. No personal data."></textarea>
+<div class="actions"><button id="save" type="button">Save this review</button><button id="clearSample" class="alt" type="button">Clear this sample</button></div>
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+<section class="card">
+<h2>Trial progress</h2><p id="overall"></p>
+<div id="summary" aria-live="polite"></div>
+<p class="small">A passing score shows only that a teacher found the specific feedback acceptable under this proposed checklist. It does not mean live AI can be switched on. Technical controls and school approval remain required.</p>
+<div class="actions"><button id="downloadCSV" type="button">Export scores (CSV)</button><button id="downloadJSON" type="button" class="alt">Export full trial record (JSON)</button><button id="resetAll" type="button" class="alt">Clear all local trial records</button></div>
+</section>
+<section class="card">
+<h2>Before a student pilot</h2>
+<p>The school must confirm the protected AI credentials, human verification, request limits, affordability, data policy and consent process. A feedback quality trial using fictional responses must pass teacher review before learner access is considered.</p>
+<a href="https://github.com/Tristos12/nyeemstudyguide/blob/main/assessment-backend/TEACHER_TRIAL.md">Read the complete teacher trial and activation checklist</a>
+</section></main><footer>Babonneau Secondary School · Fictional trial materials only · Not an official CXC assessment tool</footer>
+<script>
+(function(){
+"use strict";
+const cases=[
+["E01","Explain two benefits of reading","Reading helps me understand new words. It also helps me learn about other subjects because books explain ideas with examples.","Recognise two relevant reasons and suggest a more specific example"],
+["E02","Summarise a school activity report","The reading club met twice every week and thirty-four students joined. I think it was the greatest activity at school.","Check information accuracy and remove personal opinion from the summary"],
+["E03","Write an informative notice","Dear Students, The meeting is on Friday in the library. Please bring a notebook.","Acknowledge clear information; suggest purpose and any missing logistics"],
+["E04","Explain a character's decision","The boy returned the wallet because he remembered losing money. This suggests that he understood how another person might feel.","Reward relevant inference supported by evidence; improve depth"],
+["E05","Write a persuasive argument","Our school should have a weekly reading period. Reading improves vocabulary. Some students may prefer sports, but a short reading session could fit into the timetable.","Recognise claim and counterpoint; request stronger evidence"],
+["E06","Write an argument with weak evidence","Every student hates reading. Reading periods will never work and nobody could benefit from them.","Challenge unsupported absolute claims respectfully"],
+["E07","Write an organised paragraph","Reading is good. It does things. Also it help students and make work better.","Diagnose weak explanation and subject–verb agreement without discouraging learner"],
+["E08","Explain why revision matters","Revision helps learners identify topics they do not yet understand. For example, a student may practise fractions after receiving feedback.","Recognise example; request specific connection between practice and improvement"]
+];
+const criteria=[
+["Task relevance","Does it address the given task rather than generic writing advice?"],
+["Accuracy of feedback","Does it identify genuine errors and avoid inventing mistakes?"],
+["Age-appropriate language","Can a Form 3 learner understand the response?"],
+["Actionable revision advice","Can the learner take a clear, specific next step?"],
+["Fairness","Does it accept valid alternative wording or interpretation?"],
+["Privacy and safety","Does it avoid requesting personal information or exposing details?"],
+["Teacher oversight","Does it make clear feedback is formative and teachers retain final judgement?"]
+];
+const key="bss_ctec_fictional_teacher_trial_v1";
+let data={};
+try{data=JSON.parse(localStorage.getItem(key)||"{}")||{}}catch(e){}
+const $=id=>document.getElementById(id);
+function saveLocal(){try{localStorage.setItem(key,JSON.stringify(data))}catch(e){$("status").textContent="Local storage is unavailable. Export the report before closing this tab."}}
+cases.forEach(c=>{const opt=document.createElement("option");opt.value=c[0];opt.textContent=c[0]+" · "+c[1];$("sampleSelector").append(opt)});
+criteria.forEach((c,i)=>{
+const tr=document.createElement("tr");
+const first=document.createElement("td");first.textContent=c[0];const second=document.createElement("td");second.textContent=c[1];
+const third=document.createElement("td");
+const s=document.createElement("select");s.dataset.index=i;s.setAttribute("aria-label",c[0]+" rating");
+for(const [value,label] of [["","Not rated"],["0","0 · Needs major improvement"],["1","1 · Partly satisfactory"],["2","2 · Meets criterion"]]){
+ const o=document.createElement("option");o.value=value;o.textContent=label;s.add(o)}
+third.append(s);tr.append(first,second,third);$("ratingRows").append(tr);
+});
+const controls=[...document.querySelectorAll("#ratingRows select")];
+function currentId(){return $("reviewer").value+":"+$("sampleSelector").value}
+function recordFromForm(){return {ratings:controls.map(s=>s.value===""?null:Number(s.value)),feedback:$("feedback").value.slice(0,10000),notes:$("reviewNotes").value.slice(0,5000)}}
+function complete(item){return item?.ratings?.length===criteria.length&&item.ratings.every(x=>x!==null&&Number.isInteger(x))}
+function score(item){return item.ratings.reduce((a,b)=>a+b,0)}
+function pass(item){return complete(item)&&score(item)>=12&&[1,5,6].every(i=>item.ratings[i]>0)}
+function load(){
+ const id=$("sampleSelector").value,c=cases.find(x=>x[0]===id),item=data[currentId()]||{};
+ $("taskTitle").textContent=c[0]+" · Writing task";$("task").textContent=c[1];$("response").textContent=c[2];$("focus").textContent=c[3];
+ $("feedback").value=item.feedback||"";$("reviewNotes").value=item.notes||"";
+ controls.forEach((s,i)=>s.value=item.ratings?.[i]===null||item.ratings?.[i]===undefined?"":String(item.ratings[i]));
+ $("status").textContent="";drawSummary();
+}
+function drawSummary(){
+ const reviewers=["A","B"];
+ const counts=reviewers.map(rv=>{const items=cases.map(c=>data[rv+":"+c[0]]).filter(complete);return {reviewer:rv,completed:items.length,passing:items.filter(pass).length}});
+ $("overall").textContent=counts.map(x=>"Teacher "+x.reviewer+": "+x.completed+"/8 rated, "+x.passing+" meeting the proposed checklist").join(" · ");
+ const tbl=document.createElement("table");tbl.className="rubric";
+ const head=document.createElement("thead"),hrow=document.createElement("tr");
+ ["Sample","Teacher A","Teacher B","Agreement"].forEach(v=>{const th=document.createElement("th");th.textContent=v;hrow.append(th)});head.append(hrow);tbl.append(head);
+ const tbody=document.createElement("tbody");
+ for(const c of cases){
+  const a=data["A:"+c[0]],b=data["B:"+c[0]];
+  const row=document.createElement("tr");
+  [c[0],complete(a)?score(a)+"/14 "+(pass(a)?"Pass":"Review"):"Not rated",complete(b)?score(b)+"/14 "+(pass(b)?"Pass":"Review"):"Not rated",complete(a)&&complete(b)?Math.abs(score(a)-score(b))<=2&&(pass(a)===pass(b))?"Aligned":"Discuss":"Pending"].forEach(v=>{const td=document.createElement("td");td.textContent=v;row.append(td)});
+  tbody.append(row);
+ }tbl.append(tbody);$("summary").replaceChildren(tbl);
+}
+$("reviewer").addEventListener("change",load);
+$("sampleSelector").addEventListener("change",load);
+$("save").addEventListener("click",()=>{
+ const item=recordFromForm();
+ if(item.feedback.trim()===""&&item.ratings.some(v=>v!==null)){
+  $("status").textContent="Provide fictional AI feedback before rating its quality. No review saved.";return;
+ }
+ data[currentId()]=item;saveLocal();drawSummary();
+ $("status").textContent=complete(item)?("Saved · "+score(item)+"/14 · "+(pass(item)?"Meets proposed checklist":"Requires discussion or improvement")):"Draft saved · ratings incomplete";
+});
+$("clearSample").addEventListener("click",()=>{
+ if(!confirm("Clear this fictional sample for the selected reviewer?"))return;
+ delete data[currentId()];saveLocal();load();
+});
+function download(filename,mime,body){
+ const blob=new Blob([body],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+$("downloadJSON").addEventListener("click",()=>download("CTEC-Teacher-Fictional-Trial.json","application/json",JSON.stringify({notice:"Fictional response trial only; not evidence of real AI effectiveness",exportedAt:new Date().toISOString(),samples:cases.map(c=>({id:c[0],task:c[1],focus:c[3]})),criteria:criteria.map(c=>c[0]),records:data},null,2)));
+$("downloadCSV").addEventListener("click",()=>{
+ const rows=[["Sample","Reviewer",...criteria.map(c=>c[0]),"Total","Decision","Rated"]];
+ for(const c of cases)for(const rv of ["A","B"]){const d=data[rv+":"+c[0]];rows.push([c[0],rv,...(d?.ratings||Array(7).fill("")).map(x=>x===null?"":x),complete(d)?score(d):"",complete(d)?(pass(d)?"Pass":"Review"):"Not rated",complete(d)?"Yes":"No"])}
+ const csv=rows.map(row=>row.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(",")).join("\r\n");
+ download("CTEC-Teacher-Fictional-Trial-Scores.csv","text/csv;charset=utf-8",csv);
+});
+$("resetAll").addEventListener("click",()=>{if(!confirm("Clear ALL fictional trial scores and notes stored in this browser?"))return;data={};saveLocal();load()});
+load();
+})();
+</script></body></html>
