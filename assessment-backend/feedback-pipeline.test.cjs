@@ -49,7 +49,10 @@ async function withFakeService(mode, fn) {
   }
   if(String(url).includes("test-redis.invalid")){
    if(mode==="redis_unavailable")throw new Error("test redis failure");
-   return {ok:true,json:async()=>[{result:mode==="rate_limited"?11:1},{result:1}]};
+   return {ok:true,json:async()=>{
+    const commands=JSON.parse(opts.body);
+    return commands.map((cmd,i)=>({result:i===0?(mode==="rate_limited"?11:1):i===2?(mode==="pilot_global_limited"?21:1):1}));
+   }};
   }
   if(String(url).includes("api.openai.com")){
    if(mode==="provider_down")return {ok:false,status:500};
@@ -193,6 +196,21 @@ test("pilot can use fictional feedback while student endpoint stays disabled",as
    if(prevEnabled===undefined)delete process.env.PILOT_ENABLED;else process.env.PILOT_ENABLED=prevEnabled;
    if(prevToken===undefined)delete process.env.PILOT_ACCESS_TOKEN;else process.env.PILOT_ACCESS_TOKEN=prevToken;
    if(prevAssessment===undefined)delete process.env.ASSESSMENT_ENABLED;else process.env.ASSESSMENT_ENABLED=prevAssessment;
+  }
+ });
+});
+
+test("pilot global daily cap blocks additional AI provider calls",async()=>{
+ await withFakeService("pilot_global_limited",async seen=>{
+  const prevEnabled=process.env.PILOT_ENABLED,prevToken=process.env.PILOT_ACCESS_TOKEN;
+  process.env.PILOT_ENABLED="true";process.env.PILOT_ACCESS_TOKEN="p".repeat(40);
+  try{
+   const res=makeRes();await pilot(makeReq(example,{"x-bss-pilot-key":"p".repeat(40)}),res);
+   assert.equal(res.status,429);
+   assert.equal(seen.some(x=>x.url.includes("api.openai.com")),false);
+  }finally{
+   if(prevEnabled===undefined)delete process.env.PILOT_ENABLED;else process.env.PILOT_ENABLED=prevEnabled;
+   if(prevToken===undefined)delete process.env.PILOT_ACCESS_TOKEN;else process.env.PILOT_ACCESS_TOKEN=prevToken;
   }
  });
 });
