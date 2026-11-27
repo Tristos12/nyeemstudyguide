@@ -76,23 +76,32 @@ function extractOutput(data){
 module.exports=async function handler(req,res){
   if(req.method==="OPTIONS"){
     if(!validOrigin(req)){res.writeHead(403,headers);return res.end()}
-    res.writeHead(204,{...headers,"Access-Control-Allow-Origin":ALLOWED_ORIGIN,"Access-Control-Allow-Methods":"POST, OPTIONS","Access-Control-Allow-Headers":"Content-Type","Access-Control-Max-Age":"600"});
+    res.writeHead(204,{...headers,"Access-Control-Allow-Origin":ALLOWED_ORIGIN,"Access-Control-Allow-Methods":"POST, OPTIONS","Access-Control-Allow-Headers":req.pilotMode?"Content-Type, X-BSS-Pilot-Key":"Content-Type","Access-Control-Max-Age":"600"});
     return res.end();
   }
   if(req.method!=="POST")return json(res,405,{error:"method_not_allowed"},req.headers.origin);
   if(!validOrigin(req))return json(res,403,{error:"origin_not_allowed"});
-  if(process.env.ASSESSMENT_ENABLED!=="true")return json(res,503,{error:"assessment_not_enabled"},req.headers.origin);
+  if(process.env.ASSESSMENT_ENABLED!=="true" && req.pilotMode!==true)return json(res,503,{error:"assessment_not_enabled"},req.headers.origin);
   const gateway=process.env.AI_PROVIDER==="vercel-gateway";
   const providerReady=gateway?Boolean(process.env.AI_GATEWAY_MODEL):Boolean(process.env.OPENAI_API_KEY&&process.env.OPENAI_MODEL);
   if(!providerReady||!["TURNSTILE_SECRET_KEY","KV_REST_API_URL","KV_REST_API_TOKEN","RATE_LIMIT_SALT"].every(k=>process.env[k]))
     return json(res,503,{error:"service_not_configured"},req.headers.origin);
   try{
-    let raw="";
-    for await(const part of req){
-      raw+=part.toString();
-      if(raw.length>18000)return json(res,413,{error:"request_too_large"},req.headers.origin);
+    // Vercel Node functions may have already parsed req.body. Support both parsed and raw streams.
+    let body;
+    if(req.body!==undefined && req.body!==null){
+      const raw=typeof req.body==="string"?req.body:JSON.stringify(req.body);
+      if(Buffer.byteLength(raw,"utf8")>18000)return json(res,413,{error:"request_too_large"},req.headers.origin);
+      try{body=typeof req.body==="string"?JSON.parse(raw):req.body}
+      catch{return json(res,400,{error:"invalid_json"},req.headers.origin)}
+    }else{
+      let raw="";
+      for await(const part of req){
+        raw+=part.toString();
+        if(Buffer.byteLength(raw,"utf8")>18000)return json(res,413,{error:"request_too_large"},req.headers.origin);
+      }
+      try{body=JSON.parse(raw)}catch{return json(res,400,{error:"invalid_json"},req.headers.origin)}
     }
-    let body;try{body=JSON.parse(raw)}catch{return json(res,400,{error:"invalid_json"},req.headers.origin)}
     const {answer,task,rubric,turnstileToken,consent}=body||{};
     if(consent!==true)return json(res,400,{error:"consent_required"},req.headers.origin);
     if(typeof answer!=="string"||answer.trim().length<30||answer.length>6000||
