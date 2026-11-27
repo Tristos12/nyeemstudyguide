@@ -26,7 +26,7 @@ jobs:
         working-directory: assessment-backend
         env:
           ASSESSMENT_ENABLED: 'false'
-        run: node --test assessment.test.cjs
+        run: node --test assessment.test.cjs feedback-pipeline.test.cjs
       - name: Smoke-test public deployed endpoint (no student data)
         if: github.event_name == 'push'
         env:
