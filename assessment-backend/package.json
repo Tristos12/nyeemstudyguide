@@ -1,0 +1,15 @@
+{
+  "name": "bss-ctec-writing-feedback",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Disabled-by-default teacher-supervised writing feedback API",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test assessment.test.cjs feedback-pipeline.test.cjs"
+  },
+  "dependencies": {
+    "@vercel/oidc": "4.0.9"
+  }
+}
