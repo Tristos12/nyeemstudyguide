@@ -50,5 +50,25 @@ jobs:
           assert.equal(refused.status, 503, 'Disabled assessment must refuse requests');
           const result = await refused.json();
           assert.equal(result.error, 'assessment_not_enabled');
-          console.log('Production health and disabled-state smoke test passed.');
+          // Reproduce browser CORS preflight without submitting work or using pilot keys.
+          const preflight = await fetch(base + '/api/pilot', {
+            method:'OPTIONS',signal:AbortSignal.timeout(12000),
+            headers:{
+              Origin:'https://tristos12.github.io',
+              Referer:'https://tristos12.github.io/nyeemstudyguide/ctec-teacher-trial.html',
+              'Access-Control-Request-Method':'POST',
+              'Access-Control-Request-Headers':'content-type,x-bss-pilot-key'
+            }
+          });
+          assert.equal(preflight.status,204,'Pilot CORS preflight must succeed: '+preflight.status);
+          assert.equal(preflight.headers.get('access-control-allow-origin'),'https://tristos12.github.io');
+          assert.match(preflight.headers.get('access-control-allow-headers')||'',/x-bss-pilot-key/i);
+          const pilotRefusal=await fetch(base+'/api/pilot',{
+            method:'POST',signal:AbortSignal.timeout(12000),
+            headers:{Origin:'https://tristos12.github.io',Referer:'https://tristos12.github.io/nyeemstudyguide/ctec-teacher-trial.html','Content-Type':'application/json','X-BSS-Pilot-Key':'deliberately-invalid'},
+            body:JSON.stringify({answer:'Only synthetic test content.',task:'Test',rubric:'Test',consent:true,turnstileToken:'invalid'})
+          });
+          assert.equal(pilotRefusal.status,403,'Invalid pilot token must be rejected');
+          assert.equal(pilotRefusal.headers.get('access-control-allow-origin'),'https://tristos12.github.io');
+          console.log('Production health, disabled-state, and protected pilot CORS checks passed.');
           NODE
