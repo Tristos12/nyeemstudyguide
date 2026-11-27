@@ -132,3 +132,19 @@ test("invalid or oversized responses never reach AI",async()=>{
   assert.equal(res.status,400);assert.equal(seen.length,0);
  });
 });
+
+test("contact details are blocked before external processing",async()=>{
+ await withFakeService("success",async seen=>{
+  const samples=[
+    "Please contact me at demo.student@example.com about my assignment.",
+    "My number is 758-555-0123 and I am writing this assignment.",
+    "Read https://example.com for my work and teacher feedback."
+  ];
+  for(const sample of samples){
+    const res=makeRes();await assess(makeReq({...example,answer:sample}),res);
+    assert.equal(res.status,400);
+    assert.equal(res.json.error,"remove_contact_details");
+  }
+  assert.equal(seen.length,0);
+ });
+});
