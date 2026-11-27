@@ -73,3 +73,18 @@ Use the **existing** local English self-review tool until the checklist is compl
 ### Offline teacher rating page
 
 Use the [CTEC Teacher Trial Scorecard](https://tristos12.github.io/nyeemstudyguide/ctec-teacher-trial.html) to review the eight fictional examples, enter feedback created during an approved synthetic test, score each criterion for reviewer A and reviewer B, compare decisions, and export CSV or JSON reports. This public webpage is **not access-controlled** and must never contain real student work, identifying details or confidential assessment records. Results stay in the browser until exported. It does not connect to the AI assessment service.
+
+### Protected live fictional-response pilot
+
+The teacher scorecard has a protected button to request genuine AI feedback for its eight fictional samples only. Access requires the dedicated server-side pilot gate and does not enable student assessments.
+
+1. In [Teacher Trial Scorecard](https://tristos12.github.io/nyeemstudyguide/ctec-teacher-trial.html), choose **Generate a strong private pilot key**. Use **Copy private key** to copy it.
+2. In the dedicated Vercel project's Environment Variables, add `PILOT_ACCESS_TOKEN` as **Sensitive** with Production selected; paste the key directly there. The key must contain at least 32 characters. Do not put it in GitHub or share it in chat.
+3. Add `PILOT_ENABLED=true` as a **Production** environment variable. Leave `ASSESSMENT_ENABLED=false`.
+4. Redeploy the backend to apply both settings.
+5. Open the teacher scorecard, enter your private pilot key, choose a fictional sample and click **Run AI trial for this fictional response**. Complete Turnstile's verification.
+6. Check the AI feedback for accuracy and helpfulness, rate it independently for reviewers A and B, and export the report.
+
+The browser does not store the pilot key in localStorage or download it with review scores. Redis enforces 10 requests per IP per hour and a shared maximum of 20 pilot requests per UTC day. The teacher pilot has an explicit security gate, but the webpage itself is publicly viewable; never use real student writing or identifying information.
+
+To shut off the pilot immediately, change `PILOT_ENABLED` back to `false` in Vercel and redeploy. Keep `ASSESSMENT_ENABLED=false` until formal approval and a student-facing privacy arrangement.
