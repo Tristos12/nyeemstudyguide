@@ -114,7 +114,7 @@ module.exports=async function handler(req,res){
         revisionPrompt:{type:"string"}
       }
     };
-    const gatewayToken=gateway?await require("@vercel/oidc").getVercelOidcToken():null;
+    const gatewayToken=gateway?await (await import("@vercel/oidc")).getVercelOidcToken():null;
     if(gateway&&!gatewayToken)throw new Error("gateway-auth-unavailable");
     const response=await fetch(gateway?"https://ai-gateway.vercel.sh/v1/responses":"https://api.openai.com/v1/responses",{
       method:"POST",
