@@ -27,3 +27,28 @@ jobs:
         env:
           ASSESSMENT_ENABLED: 'false'
         run: node --test assessment.test.cjs
+      - name: Smoke-test public deployed endpoint (no student data)
+        if: github.event_name == 'push'
+        env:
+          ASSESSMENT_URL: https://babonneau-ctec-writing-feedback.vercel.app
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const base = process.env.ASSESSMENT_URL;
+          const health = await fetch(base + '/api/health', {signal: AbortSignal.timeout(12000), headers: {'Accept': 'application/json'}});
+          assert.equal(health.status, 200, 'Health endpoint must be publicly reachable');
+          const state = await health.json();
+          assert.equal(state.service, 'ctec-writing-feedback');
+          assert.equal(state.assessmentEnabled, false, 'Students must remain disabled');
+          assert.equal(state.studentSubmissionsEnabled, false, 'No student submissions permitted');
+          const refused = await fetch(base + '/api/assess', {
+            method: 'POST', signal: AbortSignal.timeout(12000),
+            headers: {'Content-Type': 'application/json', Origin: 'https://tristos12.github.io', Referer: 'https://tristos12.github.io/nyeemstudyguide/ctec-english-guide.html'},
+            body: JSON.stringify({answer:'Fictional test response without personal information.', task:'TEST', rubric:'TEST', turnstileToken:'invalid'})
+          });
+          assert.equal(refused.status, 503, 'Disabled assessment must refuse requests');
+          const result = await refused.json();
+          assert.equal(result.error, 'assessment_not_enabled');
+          console.log('Production health and disabled-state smoke test passed.');
+          NODE
