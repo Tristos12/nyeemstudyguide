@@ -4,7 +4,7 @@ This directory contains a **separate, disabled-by-default** Vercel Node.js servi
 
 ## Status
 - Source code is prepared in `api/assess.js`.
-- **Not deployed or enabled.** No OpenAI key, secret or live URL has been placed in this repository.
+- **Deployed but disabled.** The dedicated Vercel project is `babonneau-ctec-writing-feedback` at `https://babonneau-ctec-writing-feedback.vercel.app`. The deployment's health and disabled-state smoke tests have passed. No AI secret has been placed in this repository.
 - No student data is sent anywhere until a dedicated backend is deployed and configured.
 - The browser's existing local draft feedback remains the fallback.
 
@@ -18,9 +18,13 @@ This directory contains a **separate, disabled-by-default** Vercel Node.js servi
 7. Obtain school approval and appropriate parent/student notices before sending writing from minors to an external AI processor. Use no student names or identifying details in writing tasks; avoid requesting sensitive personal content. Establish a retention policy and a way for students to opt out.
 8. Teacher review remains required before awarding formal grades, and no school-wide dashboard or record storage is included in this service.
 
+## Pre-activation test results
+
+GitHub Actions runs `assessment.test.cjs` and `feedback-pipeline.test.cjs` using fictional responses and mock network calls. They cover consent, forbidden origins, Turnstile rejection, rate limiting, provider errors, malformed AI outputs and the no-grade requirement. The workflow also checks production `/api/health` and rejection of `/api/assess` while disabled. This does not demonstrate real AI feedback quality or readiness for minors.
+
 ## Request/response
 
-POST `/api/assess` with JSON fields `task`, `rubric`, `answer`, and a valid `turnstileToken`.
+POST `/api/assess` with JSON fields `task`, `rubric`, `answer`, `consent: true`, and a valid `turnstileToken`.
 
 Response includes `feedback.overview`, `feedback.strengths`, `feedback.improvements`, `feedback.revisionPrompt`, `feedback.teacherReviewRequired = true`, `feedback.grade = null`.
 
