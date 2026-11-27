@@ -37,7 +37,9 @@ async function rateLimit(hash){
   if(!r.ok)throw new Error("rate-limit-unavailable");
   const out=await r.json();
   if(!Array.isArray(out)||out[0]?.error||out[1]?.error)throw new Error("rate-limit-unavailable");
-  return Number(out[0]?.result)<=10;
+  const count=Number(out[0]?.result);
+  if(!Number.isInteger(count)||count<1)throw new Error("rate-limit-invalid");
+  return count<=10;
 }
 async function sourceHash(v){
   const data=new TextEncoder().encode(process.env.RATE_LIMIT_SALT+":"+v);
@@ -48,7 +50,11 @@ function extractOutput(data){
   // Parse response output with validation; do not trust generated markup or links.
   const text=(data.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==="output_text").map(x=>x.text).join("");
   let obj=JSON.parse(text);
-  if(!obj||typeof obj!=="object")throw new Error("invalid-ai-output");
+  if(!obj||typeof obj!=="object"||
+      typeof obj.overview!=="string"||typeof obj.revisionPrompt!=="string"||
+      !Array.isArray(obj.strengths)||!Array.isArray(obj.improvements)||
+      !obj.strengths.every(x=>typeof x==="string")||!obj.improvements.every(x=>typeof x==="string"))
+    throw new Error("invalid-ai-output");
   const clamp=s=>String(s||"").slice(0,1200);
   return {
     overview:clamp(obj.overview),
@@ -77,10 +83,11 @@ module.exports=async function handler(req,res){
       if(raw.length>18000)return json(res,413,{error:"request_too_large"},req.headers.origin);
     }
     let body;try{body=JSON.parse(raw)}catch{return json(res,400,{error:"invalid_json"},req.headers.origin)}
-    const {answer,task,rubric,turnstileToken}=body||{};
+    const {answer,task,rubric,turnstileToken,consent}=body||{};
+    if(consent!==true)return json(res,400,{error:"consent_required"},req.headers.origin);
     if(typeof answer!=="string"||answer.trim().length<30||answer.length>6000||
        typeof task!=="string"||task.length>2000||typeof rubric!=="string"||rubric.length>1600||
-       typeof turnstileToken!=="string"||turnstileToken.length>2500)
+       typeof turnstileToken!=="string"||turnstileToken.length<10||turnstileToken.length>2500)
       return json(res,400,{error:"invalid_input"},req.headers.origin);
     const ip=(req.headers["x-forwarded-for"]||"").split(",")[0].trim();
     if(!(await verifyTurnstile(turnstileToken,ip)))return json(res,403,{error:"human_check_failed"},req.headers.origin);
