@@ -69,3 +69,7 @@ Dedicated Vercel project: `babonneau-ctec-writing-feedback`.
 GitHub Pages student website: `https://tristos12.github.io/nyeemstudyguide/`.
 
 Use the **existing** local English self-review tool until the checklist is completed. The CTEC AI integration in `assessment-config.js` must stay set to `enabled: false` throughout preparation.
+
+### Offline teacher rating page
+
+Use the [CTEC Teacher Trial Scorecard](https://tristos12.github.io/nyeemstudyguide/ctec-teacher-trial.html) to review the eight fictional examples, enter feedback created during an approved synthetic test, score each criterion for reviewer A and reviewer B, compare decisions, and export CSV or JSON reports. This public webpage is **not access-controlled** and must never contain real student work, identifying details or confidential assessment records. Results stay in the browser until exported. It does not connect to the AI assessment service.
