@@ -46,6 +46,14 @@ async function sourceHash(v){
   const bytes=await crypto.subtle.digest("SHA-256",data);
   return Buffer.from(bytes).toString("hex").slice(0,32);
 }
+function containsContactDetails(value){
+  // Conservative privacy filter for email addresses, web links and phone numbers.
+  // Not a complete personal-data detector: school procedures must also prohibit names and identifiers.
+  const text=String(value||"");
+  return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(text) ||
+    /(?:https?:\/\/|www\.)\S+/i.test(text) ||
+    /(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/.test(text);
+}
 function extractOutput(data){
   // Parse response output with validation; do not trust generated markup or links.
   const text=(data.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==="output_text").map(x=>x.text).join("");
@@ -89,6 +97,8 @@ module.exports=async function handler(req,res){
        typeof task!=="string"||task.length>2000||typeof rubric!=="string"||rubric.length>1600||
        typeof turnstileToken!=="string"||turnstileToken.length<10||turnstileToken.length>2500)
       return json(res,400,{error:"invalid_input"},req.headers.origin);
+    if(containsContactDetails(answer)||containsContactDetails(task)||containsContactDetails(rubric))
+      return json(res,400,{error:"remove_contact_details"},req.headers.origin);
     const ip=(req.headers["x-forwarded-for"]||"").split(",")[0].trim();
     if(!(await verifyTurnstile(turnstileToken,ip)))return json(res,403,{error:"human_check_failed"},req.headers.origin);
     const key=await sourceHash(ip||"unknown");
