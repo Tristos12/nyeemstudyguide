@@ -8,9 +8,11 @@ This directory contains a **separate, disabled-by-default** Vercel Node.js servi
 - No student data is sent anywhere until a dedicated backend is deployed and configured.
 - The browser's existing local draft feedback remains the fallback.
 
+See [FINAL_SETUP.md](./FINAL_SETUP.md) for the remaining administrator steps. AI student submissions remain disabled until school approval and technical verification.
+
 ## Deploy safely
 1. Create a separate Vercel project using this GitHub repository, with **Root Directory** `assessment-backend`; do not point the existing multiplayer project at this folder.
-2. Add server-only environment variables in Vercel, never GitHub or client JS: `OPENAI_API_KEY`, `OPENAI_MODEL`, `TURNSTILE_SECRET_KEY`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `RATE_LIMIT_SALT`. Use a supported model capable of Responses API structured JSON.
+2. The dedicated Vercel project now uses `AI_PROVIDER=vercel-gateway` and `AI_GATEWAY_MODEL=openai/gpt-5.4-mini`. It authenticates server-side through Vercel OIDC, avoiding an external provider key. Configure the remaining protected environment variables in Vercel: `TURNSTILE_SECRET_KEY`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `RATE_LIMIT_SALT`. Check the model and spending limits in Vercel AI Gateway before enabling. The optional legacy direct-provider mode still accepts `OPENAI_API_KEY` and `OPENAI_MODEL` if explicitly chosen.
 3. Configure a dedicated Cloudflare Turnstile widget for `tristos12.github.io`, and configure the Redis REST credentials for persistent request limits. This implementation allows at most **10 valid requests per hashed IP per hour**, and refuses requests if the limiter fails.
 4. Keep `ASSESSMENT_ENABLED` unset while validating accessibility, privacy requirements and request handling. Set it to `true` only after a supervised test.
 5. Configure the public endpoint URL and public Turnstile site key in the separate client configuration when ready. No secret values belong there.
